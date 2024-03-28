@@ -9,6 +9,7 @@ It is a REST API running by go fiber with basic CRUD which follows the Controlle
 - With a [simple script](#generate-new-module) `cmd/gen/gen.go` for generate new module to `internal/modules/`.
 - With the example of JWT auth in the (login API)[#login].
 - Can generate swagger doc.
+- Make use of `viper` for loading env variables in config.
 - With a logging wrapper by `zap` middleware which output the request's logs in `log/`, the log file may be used for centralised log server like ELK or Signoz. 
 
 # Quick start by docker-compose
