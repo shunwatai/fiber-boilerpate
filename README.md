@@ -1,7 +1,7 @@
 # Fiber boilerpate
-It is my toy project for learning go, just a starter project for myself to build REST API.
+This project is for learning purpose, just a starter project for myself to learn go and start a REST API quicker.
 
-It is a REST API running by go fiber with basic CRUD which follows the Controller-Service-Repository like Spring or Laravel's structure.
+It is running by fiber with basic CRUD routes which follows the Controller-Service-Repository pattern like Spring or Laravel's structure.
 
 # Features
 - With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` for storing records in DB. Just raw sql without ORM.
@@ -10,7 +10,7 @@ It is a REST API running by go fiber with basic CRUD which follows the Controlle
 - With the example of JWT auth in the (login API)[#login].
 - Can generate swagger doc.
 - Make use of `viper` for loading env variables in config.
-- With a logging wrapper by `zap` middleware which output the request's logs in `log/`, the log file may be used for centralised log server like ELK or Signoz. 
+- With a logging wrapper by `zap` which uses as middleware for writing the request's logs in `log/`, the log file may be used for centralised log server like ELK or Signoz. 
 
 # Quick start by docker-compose
 1. [Start the databases](#start-databases-for-development)
@@ -256,6 +256,9 @@ Afterwards, the following should be created:
 Then you have to edit the `interal/modules/post/type.go` for its fields,
 and edit the migration files in `migrations/<postgres/mariadb/sqlite/mongodb>` for its columns and run the migrations.
 Then the `post`'s CRUD should be ready.
+
+# Modules details
+[password-reset](interal/modules/passwordReset)
 
 # Run tests
 To disable cache when running tests, run with options: `-count=1`
