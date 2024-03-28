@@ -1,20 +1,54 @@
-
 # Install dependencies
 ## Air - hot reload
+```
 go install github.com/cosmtrek/air@latest
+```
 ## Go-migrate - db migration
+```
 go install -tags 'postgres mysql sqlite3 mongodb' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+```
 ## Swag - swagger doc
+```
 go install github.com/swaggo/swag/cmd/swag@latest
+```
 
-# Edit config
-If run by docker, then edit `configs/`
-If run without docker, then edit `configs/`
+# Config
+## Edit config
+For run without docker
+```
+cp configs/localhost.yaml.sample configs/localhost.yaml
+```
+
+For run by docker
+```
+cp configs/docker.yaml.sample configs/docker.yaml
+```
+
+## Set the db driver
+At `database` section, edit the `engine`
+```
+...
+database:
+  engine: "postgres/sqlite/mariadb/mongodb"
+...
+```
 
 # Start databases for development
+1. copy and then edit the `db.env` if needed
+```
+cp db.env.sample db.env
+```
+
+2. Start all by docker-compose
+Postgres, Mariadb & Mongodb will be started
+```
+docker-compose -f compose-db.yaml up -d
+```
 
 # Start the api server
 ## For development
+Set the `env` to `local` in the `configs/<localhost/docker>.yaml`
+
 ### Start without docker
 ```
 air
@@ -37,6 +71,8 @@ make docker-dev-log
 ```
 
 ## For production
+Set the `env` to `prod` in the `configs/<localhost/docker>.yaml`
+
 ### Start by docker
 Run the production container
 ```
@@ -54,7 +90,6 @@ make docker-prod-log
 ```
 
 # DB Migration
-
 ## Create new migration
 ```migrate create -ext sql -dir migrations/<dbEngine(postgres/mariadb/sqlite)> -seq <migrationName>```
 
@@ -180,7 +215,6 @@ $ swag init
 ```
 
 ## go to the swagger page by web browser
-
 http://localhost:7000/swagger/index.html
 
 # Send log to Signoz

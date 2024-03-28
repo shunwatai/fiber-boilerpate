@@ -1,0 +1,65 @@
+services:
+  postgres-dev:
+    image: postgres:15-alpine
+    env_file:
+      - ./db.env
+    restart: always
+    ports:
+      - 5432:5432
+    networks:
+      - api
+    volumes:
+      - pg-data-dev:/var/lib/postgresql/data
+      - ./db-backup/:/db-backup/
+
+  mariadb-dev:
+    image: mariadb:11.1
+    env_file:
+      - ./db.env
+    restart: always
+    ports:
+      - 3306:3306
+    networks:
+      - api
+    volumes:
+      - mariadb-data-dev:/var/lib/mariadb/data
+      - ./db-backup/:/db-backup/
+
+  mongodb-dev:
+    image: mongo:5.0.12
+    restart: always
+    env_file:
+      - ./db.env
+    volumes:
+      - mongo-data-dev:/data/db 
+      - ./db-backup/:/db-backup/
+    ports:
+      - 27017:27017
+    networks:
+      - api
+
+  # web client for postgres & mariadb
+  adminer:
+    image: adminer:4.8.1
+    restart: always
+    ports:
+      - 18890:8080
+    networks:
+      - api
+
+  # web client for mongo
+  nosqlclient:
+    image: mongoclient/mongoclient
+    ports:
+      - 3100:3000
+    networks:
+      - api
+
+volumes:
+  pg-data-dev:
+  mariadb-data-dev:
+  mongo-data-dev:
+
+networks:
+  api:
+    external: true

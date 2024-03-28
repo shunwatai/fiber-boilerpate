@@ -15,19 +15,19 @@ database:
     pass: "user"
     database: "fiber-starter"
   mariadb:
-    host: "mariadb"
+    host: "mariadb-dev" # service's name in compose-db.yaml
     port: "3306"
     user: "user"
     pass: "password"
     database: "fiber-starter"
   postgres:
-    host: "postgres-dev"
+    host: "postgres-dev" # service's name in compose-db.yaml
     port: "5432"
     user: "user"
     pass: "password"
     database: "fiber-starter"
   mongodb:
-    host: "mongodb"
+    host: "mongodb-dev" # service's name in compose-db.yaml
     port: "27017"
     user: "user"
     pass: "password"
@@ -58,6 +58,7 @@ notification:
     user: "xxxx@gmail.com"
     pass: "xxxxyyyyyzzzxz"
 
-redis:
-  host: "localhost"
-  port: "6379"
+# Play with it later
+#redis:
+#  host: "localhost"
+#  port: "6379"

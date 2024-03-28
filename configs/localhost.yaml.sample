@@ -58,6 +58,7 @@ notification:
     user: "xxxx@gmail.com"
     pass: "xxxxyyyyyzzzxz"
 
-redis:
-  host: "localhost"
-  port: "6379"
+# Play with it later
+#redis:
+#  host: "localhost"
+#  port: "6379"
