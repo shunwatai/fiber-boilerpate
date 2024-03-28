@@ -1,3 +1,10 @@
+# Quick start by docker-compose
+1. [Start the databases](#start-databases-for-development)
+2. [Run database migrations](#run-migration)
+3. [Set the database in config](#for-run-by-docker)
+3. [Start fiber api](#start-by-docker)
+4. [Test the apis by curl](#test-sample-APIs)
+
 # Install dependencies
 ## Air - hot reload
 ```
@@ -14,12 +21,12 @@ go install github.com/swaggo/swag/cmd/swag@latest
 
 # Config
 ## Edit config
-For run without docker
+### For run without docker
 ```
 cp configs/localhost.yaml.sample configs/localhost.yaml
 ```
 
-For run by docker
+### For run by docker
 ```
 cp configs/docker.yaml.sample configs/docker.yaml
 ```
@@ -91,11 +98,19 @@ make docker-prod-log
 
 # DB Migration
 ## Create new migration
-```migrate create -ext sql -dir migrations/<dbEngine(postgres/mariadb/sqlite)> -seq <migrationName>```
+```
+migrate create -ext sql -dir migrations/<dbEngine(postgres/mariadb/sqlite)> -seq <migrationName>
+```
 
 e.g.
-```migrate create -ext sql -dir migrations/postgres -seq add_new_col_to_users```
-```migrate create -ext json -dir migrations/mongodb -seq add_xxx_index_to_users```
+postgres:
+```
+migrate create -ext sql -dir migrations/postgres -seq add_new_col_to_users
+```
+mongodb:
+```
+migrate create -ext json -dir migrations/mongodb -seq add_xxx_index_to_users
+```
 
 ## Run migration
 ### Sqlite
@@ -174,6 +189,22 @@ or
 migrate -source file://migrations/mongodb -database "mongodb://user:password@localhost:27017/fiber-starter?authSource=admin" down 1
 ```
 
+# Test sample APIs
+## ping
+```
+curl --request GET \
+  --url http://localhost:7000/ping \
+  --header 'User-Agent: insomnium/0.2.3-a'
+```
+
+## login
+```
+curl --request POST \
+  --url http://localhost:7000/api/auth/login \
+  --header 'Content-Type: application/json' \
+  --data '{"name":"admin","password":"admin"}'
+```
+
 # Run tests
 To disable cache when running tests, run with options: `-count=1`
 ref: https://stackoverflow.com/a/49999321
@@ -207,7 +238,7 @@ go test -v ./internal/database -run TestMongodbConstructSelectStmtFromQuerystrin
 
 # Swagger
 ## Edit the doc
-In each module under `internal/modules/<module>/route`, edit the swagger doc before generate the `docs/` directory at next section below.
+In each module under `internal/modules/<module>/route.go`, edit the swagger doc before generate the `docs/` directory at next section below.
 
 ## Format swagger's comments & generate the swagger docs
 ```
