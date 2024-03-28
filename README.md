@@ -1,9 +1,10 @@
 # Fiber boilerpate
 It is my toy project for learning go, just a starter project for myself to build REST API.
+
 It is a REST API running by go fiber with basic CRUD which follows the Controller-Service-Repository like Spring or Laravel's structure.
 
 # Features
-- With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` for storing records without ORM.
+- With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` for storing records in DB. Just raw sql without ORM.
 - With example modules like `users`, `todos`, `documents` etc. in `interal/modules/`, with CRUD APIs.
 - With a [simple script](#generate-new-module) `cmd/gen/gen.go` for generate new module to `internal/modules/`.
 - With the example of JWT auth in the (login API)[#login].
