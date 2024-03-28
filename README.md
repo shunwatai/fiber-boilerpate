@@ -99,7 +99,7 @@ e.g.
 
 ## Run migration
 ### Sqlite
-Run migrations
+#### Run migrations
 ```
 go run main.go migrate-up sqlite
 ```
@@ -108,7 +108,7 @@ or
 migrate -source file://migrations/sqlite -database "sqlite3://fiber-starter.db?_auth&_auth_user=user&_auth_pass=user&_auth_crypt=sha1" up
 ```
 
-Revert migration
+#### Revert migration
 ```
 go run main.go migrate-down sqlite
 ```
@@ -118,7 +118,7 @@ migrate -source file://migrations/sqlite -database "sqlite3://fiber-starter.db?_
 ```
 
 ### Mariadb
-Run migrations
+#### Run migrations
 ```
 go run main.go migrate-up mariadb
 ```
@@ -127,7 +127,7 @@ or
 migrate -source file://migrations/mariadb -database "mysql://user:password@tcp(localhost:3306)/fiber-starter" up
 ```
 
-Revert migration
+#### Revert migration
 ```
 go run main.go migrate-down mariadb
 ```
@@ -137,7 +137,7 @@ migrate -source file://migrations/mariadb -database "mysql://user:password@tcp(l
 ```
 
 ### Postgres
-Run migrations
+#### Run migrations
 ```
 go run main.go migrate-up postgres
 ```
@@ -146,7 +146,7 @@ or
 migrate -source file://migrations/postgres -database "postgres://user:password@localhost:5432/fiber-starter?sslmode=disable" up
 ```
 
-Revert migration
+#### Revert migration
 ```
 go run main.go migrate-down postgres
 ```
@@ -156,7 +156,7 @@ migrate -source file://migrations/postgres -database "postgres://user:password@l
 ```
 
 ### Mongodb
-Run migrations
+#### Run migrations
 ```
 go run main.go migrate-up mongodb
 ```
@@ -165,7 +165,7 @@ or
 migrate -source file://migrations/mongodb -database "mongodb://user:password@localhost:27017/fiber-starter?authSource=admin" up
 ```
 
-Revert migration
+#### Revert migration
 ```
 go run main.go migrate-down mongodb
 ```
@@ -206,9 +206,10 @@ go test -v ./internal/database -run TestMongodbConstructSelectStmtFromQuerystrin
 ```
 
 # Swagger
+## Edit the doc
+In each module under `internal/modules/<module>/route`, edit the swagger doc before generate the `docs/` directory at next section below.
 
-## format swagger's comments & generate the swagger docs
-
+## Format swagger's comments & generate the swagger docs
 ```
 $ swag fmt
 $ swag init

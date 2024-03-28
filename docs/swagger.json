@@ -1,0 +1,1387 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a sample API starter by fiber.",
+        "title": "Golang Fiber API starter",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:7000",
+    "basePath": "/api",
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "login user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Login user",
+                "parameters": [
+                    {
+                        "description": "Login request json",
+                        "name": "User",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{ \"name\": \"admin\", \"password\": \"admin\" }"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "description": "refresh user",
+                "tags": [
+                    "users"
+                ],
+                "summary": "Refrese user",
+                "responses": {}
+            }
+        },
+        "/documents": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get Documents",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "documents"
+                ],
+                "summary": "List Documents",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "example": 2,
+                        "description": "id",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "example": 2,
+                        "description": "search by userId",
+                        "name": "userId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "go practice",
+                        "description": "search by task",
+                        "name": "task",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "search by done",
+                        "name": "done",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1",
+                        "description": "page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "10",
+                        "description": "items per page for pagination",
+                        "name": "items",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create document(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "documents"
+                ],
+                "summary": "Create new document(s)",
+                "parameters": [
+                    {
+                        "description": "single Document request json",
+                        "name": "Document",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{ \"task\": \"take shower\", \"done\": false }"
+                        }
+                    },
+                    {
+                        "description": "batch Document request json",
+                        "name": "Documents",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[{ \"task\": \"take shower\", \"done\": false }, { \"task\": \"go practice\", \"done\": false }]"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete document(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "documents"
+                ],
+                "summary": "Delete document(s)",
+                "parameters": [
+                    {
+                        "description": "array of document IDs",
+                        "name": "documentIds",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[1,2,3]"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update document(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "documents"
+                ],
+                "summary": "Update existing document(s)",
+                "parameters": [
+                    {
+                        "description": "single Document request json",
+                        "name": "Document",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{ \"id\":2, \"task\": \"take shower\", \"done\": false }"
+                        }
+                    },
+                    {
+                        "description": "batch Document request json",
+                        "name": "Documents",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[{ \"id\":2, \"task\": \"take shower\", \"done\": false, createdAt: \"2021-01-11\" }, { \"id\":3, \"task\": \"go practice\", \"done\": false }]"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/documents/{documentId}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get Document by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "documents"
+                ],
+                "summary": "Get Document by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 12,
+                        "description": "document ID",
+                        "name": "documentId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/documents/{documentId}/download": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "download document by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "documents"
+                ],
+                "summary": "Download Document by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 123,
+                        "description": "document ID",
+                        "name": "documentId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    }
+                }
+            }
+        },
+        "/logs": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get Logs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "summary": "List Logs",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "example": 2,
+                        "description": "id",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "example": 2,
+                        "description": "search by userId",
+                        "name": "userId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "go practice",
+                        "description": "search by task",
+                        "name": "task",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "search by done",
+                        "name": "done",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1",
+                        "description": "page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "10",
+                        "description": "items per page for pagination",
+                        "name": "items",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create log(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "summary": "Create new log(s)",
+                "parameters": [
+                    {
+                        "description": "single Log request json",
+                        "name": "Log",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{ \"task\": \"take shower\", \"done\": false }"
+                        }
+                    },
+                    {
+                        "description": "batch Log request json",
+                        "name": "Logs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[{ \"task\": \"take shower\", \"done\": false }, { \"task\": \"go practice\", \"done\": false }]"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete log(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "summary": "Delete log(s)",
+                "parameters": [
+                    {
+                        "description": "array of log IDs",
+                        "name": "logIds",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[1,2,3]"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update log(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "summary": "Update existing log(s)",
+                "parameters": [
+                    {
+                        "description": "single Log request json",
+                        "name": "Log",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{ \"id\":2, \"task\": \"take shower\", \"done\": false }"
+                        }
+                    },
+                    {
+                        "description": "batch Log request json",
+                        "name": "Logs",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[{ \"id\":2, \"task\": \"take shower\", \"done\": false, createdAt: \"2021-01-11\" }, { \"id\":3, \"task\": \"go practice\", \"done\": false }]"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/logs/{logId}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get Log by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "summary": "Get Log by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 12,
+                        "description": "log ID",
+                        "name": "logId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/password-resets": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get PasswordResets",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "passwordResets"
+                ],
+                "summary": "List PasswordResets",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "example": 2,
+                        "description": "id",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "example": 2,
+                        "description": "search by userId",
+                        "name": "userId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "go practice",
+                        "description": "search by task",
+                        "name": "task",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "search by done",
+                        "name": "done",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1",
+                        "description": "page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "10",
+                        "description": "items per page for pagination",
+                        "name": "items",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create passwordReset(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "passwordResets"
+                ],
+                "summary": "Create new passwordReset(s)",
+                "parameters": [
+                    {
+                        "description": "single PasswordReset request json",
+                        "name": "PasswordReset",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{ \"task\": \"take shower\", \"done\": false }"
+                        }
+                    },
+                    {
+                        "description": "batch PasswordReset request json",
+                        "name": "PasswordResets",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[{ \"task\": \"take shower\", \"done\": false }, { \"task\": \"go practice\", \"done\": false }]"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete passwordReset(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "passwordResets"
+                ],
+                "summary": "Delete passwordReset(s)",
+                "parameters": [
+                    {
+                        "description": "array of passwordReset IDs",
+                        "name": "passwordResetIds",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[1,2,3]"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update passwordReset(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "passwordResets"
+                ],
+                "summary": "Update existing passwordReset(s)",
+                "parameters": [
+                    {
+                        "description": "single PasswordReset request json",
+                        "name": "PasswordReset",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{ \"id\":2, \"task\": \"take shower\", \"done\": false }"
+                        }
+                    },
+                    {
+                        "description": "batch PasswordReset request json",
+                        "name": "PasswordResets",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[{ \"id\":2, \"task\": \"take shower\", \"done\": false, createdAt: \"2021-01-11\" }, { \"id\":3, \"task\": \"go practice\", \"done\": false }]"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/password-resets/{passwordResetId}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get PasswordReset by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "passwordResets"
+                ],
+                "summary": "Get PasswordReset by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 12,
+                        "description": "passwordReset ID",
+                        "name": "passwordResetId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/qrcodes": {
+            "post": {
+                "description": "Get Qrcode content from pdf",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "qrcodes"
+                ],
+                "summary": "Get Qrcode content from pdf",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "A document file like image or pdf",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/todo-documents": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get TodoDocuments",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "todoDocuments"
+                ],
+                "summary": "List TodoDocuments",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "example": 2,
+                        "description": "id",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "example": 2,
+                        "description": "search by userId",
+                        "name": "userId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "go practice",
+                        "description": "search by task",
+                        "name": "task",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "search by done",
+                        "name": "done",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1",
+                        "description": "page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "10",
+                        "description": "items per page for pagination",
+                        "name": "items",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create todoDocument(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "todoDocuments"
+                ],
+                "summary": "Create new todoDocument(s)",
+                "parameters": [
+                    {
+                        "description": "single TodoDocument request json",
+                        "name": "TodoDocument",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{ \"task\": \"take shower\", \"done\": false }"
+                        }
+                    },
+                    {
+                        "description": "batch TodoDocument request json",
+                        "name": "TodoDocuments",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[{ \"task\": \"take shower\", \"done\": false }, { \"task\": \"go practice\", \"done\": false }]"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete todoDocument(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "todoDocuments"
+                ],
+                "summary": "Delete todoDocument(s)",
+                "parameters": [
+                    {
+                        "description": "array of todoDocument IDs",
+                        "name": "todoDocumentIds",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[1,2,3]"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update todoDocument(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "todoDocuments"
+                ],
+                "summary": "Update existing todoDocument(s)",
+                "parameters": [
+                    {
+                        "description": "single TodoDocument request json",
+                        "name": "TodoDocument",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{ \"id\":2, \"task\": \"take shower\", \"done\": false }"
+                        }
+                    },
+                    {
+                        "description": "batch TodoDocument request json",
+                        "name": "TodoDocuments",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[{ \"id\":2, \"task\": \"take shower\", \"done\": false, createdAt: \"2021-01-11\" }, { \"id\":3, \"task\": \"go practice\", \"done\": false }]"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/todo-documents/{todoDocumentId}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get TodoDocument by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "todoDocuments"
+                ],
+                "summary": "Get TodoDocument by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 12,
+                        "description": "todoDocument ID",
+                        "name": "todoDocumentId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/todos": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get Todos",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "todos"
+                ],
+                "summary": "List Todos",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "example": 2,
+                        "description": "id",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "example": 2,
+                        "description": "search by userId",
+                        "name": "userId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "go practice",
+                        "description": "search by task",
+                        "name": "task",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "search by done",
+                        "name": "done",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1",
+                        "description": "page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "10",
+                        "description": "items per page for pagination",
+                        "name": "items",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create todo(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "todos"
+                ],
+                "summary": "Create new todo(s)",
+                "parameters": [
+                    {
+                        "description": "single Todo request json",
+                        "name": "Todo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{ \"task\": \"take shower\", \"done\": false }"
+                        }
+                    },
+                    {
+                        "description": "batch Todo request json",
+                        "name": "Todos",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[{ \"task\": \"take shower\", \"done\": false }, { \"task\": \"go practice\", \"done\": false }]"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete todo(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "todos"
+                ],
+                "summary": "Delete todo(s)",
+                "parameters": [
+                    {
+                        "description": "array of todo IDs",
+                        "name": "todoIds",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[1,2,3]"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update todo(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "todos"
+                ],
+                "summary": "Update existing todo(s)",
+                "parameters": [
+                    {
+                        "description": "single Todo request json",
+                        "name": "Todo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{ \"id\":2, \"task\": \"take shower\", \"done\": false }"
+                        }
+                    },
+                    {
+                        "description": "batch Todo request json",
+                        "name": "Todos",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[{ \"id\":2, \"task\": \"take shower\", \"done\": false, createdAt: \"2021-01-11\" }, { \"id\":3, \"task\": \"go practice\", \"done\": false }]"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/todos/{todoId}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get Todo by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "todos"
+                ],
+                "summary": "Get Todo by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 12,
+                        "description": "todo ID",
+                        "name": "todoId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/users": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get Users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "List Users",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "example": 2,
+                        "description": "id",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "tom",
+                        "description": "search by name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "will",
+                        "description": "search by firstName",
+                        "name": "firstName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "smith",
+                        "description": "search by lastName",
+                        "name": "lastName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": false,
+                        "description": "search by disabled",
+                        "name": "disabled",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1",
+                        "description": "page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "10",
+                        "description": "items per page for pagination",
+                        "name": "items",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create user(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Create new user(s)",
+                "parameters": [
+                    {
+                        "description": "single User request json",
+                        "name": "User",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{ \"task\": \"take shower\", \"done\": false }"
+                        }
+                    },
+                    {
+                        "description": "batch User request json",
+                        "name": "Users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[{ \"task\": \"take shower\", \"done\": false }, { \"task\": \"go practice\", \"done\": false }]"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete user(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Delete user(s)",
+                "parameters": [
+                    {
+                        "description": "array of user IDs",
+                        "name": "userIds",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[1,2,3]"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update user(s)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update existing user(s)",
+                "parameters": [
+                    {
+                        "description": "single User request json",
+                        "name": "User",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{ \"id\":2, \"task\": \"take shower\", \"done\": false }"
+                        }
+                    },
+                    {
+                        "description": "batch User request json",
+                        "name": "Users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "[{ \"id\":2, \"task\": \"take shower\", \"done\": false, createdAt: \"2021-01-11\" }, { \"id\":3, \"task\": \"go practice\", \"done\": false }]"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/users/{userId}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get User by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get User by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 12,
+                        "description": "user ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

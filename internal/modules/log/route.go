@@ -71,7 +71,7 @@ func GetById(c *fiber.Ctx) error {
 //	@Tags			logs
 //	@Accept			json
 //	@Produce		json
-//	@Param			Log	body	string	true	"single Log request json"	SchemaExample({ "task": "take shower", "done": false })
+//	@Param			Log		body	string	true	"single Log request json"	SchemaExample({ "task": "take shower", "done": false })
 //	@Param			Logs	body	string	true	"batch Log request json"	SchemaExample([{ "task": "take shower", "done": false }, { "task": "go practice", "done": false }])
 //	@Security		ApiKeyAuth
 //	@Router			/logs [post]
@@ -86,7 +86,7 @@ func Create(c *fiber.Ctx) error {
 //	@Tags			logs
 //	@Accept			json
 //	@Produce		json
-//	@Param			Log	body	string	true	"single Log request json"	SchemaExample({ "id":2, "task": "take shower", "done": false })
+//	@Param			Log		body	string	true	"single Log request json"	SchemaExample({ "id":2, "task": "take shower", "done": false })
 //	@Param			Logs	body	string	true	"batch Log request json"	SchemaExample([{ "id":2, "task": "take shower", "done": false, createdAt: "2021-01-11" }, { "id":3, "task": "go practice", "done": false }])
 //	@Security		ApiKeyAuth
 //	@Router			/logs [patch]

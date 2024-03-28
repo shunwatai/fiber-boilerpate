@@ -1,0 +1,928 @@
+basePath: /api
+host: localhost:7000
+info:
+  contact: {}
+  description: This is a sample API starter by fiber.
+  title: Golang Fiber API starter
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: login user
+      parameters:
+      - description: Login request json
+        in: body
+        name: User
+        required: true
+        schema:
+          example: '{ "name": "admin", "password": "admin" }'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Login user
+      tags:
+      - users
+  /auth/refresh:
+    post:
+      description: refresh user
+      responses: {}
+      summary: Refrese user
+      tags:
+      - users
+  /documents:
+    delete:
+      consumes:
+      - application/json
+      description: delete document(s)
+      parameters:
+      - description: array of document IDs
+        in: body
+        name: documentIds
+        required: true
+        schema:
+          example: '[1,2,3]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Delete document(s)
+      tags:
+      - documents
+    get:
+      consumes:
+      - application/json
+      description: get Documents
+      parameters:
+      - description: id
+        example: 2
+        in: query
+        name: id
+        type: number
+      - description: search by userId
+        example: 2
+        in: query
+        name: userId
+        type: number
+      - description: search by task
+        example: go practice
+        in: query
+        name: task
+        type: string
+      - description: search by done
+        example: true
+        in: query
+        name: done
+        type: boolean
+      - description: page number for pagination
+        example: "1"
+        in: query
+        name: page
+        type: string
+      - description: items per page for pagination
+        example: "10"
+        in: query
+        name: items
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: List Documents
+      tags:
+      - documents
+    patch:
+      consumes:
+      - application/json
+      description: Update document(s)
+      parameters:
+      - description: single Document request json
+        in: body
+        name: Document
+        required: true
+        schema:
+          example: '{ "id":2, "task": "take shower", "done": false }'
+          type: string
+      - description: batch Document request json
+        in: body
+        name: Documents
+        required: true
+        schema:
+          example: '[{ "id":2, "task": "take shower", "done": false, createdAt: "2021-01-11"
+            }, { "id":3, "task": "go practice", "done": false }]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Update existing document(s)
+      tags:
+      - documents
+    post:
+      consumes:
+      - application/json
+      description: Create document(s)
+      parameters:
+      - description: single Document request json
+        in: body
+        name: Document
+        required: true
+        schema:
+          example: '{ "task": "take shower", "done": false }'
+          type: string
+      - description: batch Document request json
+        in: body
+        name: Documents
+        required: true
+        schema:
+          example: '[{ "task": "take shower", "done": false }, { "task": "go practice",
+            "done": false }]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Create new document(s)
+      tags:
+      - documents
+  /documents/{documentId}:
+    get:
+      consumes:
+      - application/json
+      description: get Document by ID
+      parameters:
+      - description: document ID
+        example: 12
+        in: path
+        name: documentId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Get Document by ID
+      tags:
+      - documents
+  /documents/{documentId}/download:
+    get:
+      consumes:
+      - application/json
+      description: download document by ID
+      parameters:
+      - description: document ID
+        example: 123
+        in: path
+        name: documentId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - ApiKeyAuth: []
+      summary: Download Document by ID
+      tags:
+      - documents
+  /logs:
+    delete:
+      consumes:
+      - application/json
+      description: delete log(s)
+      parameters:
+      - description: array of log IDs
+        in: body
+        name: logIds
+        required: true
+        schema:
+          example: '[1,2,3]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Delete log(s)
+      tags:
+      - logs
+    get:
+      consumes:
+      - application/json
+      description: get Logs
+      parameters:
+      - description: id
+        example: 2
+        in: query
+        name: id
+        type: number
+      - description: search by userId
+        example: 2
+        in: query
+        name: userId
+        type: number
+      - description: search by task
+        example: go practice
+        in: query
+        name: task
+        type: string
+      - description: search by done
+        example: true
+        in: query
+        name: done
+        type: boolean
+      - description: page number for pagination
+        example: "1"
+        in: query
+        name: page
+        type: string
+      - description: items per page for pagination
+        example: "10"
+        in: query
+        name: items
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: List Logs
+      tags:
+      - logs
+    patch:
+      consumes:
+      - application/json
+      description: Update log(s)
+      parameters:
+      - description: single Log request json
+        in: body
+        name: Log
+        required: true
+        schema:
+          example: '{ "id":2, "task": "take shower", "done": false }'
+          type: string
+      - description: batch Log request json
+        in: body
+        name: Logs
+        required: true
+        schema:
+          example: '[{ "id":2, "task": "take shower", "done": false, createdAt: "2021-01-11"
+            }, { "id":3, "task": "go practice", "done": false }]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Update existing log(s)
+      tags:
+      - logs
+    post:
+      consumes:
+      - application/json
+      description: Create log(s)
+      parameters:
+      - description: single Log request json
+        in: body
+        name: Log
+        required: true
+        schema:
+          example: '{ "task": "take shower", "done": false }'
+          type: string
+      - description: batch Log request json
+        in: body
+        name: Logs
+        required: true
+        schema:
+          example: '[{ "task": "take shower", "done": false }, { "task": "go practice",
+            "done": false }]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Create new log(s)
+      tags:
+      - logs
+  /logs/{logId}:
+    get:
+      consumes:
+      - application/json
+      description: get Log by ID
+      parameters:
+      - description: log ID
+        example: 12
+        in: path
+        name: logId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Get Log by ID
+      tags:
+      - logs
+  /password-resets:
+    delete:
+      consumes:
+      - application/json
+      description: delete passwordReset(s)
+      parameters:
+      - description: array of passwordReset IDs
+        in: body
+        name: passwordResetIds
+        required: true
+        schema:
+          example: '[1,2,3]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Delete passwordReset(s)
+      tags:
+      - passwordResets
+    get:
+      consumes:
+      - application/json
+      description: get PasswordResets
+      parameters:
+      - description: id
+        example: 2
+        in: query
+        name: id
+        type: number
+      - description: search by userId
+        example: 2
+        in: query
+        name: userId
+        type: number
+      - description: search by task
+        example: go practice
+        in: query
+        name: task
+        type: string
+      - description: search by done
+        example: true
+        in: query
+        name: done
+        type: boolean
+      - description: page number for pagination
+        example: "1"
+        in: query
+        name: page
+        type: string
+      - description: items per page for pagination
+        example: "10"
+        in: query
+        name: items
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: List PasswordResets
+      tags:
+      - passwordResets
+    patch:
+      consumes:
+      - application/json
+      description: Update passwordReset(s)
+      parameters:
+      - description: single PasswordReset request json
+        in: body
+        name: PasswordReset
+        required: true
+        schema:
+          example: '{ "id":2, "task": "take shower", "done": false }'
+          type: string
+      - description: batch PasswordReset request json
+        in: body
+        name: PasswordResets
+        required: true
+        schema:
+          example: '[{ "id":2, "task": "take shower", "done": false, createdAt: "2021-01-11"
+            }, { "id":3, "task": "go practice", "done": false }]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Update existing passwordReset(s)
+      tags:
+      - passwordResets
+    post:
+      consumes:
+      - application/json
+      description: Create passwordReset(s)
+      parameters:
+      - description: single PasswordReset request json
+        in: body
+        name: PasswordReset
+        required: true
+        schema:
+          example: '{ "task": "take shower", "done": false }'
+          type: string
+      - description: batch PasswordReset request json
+        in: body
+        name: PasswordResets
+        required: true
+        schema:
+          example: '[{ "task": "take shower", "done": false }, { "task": "go practice",
+            "done": false }]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Create new passwordReset(s)
+      tags:
+      - passwordResets
+  /password-resets/{passwordResetId}:
+    get:
+      consumes:
+      - application/json
+      description: get PasswordReset by ID
+      parameters:
+      - description: passwordReset ID
+        example: 12
+        in: path
+        name: passwordResetId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Get PasswordReset by ID
+      tags:
+      - passwordResets
+  /qrcodes:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Get Qrcode content from pdf
+      parameters:
+      - description: A document file like image or pdf
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses: {}
+      summary: Get Qrcode content from pdf
+      tags:
+      - qrcodes
+  /todo-documents:
+    delete:
+      consumes:
+      - application/json
+      description: delete todoDocument(s)
+      parameters:
+      - description: array of todoDocument IDs
+        in: body
+        name: todoDocumentIds
+        required: true
+        schema:
+          example: '[1,2,3]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Delete todoDocument(s)
+      tags:
+      - todoDocuments
+    get:
+      consumes:
+      - application/json
+      description: get TodoDocuments
+      parameters:
+      - description: id
+        example: 2
+        in: query
+        name: id
+        type: number
+      - description: search by userId
+        example: 2
+        in: query
+        name: userId
+        type: number
+      - description: search by task
+        example: go practice
+        in: query
+        name: task
+        type: string
+      - description: search by done
+        example: true
+        in: query
+        name: done
+        type: boolean
+      - description: page number for pagination
+        example: "1"
+        in: query
+        name: page
+        type: string
+      - description: items per page for pagination
+        example: "10"
+        in: query
+        name: items
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: List TodoDocuments
+      tags:
+      - todoDocuments
+    patch:
+      consumes:
+      - application/json
+      description: Update todoDocument(s)
+      parameters:
+      - description: single TodoDocument request json
+        in: body
+        name: TodoDocument
+        required: true
+        schema:
+          example: '{ "id":2, "task": "take shower", "done": false }'
+          type: string
+      - description: batch TodoDocument request json
+        in: body
+        name: TodoDocuments
+        required: true
+        schema:
+          example: '[{ "id":2, "task": "take shower", "done": false, createdAt: "2021-01-11"
+            }, { "id":3, "task": "go practice", "done": false }]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Update existing todoDocument(s)
+      tags:
+      - todoDocuments
+    post:
+      consumes:
+      - application/json
+      description: Create todoDocument(s)
+      parameters:
+      - description: single TodoDocument request json
+        in: body
+        name: TodoDocument
+        required: true
+        schema:
+          example: '{ "task": "take shower", "done": false }'
+          type: string
+      - description: batch TodoDocument request json
+        in: body
+        name: TodoDocuments
+        required: true
+        schema:
+          example: '[{ "task": "take shower", "done": false }, { "task": "go practice",
+            "done": false }]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Create new todoDocument(s)
+      tags:
+      - todoDocuments
+  /todo-documents/{todoDocumentId}:
+    get:
+      consumes:
+      - application/json
+      description: get TodoDocument by ID
+      parameters:
+      - description: todoDocument ID
+        example: 12
+        in: path
+        name: todoDocumentId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Get TodoDocument by ID
+      tags:
+      - todoDocuments
+  /todos:
+    delete:
+      consumes:
+      - application/json
+      description: delete todo(s)
+      parameters:
+      - description: array of todo IDs
+        in: body
+        name: todoIds
+        required: true
+        schema:
+          example: '[1,2,3]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Delete todo(s)
+      tags:
+      - todos
+    get:
+      consumes:
+      - application/json
+      description: get Todos
+      parameters:
+      - description: id
+        example: 2
+        in: query
+        name: id
+        type: number
+      - description: search by userId
+        example: 2
+        in: query
+        name: userId
+        type: number
+      - description: search by task
+        example: go practice
+        in: query
+        name: task
+        type: string
+      - description: search by done
+        example: true
+        in: query
+        name: done
+        type: boolean
+      - description: page number for pagination
+        example: "1"
+        in: query
+        name: page
+        type: string
+      - description: items per page for pagination
+        example: "10"
+        in: query
+        name: items
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: List Todos
+      tags:
+      - todos
+    patch:
+      consumes:
+      - application/json
+      description: Update todo(s)
+      parameters:
+      - description: single Todo request json
+        in: body
+        name: Todo
+        required: true
+        schema:
+          example: '{ "id":2, "task": "take shower", "done": false }'
+          type: string
+      - description: batch Todo request json
+        in: body
+        name: Todos
+        required: true
+        schema:
+          example: '[{ "id":2, "task": "take shower", "done": false, createdAt: "2021-01-11"
+            }, { "id":3, "task": "go practice", "done": false }]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Update existing todo(s)
+      tags:
+      - todos
+    post:
+      consumes:
+      - application/json
+      description: Create todo(s)
+      parameters:
+      - description: single Todo request json
+        in: body
+        name: Todo
+        required: true
+        schema:
+          example: '{ "task": "take shower", "done": false }'
+          type: string
+      - description: batch Todo request json
+        in: body
+        name: Todos
+        required: true
+        schema:
+          example: '[{ "task": "take shower", "done": false }, { "task": "go practice",
+            "done": false }]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Create new todo(s)
+      tags:
+      - todos
+  /todos/{todoId}:
+    get:
+      consumes:
+      - application/json
+      description: get Todo by ID
+      parameters:
+      - description: todo ID
+        example: 12
+        in: path
+        name: todoId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Get Todo by ID
+      tags:
+      - todos
+  /users:
+    delete:
+      consumes:
+      - application/json
+      description: delete user(s)
+      parameters:
+      - description: array of user IDs
+        in: body
+        name: userIds
+        required: true
+        schema:
+          example: '[1,2,3]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user(s)
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: get Users
+      parameters:
+      - description: id
+        example: 2
+        in: query
+        name: id
+        type: number
+      - description: search by name
+        example: tom
+        in: query
+        name: name
+        type: string
+      - description: search by firstName
+        example: will
+        in: query
+        name: firstName
+        type: string
+      - description: search by lastName
+        example: smith
+        in: query
+        name: lastName
+        type: string
+      - description: search by disabled
+        example: false
+        in: query
+        name: disabled
+        type: boolean
+      - description: page number for pagination
+        example: "1"
+        in: query
+        name: page
+        type: string
+      - description: items per page for pagination
+        example: "10"
+        in: query
+        name: items
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: List Users
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: Update user(s)
+      parameters:
+      - description: single User request json
+        in: body
+        name: User
+        required: true
+        schema:
+          example: '{ "id":2, "task": "take shower", "done": false }'
+          type: string
+      - description: batch User request json
+        in: body
+        name: Users
+        required: true
+        schema:
+          example: '[{ "id":2, "task": "take shower", "done": false, createdAt: "2021-01-11"
+            }, { "id":3, "task": "go practice", "done": false }]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Update existing user(s)
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create user(s)
+      parameters:
+      - description: single User request json
+        in: body
+        name: User
+        required: true
+        schema:
+          example: '{ "task": "take shower", "done": false }'
+          type: string
+      - description: batch User request json
+        in: body
+        name: Users
+        required: true
+        schema:
+          example: '[{ "task": "take shower", "done": false }, { "task": "go practice",
+            "done": false }]'
+          type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Create new user(s)
+      tags:
+      - users
+  /users/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: get User by ID
+      parameters:
+      - description: user ID
+        example: 12
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Get User by ID
+      tags:
+      - users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
