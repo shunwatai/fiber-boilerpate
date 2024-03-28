@@ -37,6 +37,8 @@ type Fiber struct {
 var cfg = config.Cfg
 
 func (f *Fiber) GetApp() {
+	cfg.LoadEnvVariables()
+	zlog.NewZlog()
 	f.App = fiber.New(fiber.Config{
 		// Prefork:       true,
 		CaseSensitive:                true,
@@ -45,15 +47,6 @@ func (f *Fiber) GetApp() {
 		BodyLimit:                    500 << 20, // 500Mb
 		DisablePreParseMultipartForm: true,      // ref:https://github.com/gofiber/fiber/issues/1838#issuecomment-1086214017
 		StreamRequestBody:            true,
-	})
-	cfg.LoadEnvVariables()
-	zlog.NewZlog()
-	f.App = fiber.New(fiber.Config{
-		// Prefork:       true,
-		CaseSensitive: true,
-		StrictRouting: false,
-		ServerHeader:  "Fiber",
-		BodyLimit:     500 << 20, // 500Mb
 	})
 }
 
