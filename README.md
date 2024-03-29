@@ -15,12 +15,12 @@ It is running by fiber with basic CRUD routes which follows the Controller-Servi
 # Todo
 - [ ] Try `bubbletea` for `cmd/gen/gen.go`
 - [ ] Try Oauth
-- [ ] Web template by htmx?
+- [ ] Web template by htmx
     - [ ] Login page
     - [ ] CRUD users,todos etc.
         - [ ] searching
         - [ ] pagination
-- [ ] Try views and joining for in repository
+- [ ] DB try views and joining in repository
 
 # Quick start by docker-compose
 1. [Start the databases](#start-databases-for-development)
@@ -244,7 +244,8 @@ curl --request POST \
 
 # Generate new module
 The `cmd/gen/gen.go` is for generating new module without tedious copy & paste, find & replace.
-Please read the README in `cms/gen/` for usage.
+
+Please read the README in `cmd/gen/` for usage.
 
 # Modules details
 [password-reset](interal/modules/passwordReset)
