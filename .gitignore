@@ -9,3 +9,4 @@ db-backup/
 build/
 log/*.log
 log/*.gz
+node_modules/

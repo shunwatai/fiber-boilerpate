@@ -1,0 +1,14 @@
+<html>
+  <head>
+    {{ template "title" . }}
+    <script src="/static/3p/htmx/htmx-1.9.11.min.js"></script>
+    <script src="/static/3p/htmx/json-enc.js"></script>
+    <link href="/static/css/output.css" rel="stylesheet">
+  </head>
+  <body style="display:flex; flex-direction:column; justify-content:center; gap:1rem;">
+    {{ template "content" . }}
+  </body>
+  <footer>
+    {{ template "footer" . }}
+  </footer>
+</html>

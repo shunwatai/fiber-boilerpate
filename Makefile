@@ -1,7 +1,8 @@
 .PHONY: dev build clean \
 	docker-dev docker-dev-build docker-dev-up docker-dev-down docker-dev-log \
 	docker-prod docker-prod-build docker-prod-up docker-prod-down docker-prod-log \
-	migrate-up migrate-down
+	migrate-up migrate-down \
+	tw-watch
 
 dev:
 	air -c .air.toml
@@ -45,6 +46,9 @@ migrate-up:
 
 migrate-down: 
 	go run main.go migrate-down $(filter-out $@,$(MAKECMDGOALS))
+
+tw-watch:
+	npx tailwindcss -i ./web/static/css/input.css -o ./web/static/css/output.css --watch
 
 %:
 	@:

@@ -39,7 +39,7 @@ func (c *Controller) SendEmail(ctx *fiber.Ctx) error {
 	emailInfo := email.EmailInfo{
 		To: recipients,
 		MsgMeta: map[string]interface{}{
-			"subject": body["subject"].(string),
+			"subject":          body["subject"].(string),
 			"resetPasswordUrl": "https://yahoo.com",
 		},
 		MsgContent: body["message"].(string),
@@ -60,7 +60,7 @@ func (c *Controller) SendEmail(ctx *fiber.Ctx) error {
 }
 
 func (c *Controller) HalloPage(ctx *fiber.Ctx) error {
-	tpl := template.Must(template.ParseGlob("web/template/hallo.gohtml"))
+	tpl := template.Must(template.ParseFiles("web/template/hallo.gohtml", "web/template/base.gohtml"))
 
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	respCode = fiber.StatusOK
@@ -72,5 +72,10 @@ func (c *Controller) HalloPage(ctx *fiber.Ctx) error {
 		"env":       cfg.ServerConf.Env,
 		"db driver": cfg.DbConf.Driver,
 	}
-	return tpl.Execute(fctx.Fctx.Response().BodyWriter(), map[string]interface{}{"date": dateStr, "envs": envs})
+
+	// err := tpl.Execute(fctx.Fctx.Response().BodyWriter(), map[string]interface{}{"date": dateStr, "envs": envs})
+	err := tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml",map[string]interface{}{"date": dateStr, "envs": envs})
+
+	logger.Debugf("tpl exe err: %+v", err)
+	return err
 }

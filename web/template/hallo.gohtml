@@ -1,16 +1,13 @@
-<html>
-  <head>
-    <title>
-      hello world
-    </title>
-  </head>
-  <body style="display:flex; flex-direction:column; justify-content:center; gap:1rem;">
-    <h1 style="margin:0 auto">Hallo Welt</h1>
-    <div style="margin:0 auto">
+{{ define "title"}}<title>hello world</title>{{ end }}
+      
+{{ define "content"}}
+    <h1 class="text-2xl mx-auto">Hallo Welt</h1>
+  </h1>
+    <div class="mx-auto">
       date: {{$.date}}
     </div>
 
-    <div style="margin:0 auto">
+    <div class="mx-auto">
     <div>Env variables:</div>
     {{range $key, $value := $.envs}}
       <div>
@@ -18,5 +15,6 @@
       </div>
     {{end}}
     </div>
-  </body>
-</html>
+{{end}}
+
+{{ define "footer"}}<div></div>{{ end }}
