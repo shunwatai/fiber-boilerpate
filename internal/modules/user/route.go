@@ -22,6 +22,10 @@ func GetRoutes(router fiber.Router) {
 	Srvc = NewService(Repo)
 	ctrl = NewController(Srvc)
 
+	viewRoute := router.Group("")
+	viewRoute.Get("/login", ctrl.LoginPage)
+	viewRoute.Post("/login", ctrl.SendLogin)
+
 	// normal auth from database's users table
 	authRoute := router.Group("/api/auth")
 	authRoute.Post("/login", Login)

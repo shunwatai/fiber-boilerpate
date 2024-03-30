@@ -73,9 +73,5 @@ func (c *Controller) HalloPage(ctx *fiber.Ctx) error {
 		"db driver": cfg.DbConf.Driver,
 	}
 
-	// err := tpl.Execute(fctx.Fctx.Response().BodyWriter(), map[string]interface{}{"date": dateStr, "envs": envs})
-	err := tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml",map[string]interface{}{"date": dateStr, "envs": envs})
-
-	logger.Debugf("tpl exe err: %+v", err)
-	return err
+	return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", map[string]interface{}{"date": dateStr, "envs": envs})
 }

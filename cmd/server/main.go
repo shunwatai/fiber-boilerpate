@@ -15,6 +15,7 @@ import (
 	"golang-api-starter/internal/modules/todo"
 	"golang-api-starter/internal/modules/todoDocument"
 	"golang-api-starter/internal/modules/user"
+	"golang-api-starter/internal/modules/web"
 	"golang-api-starter/web/static"
 	lg "log"
 	"net/http"
@@ -88,9 +89,9 @@ func (f *Fiber) LoadAllRoutes() {
 		Browse: false,
 	}))
 
-	sample.GetRoutes(f.App) // sample routes for testing
-
 	router := f.App.Group("", logging.Logger()) // add logging to all routes
+	sample.GetRoutes(router) // sample routes for testing
+	web.GetRoutes(router)
 	document.GetRoutes(router)
 	log.GetRoutes(router)
 	oauth.GetRoutes(router)

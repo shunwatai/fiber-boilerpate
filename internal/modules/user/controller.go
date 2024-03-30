@@ -2,10 +2,12 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"golang-api-starter/internal/auth"
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
 	"golang-api-starter/internal/helper/utils"
+	"html/template"
 	"sync"
 	"time"
 
@@ -354,4 +356,52 @@ func (c *Controller) Refresh(ctx *fiber.Ctx) error {
 	}
 	respCode = fiber.StatusOK
 	return fctx.JsonResponse(respCode, map[string]interface{}{"data": result})
+}
+
+func (c *Controller) LoginPage(ctx *fiber.Ctx) error {
+	// data for template
+	data := map[string]interface{}{
+		"errMessage": nil,
+	}
+	tpl := template.Must(template.ParseFiles("web/template/login.gohtml", "web/template/base.gohtml"))
+
+	fctx := &helper.FiberCtx{Fctx: ctx}
+
+	respCode = fiber.StatusOK
+
+	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
+}
+
+func (c *Controller) SendLogin(ctx *fiber.Ctx) error {
+	data := fiber.Map{}
+	html := `
+	<div id="errorMessage" class="mx-auto text-red-600">{{$.message}}</div>
+	`
+	tpl, _ := template.New("change-password").Parse(html)
+
+	u := new(User)
+	fctx := &helper.FiberCtx{Fctx: ctx}
+
+	if err := fctx.Fctx.BodyParser(u); err != nil {
+		logger.Errorf("BodyParser err: %+v", err)
+		data["message"] = "something went wrong: failed to parse request json"
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	}
+
+	result, httpErr := c.service.Login(u)
+	if httpErr != nil {
+		logger.Errorf("user Login err: %+v", httpErr.Err.Error())
+		data["message"] = fmt.Sprintf("login failed: %s", httpErr.Err.Error())
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	}
+
+	if err := SetTokensInCookie(result, ctx); err != nil {
+		logger.Errorf("SetTokensInCookie err: %+v", err.Error())
+	}
+
+	// login success, redirect to target path/url
+	homePage := "/home"
+	fctx.Fctx.Set("HX-Redirect", homePage)
+	return fctx.Fctx.Redirect(homePage, fiber.StatusOK)
 }

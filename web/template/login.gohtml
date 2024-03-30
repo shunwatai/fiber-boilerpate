@@ -1,0 +1,31 @@
+{{ define "title"}}<title>Login</title>{{ end }}
+      
+{{ define "content"}}
+  <h1 class="text-2xl mx-auto">Login</h1>
+  <div id="errorMessage" class="mx-auto text-red-600">
+    {{if $.errMessage}}
+      ERROR: {{ $.errMessage }}
+    {{end}}
+  </div>
+  {{if not $.errMessage}}
+  <form 
+    class="flex flex-col mx-auto gap-4 p-2 w-[28vw]"
+    hx-target="#errorMessage"
+    hx-post="/login"
+    hx-ext="json-enc"
+    hx-swap="outerHTML"
+  >
+    <div class="flex justify-between">
+      <label for="name" class="after:content-['*'] after:ml-0.5 after:text-red-500 block font-medium text-slate-700 mr-auto my-auto">Username/Email:</label>
+      <input name="name" required class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" />
+    </div>
+    <div class="flex justify-between">
+      <label for="password" class="after:content-['*'] after:ml-0.5 after:text-red-500 block font-medium text-slate-700 mr-auto my-auto">Passowrd:</label>
+      <input name="password" type="password" required class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" />
+    </div>
+    <button type="sumit" class="border-2 rounded-md shadow-sm border-slate-300 w-fit p-2 mx-auto">Login</button>
+  </form>
+  {{end}}
+{{end}}
+
+{{ define "footer"}}<div></div>{{ end }}

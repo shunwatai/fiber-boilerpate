@@ -315,12 +315,6 @@ func (c *Controller) SendResetEmail(ctx *fiber.Ctx) error {
 		data["errMessage"] = "something went wrong: failed to parse request json"
 	}
 
-	// users, _ := user.Srvc.Get(map[string]interface{}{"email": u.Email, "exactMatch": map[string]bool{"email": true}})
-	// if len(users) == 0 {
-	// 	data["errMessage"] = "email doesn't match with any existing users..."
-	// 	return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
-	// }
-
 	_, httpErr := c.service.Create(PasswordResets{&PasswordReset{Email: *u.Email}})
 	if httpErr.Err != nil {
 		logger.Errorf("BodyParser err: %+v", httpErr.Err)
@@ -397,14 +391,17 @@ func (c *Controller) ChangePassword(ctx *fiber.Ctx) error {
 	if err := fctx.Fctx.BodyParser(u); err != nil {
 		logger.Errorf("BodyParser err: %+v", err)
 		data["message"] = "something went wrong: failed to parse request json"
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 	}
 
 	users, httpErr := user.Srvc.Update(user.Users{u})
 	if httpErr.Err != nil {
 		logger.Errorf("user Update err: %+v", httpErr.Err.Error())
 		data["message"] = "something went wrong: failed to reset password"
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 	}
 
 	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-	return tpl.Execute(fctx.Fctx.Response().BodyWriter(), fiber.Map{"message": fmt.Sprintf("reset success for %s", users[0].Name)})
+	data["message"] = fmt.Sprintf("reset success for %s", users[0].Name)
+	return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 }

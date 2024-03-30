@@ -1,8 +1,10 @@
-package sample
+package web
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"golang-api-starter/internal/config"
+	"golang-api-starter/internal/middleware/jwtcheck"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -15,7 +17,6 @@ func GetRoutes(router fiber.Router) {
 	Srvc = NewService()
 	ctrl = NewController(Srvc)
 
-	router.Get("/ping", ctrl.Ping)
-	router.Get("/hallo", ctrl.HalloPage)
-	router.Post("/test-email", ctrl.SendEmail)
+	router.Get("/home", jwtcheck.CheckJwt(), ctrl.HomePage)
+	router.Get("/error", ctrl.ErrorPage)
 }

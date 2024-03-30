@@ -83,9 +83,8 @@ func (f *Fiber) LoadAllRoutes() {
 		Browse: false,
 	}))
 
-	sample.GetRoutes(f.App) // sample routes for testing
-
 	router := f.App.Group("", logging.Logger()) // add logging to all routes
+	sample.GetRoutes(router) // sample routes for testing
   {{- range .Modules }}
 	{{.ModuleName}}.GetRoutes(router)
   {{- end }}

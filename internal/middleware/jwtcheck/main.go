@@ -4,6 +4,7 @@ import (
 	"errors"
 	"golang-api-starter/internal/auth"
 	logger "golang-api-starter/internal/helper/logger/zap_log"
+	"html/template"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,7 +17,10 @@ import (
  */
 func CheckJwt() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// logger.Printf("middleware checking jwt in header.....\n")
+		// logger.Debugf("middleware checking jwt in header.....")
+		requestHeader := c.GetReqHeaders()
+		isHtml := strings.Contains(requestHeader["Accept"][0], "text/html")
+
 		var (
 			claims jwt.MapClaims
 			errStr []string
@@ -26,17 +30,28 @@ func CheckJwt() fiber.Handler {
 		if err == nil {
 			c.Locals("claims", claims)
 			return c.Next()
+		} else {
+			errStr = append(errStr, err.Error())
 		}
-		errStr = append(errStr, err.Error())
 
 		claims, err = GetTokenFromHeader(c)
-		errStr = append(errStr, err.Error())
+		if err != nil {
+			errStr = append(errStr, err.Error())
+		}
 
 		if err != nil {
+			if isHtml {
+				tpl := template.Must(template.ParseFiles("web/template/error.gohtml", "web/template/base.gohtml"))
+				c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+				c.Redirect("/error", fiber.StatusPermanentRedirect)
+				return tpl.ExecuteTemplate(c.Response().BodyWriter(), "base.gohtml", fiber.Map{})
+			}
+
 			return c.
 				Status(fiber.StatusUnauthorized).
 				JSON(map[string]interface{}{"message": errors.Join(errors.New(strings.Join(errStr, ". ")), errors.New("failed to get the jwt from both cookie & header")).Error()})
 		}
+		logger.Debugf("22222222")
 
 		c.Locals("claims", claims)
 		return c.Next()

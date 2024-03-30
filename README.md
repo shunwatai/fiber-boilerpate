@@ -6,7 +6,7 @@ It is running by fiber with basic CRUD routes which follows the Controller-Servi
 # Features
 - With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` for storing records in DB. Just raw sql without ORM.
 - With example modules like `users`, `todos`, `documents` etc. in `interal/modules/`, with CRUD APIs.
-- With a [simple script](#generate-new-module) `cmd/gen/gen.go` for generate new module to `internal/modules/`.
+- With a [script](#generate-new-module) `cmd/gen/gen.go` for generate new module to `internal/modules/`.
 - With the example of JWT auth in the (login API)[#login].
 - Can generate swagger doc.
 - Make use of `viper` for loading env variables in config.
@@ -245,10 +245,11 @@ curl --request POST \
 # Generate new module
 The `cmd/gen/gen.go` is for generating new module without tedious copy & paste, find & replace.
 
-Please read the README in `cmd/gen/` for usage.
+[Detail usage](cmd/gen/README.md)
 
-# Modules details
-[password-reset](interal/modules/passwordReset)
+# API details
+## Password reset
+[readme](internal/modules/passwordReset/README.md)
 
 # Run tests
 To disable cache when running tests, run with options: `-count=1`
