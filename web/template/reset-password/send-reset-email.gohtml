@@ -1,31 +1,20 @@
-<html>
-  <head>
-    <title>
-      forgot password
-    </title>
-    <script src="/static/3p/htmx/htmx-1.9.11.min.js"></script>
-    <script src="/static/3p/htmx/json-enc.js"></script>
-  </head>
-  <body style="display:flex; text-align:center; flex-direction:column; gap:1rem">
-    <div>
-      reset password
-    </div>
-    <div>
-      {{if $.errMessage}}
-        ERROR: {{ $.errMessage }}
-      {{end}}
-    </div>
-    <div>
-      <form 
-        hx-post="/password-resets/send"
-        hx-ext="json-enc"
-        hx-target="#message"
-      >
-        <label for="password">Enter your email:</label>
-        <input name="email" required />
-        <button type="sumit">Send</button>
-      </form>
+{{ define "title"}}<title>Forgot password</title>{{ end }}
+      
+{{ define "content"}}
+  <h1 class="text-2xl mx-auto">Forgot password</h1>
+  <div>
+    <form 
+      class="flex flex-col mx-auto gap-2 p-2 w-[28vw]"
+      hx-post="/password-resets/send"
+      hx-ext="json-enc"
+      hx-target="#message"
+    >
+      <label for="email" class="after:content-['*'] after:ml-0.5 after:text-red-500 block font-medium text-slate-700 mr-auto my-auto">Enter your email:</label>
+      <input name="email" required class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1"/>
       <div id="message"></div>
-    </div>
-  </body>
-</html>
+      <button type="sumit" class="border-2 rounded-md shadow-sm border-slate-300 w-fit p-2 mx-auto">Send</button>
+    </form>
+  </div>
+{{end}}
+
+{{ define "footer"}}<div></div>{{ end }}

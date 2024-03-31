@@ -1,11 +1,13 @@
 <html>
   <head>
     {{ template "title" . }}
+    <meta charset="UTF-8">
     <script src="/static/3p/htmx/htmx-1.9.11.min.js"></script>
     <script src="/static/3p/htmx/json-enc.js"></script>
+    <script src="/static/3p/htmx/response-targets.js"></script>
     <link href="/static/css/output.css" rel="stylesheet">
   </head>
-  <body class="flex flex-col justify-center gap-2">
+  <body class="flex flex-col justify-center gap-2" hx-ext="response-targets">
     {{ template "content" . }}
   </body>
   <footer>

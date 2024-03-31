@@ -163,6 +163,16 @@ func (c *Config) WatchConfig() {
 	c.Vpr.WatchConfig()
 }
 
+func (c *Config) GetServerUrl() string {
+	url := fmt.Sprintf("http://%s", c.ServerConf.Host)
+
+	if len(c.ServerConf.Port) > 0 {
+		url = fmt.Sprintf("%s:%s", url, c.ServerConf.Port)
+	}
+
+	return url
+}
+
 var Cfg = &Config{
 	Vpr: viper.GetViper(),
 }

@@ -64,7 +64,7 @@ func (f *Fiber) LoadMiddlewares() {
 
 func (f *Fiber) LoadSwagger() {
 	/* for swagger web */
-	serverUrl := fmt.Sprintf("http://%s/swagger/doc.json", fmt.Sprintf("%s:%s", cfg.ServerConf.Host, cfg.ServerConf.Port))
+	serverUrl := fmt.Sprintf("%s/swagger/doc.json", cfg.GetServerUrl())
 	f.App.Get("/swagger/*", swagger.HandlerDefault)
 	f.App.Get("/swagger/*", swagger.New(swagger.Config{ // custom
 		URL:         fmt.Sprintf("http://%s/doc.json", serverUrl),
@@ -90,7 +90,7 @@ func (f *Fiber) LoadAllRoutes() {
 	}))
 
 	router := f.App.Group("", logging.Logger()) // add logging to all routes
-	sample.GetRoutes(router) // sample routes for testing
+	sample.GetRoutes(router)                    // sample routes for testing
 	web.GetRoutes(router)
 	document.GetRoutes(router)
 	log.GetRoutes(router)

@@ -363,7 +363,12 @@ func (c *Controller) LoginPage(ctx *fiber.Ctx) error {
 	data := map[string]interface{}{
 		"errMessage": nil,
 	}
-	tpl := template.Must(template.ParseFiles("web/template/login.gohtml", "web/template/base.gohtml"))
+	tmplFiles := []string{
+		"web/template/parts/error-dialog.gohtml",
+		"web/template/login.gohtml",
+		"web/template/base.gohtml",
+	}
+	tpl := template.Must(template.ParseFiles(tmplFiles...))
 
 	fctx := &helper.FiberCtx{Fctx: ctx}
 
@@ -374,25 +379,29 @@ func (c *Controller) LoginPage(ctx *fiber.Ctx) error {
 }
 
 func (c *Controller) SendLogin(ctx *fiber.Ctx) error {
+	respCode = fiber.StatusInternalServerError
+	fctx := &helper.FiberCtx{Fctx: ctx}
+	fctx.Fctx.Response().SetStatusCode(respCode)
 	data := fiber.Map{}
-	html := `
-	<div id="errorMessage" class="mx-auto text-red-600">{{$.message}}</div>
-	`
-	tpl, _ := template.New("change-password").Parse(html)
+
+	tmplFiles := []string{"web/template/parts/error-dialog.gohtml"}
+	tpl := template.Must(template.ParseFiles(tmplFiles...))
+
+	html := `{{ template "errorDialog" . }}`
+	tpl, _ = tpl.New("message").Parse(html)
 
 	u := new(User)
-	fctx := &helper.FiberCtx{Fctx: ctx}
 
 	if err := fctx.Fctx.BodyParser(u); err != nil {
 		logger.Errorf("BodyParser err: %+v", err)
-		data["message"] = "something went wrong: failed to parse request json"
+		data["errMessage"] = "something went wrong: failed to parse request json"
 		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 	}
 
 	result, httpErr := c.service.Login(u)
 	if httpErr != nil {
 		logger.Errorf("user Login err: %+v", httpErr.Err.Error())
-		data["message"] = fmt.Sprintf("login failed: %s", httpErr.Err.Error())
+		data["errMessage"] = fmt.Sprintf("login failed: %s", httpErr.Err.Error())
 		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 	}
 
@@ -403,5 +412,7 @@ func (c *Controller) SendLogin(ctx *fiber.Ctx) error {
 	// login success, redirect to target path/url
 	homePage := "/home"
 	fctx.Fctx.Set("HX-Redirect", homePage)
+	respCode = fiber.StatusOK
+	fctx.Fctx.Response().SetStatusCode(respCode)
 	return fctx.Fctx.Redirect(homePage, fiber.StatusOK)
 }

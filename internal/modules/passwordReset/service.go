@@ -96,7 +96,9 @@ func (s *Service) Create(passwordResets []*PasswordReset) ([]*PasswordReset, *he
 
 func (s *Service) sendResetPasswordEmail(passwordResets []*PasswordReset) error {
 	for _, pr := range passwordResets {
-		resetLink := fmt.Sprintf("http://localhost:7000/password-resets?token=%s&userId=%s&email=%s", pr.Token, pr.UserId, pr.Email)
+		resetLink := fmt.Sprintf("%s/password-resets?token=%s&userId=%s&email=%s", cfg.GetServerUrl(), pr.Token, pr.UserId, pr.Email)
+
+		tmplFiles := []string{"web/template/reset-password/reset-email.gohtml"}
 
 		emailInfo := email.EmailInfo{
 			To: []string{pr.Email},
@@ -104,7 +106,7 @@ func (s *Service) sendResetPasswordEmail(passwordResets []*PasswordReset) error 
 				"subject":          "reset password",
 				"resetPasswordUrl": resetLink,
 			},
-			Template: template.Must(template.ParseGlob("web/template/reset-password/reset-email.gohtml")),
+			Template: template.Must(template.ParseFiles(tmplFiles...)),
 		}
 
 		if err := email.TemplateEmail(emailInfo); err != nil {

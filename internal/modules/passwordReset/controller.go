@@ -282,30 +282,40 @@ func SetResetTokenInCookie(result map[string]interface{}, c *fiber.Ctx) {
 	delete(result, "accessToken")
 }
 
+// SendResetEmailPage will retrun a html form for user to enter their account's email in order to receive the "reset url" in their mailbox
 func (c *Controller) SendResetEmailPage(ctx *fiber.Ctx) error {
 	// data for template
 	data := map[string]interface{}{
 		"errMessage": nil,
 	}
 
-	tpl := template.Must(template.ParseGlob("web/template/reset-password/send-reset-email.gohtml"))
+	tmplFiles := []string{
+		"web/template/parts/error-dialog.gohtml",
+		"web/template/reset-password/send-reset-email.gohtml",
+		"web/template/base.gohtml",
+	}
+	tpl := template.Must(template.ParseFiles(tmplFiles...))
 
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-	return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
 }
 
+// SendResetEmail will send the "reset url" to user's mailbox
 func (c *Controller) SendResetEmail(ctx *fiber.Ctx) error {
 	// data for template
 	data := map[string]interface{}{
 		"errMessage": nil,
 	}
 
+	tmplFiles := []string{"web/template/parts/error-dialog.gohtml"}
+	tpl := template.Must(template.ParseFiles(tmplFiles...))
+
 	html := `
-	<div>{{$.errMessage}}</div>
-	<div>{{$.message}}</div>
+	{{ template "errorDialog" . }}
+	<div id="message" class="mx-auto text-xs">{{$.message}}</div>
 	`
-	tpl, _ := template.New("change-password").Parse(html)
+	tpl, _ = tpl.New("message").Parse(html)
 
 	fctx := &helper.FiberCtx{Fctx: ctx}
 
@@ -317,48 +327,61 @@ func (c *Controller) SendResetEmail(ctx *fiber.Ctx) error {
 
 	_, httpErr := c.service.Create(PasswordResets{&PasswordReset{Email: *u.Email}})
 	if httpErr.Err != nil {
-		logger.Errorf("BodyParser err: %+v", httpErr.Err)
+		logger.Errorf("Create err: %+v", httpErr.Err)
 		data["errMessage"] = "email doesn't match with any existing users..."
 		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 	}
 
 	data["message"] = "Reset email has been sent, please check your mailbox"
+
 	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
 	return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 }
 
+// PasswordResetPage will retrun a html reset form after user open the "reset url" in their mailbox
 func (c *Controller) PasswordResetPage(ctx *fiber.Ctx) error {
+	fctx := &helper.FiberCtx{Fctx: ctx}
+	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
 	// data for template
 	data := map[string]interface{}{
 		"errMessage": nil,
 	}
-	tpl := template.Must(template.ParseGlob("web/template/reset-password/reset-form.gohtml"))
 
-	fctx := &helper.FiberCtx{Fctx: ctx}
+	tmplFiles := []string{
+		"web/template/parts/error-dialog.gohtml",
+		"web/template/reset-password/reset-form.gohtml",
+		"web/template/base.gohtml",
+	}
+	tpl := template.Must(template.ParseFiles(tmplFiles...))
+
 	paramsMap := helper.GetQueryString(ctx.Request().URI().QueryString())
-	logger.Debugf("paramsMap: %v", paramsMap["token"])
+
+	if paramsMap["token"] == nil {
+		data["errMessage"] = fmt.Sprintf("token missing")
+		return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
+	}
 	token := paramsMap["token"].(string)
 	email := paramsMap["email"].(string)
 	users, _ := user.Srvc.Get(map[string]interface{}{"email": email, "exactMatch": map[string]bool{"email": true}})
 	logger.Debugf("users: %v", len(users))
 	if len(users) == 0 {
 		data["errMessage"] = fmt.Sprintf("email not found: %s", email)
-		fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		fctx.Fctx.Response().SetStatusCode(respCode)
+		return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
 	}
 
 	passwordResets, _ := c.service.Get(map[string]interface{}{"user_id": users[0].GetId(), "is_used": false})
 	if len(passwordResets) == 0 {
 		data["errMessage"] = "something went wrong, please try to send reset password again"
-		fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		fctx.Fctx.Response().SetStatusCode(respCode)
+		return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(*passwordResets[0].TokenHash), []byte(token))
 	if err != nil {
 		data["errMessage"] = "something went wrong, please try to send reset password again"
-		fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		fctx.Fctx.Response().SetStatusCode(respCode)
+		return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
 	}
 
 	resetToken, err := GetResetJwtToken(passwordResets[0])
@@ -367,41 +390,64 @@ func (c *Controller) PasswordResetPage(ctx *fiber.Ctx) error {
 		logger.Errorf("GetResetJwtToken err: %+v", err)
 	}
 
-	respCode = fiber.StatusOK
-
 	data["token"] = token
 	data["userId"] = users[0].Id
 	data["name"] = users[0].Name
+
+	respCode = fiber.StatusOK
+	fctx.Fctx.Response().SetStatusCode(respCode)
 	SetResetTokenInCookie(map[string]interface{}{"accessToken": resetToken}, fctx.Fctx)
-	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-	return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
 }
 
+// ChangePassword will update the user's password after the user submits their new password in the "reset form"
 func (c *Controller) ChangePassword(ctx *fiber.Ctx) error {
-	data := fiber.Map{}
-	html := `
-	<div>{{$.message}}</div>
-	<div>go to login page</div>
-	`
-	tpl, _ := template.New("change-password").Parse(html)
+	respCode = fiber.StatusInternalServerError
+	fctx := &helper.FiberCtx{Fctx: ctx}
+	fctx.Fctx.Response().SetStatusCode(respCode)
+	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	data := fiber.Map{
+		"errMessage": nil,
+		"message":    nil,
+		"updated":    false,
+	}
+
+	tmplFiles := []string{"web/template/parts/error-dialog.gohtml"}
+	tpl := template.Must(template.ParseFiles(tmplFiles...))
+
+	html := `{{ template "errorDialog" . }}`
+	tpl, _ = tpl.New("message").Parse(html)
 
 	u := new(user.User)
-	fctx := &helper.FiberCtx{Fctx: ctx}
 
 	if err := fctx.Fctx.BodyParser(u); err != nil {
 		logger.Errorf("BodyParser err: %+v", err)
-		data["message"] = "something went wrong: failed to parse request json"
+		data["errMessage"] = "something went wrong: failed to parse request json"
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	}
+
+	if len(*u.Password) < 3 {
+		data["errMessage"] = "password too short..."
 		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 	}
 
 	users, httpErr := user.Srvc.Update(user.Users{u})
 	if httpErr.Err != nil {
 		logger.Errorf("user Update err: %+v", httpErr.Err.Error())
-		data["message"] = "something went wrong: failed to reset password"
+		data["errMessage"] = "something went wrong: failed to reset password"
 		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 	}
 
-	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-	data["message"] = fmt.Sprintf("reset success for %s", users[0].Name)
+	html = `
+	<div id="message" class="mx-auto">
+	reset success for <span class="font-bold text-sky-700 text-xs">{{$.user}}</span>. go to <a class="text-sky-400" href="/login">login</a> page
+	</div>
+	`
+	tpl, _ = tpl.New("message").Parse(html)
+	data["user"] = users[0].Name
+	data["updated"] = true
+
+	respCode = fiber.StatusOK
+	fctx.Fctx.Response().SetStatusCode(respCode)
 	return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 }
