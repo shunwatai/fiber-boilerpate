@@ -325,6 +325,7 @@ func (c *Controller) SendResetEmail(ctx *fiber.Ctx) error {
 		data["errMessage"] = "something went wrong: failed to parse request json"
 	}
 
+	// email will send in c.service.Create
 	_, httpErr := c.service.Create(PasswordResets{&PasswordReset{Email: *u.Email}})
 	if httpErr.Err != nil {
 		logger.Errorf("Create err: %+v", httpErr.Err)

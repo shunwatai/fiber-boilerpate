@@ -1,0 +1,19 @@
+.htmx-indicator {
+  display: none;
+  opacity: 0;
+  transition: opacity 500ms ease-in;
+}
+
+.htmx-request .htmx-indicator {
+  display: block;
+  opacity: 1
+}
+
+.htmx-request.htmx-indicator {
+  display: block;
+  opacity: 1
+}
+
+*:disabled {
+  cursor: not-allowed;
+}
