@@ -8,6 +8,7 @@ import (
 	"golang-api-starter/internal/helper/logger/zap_log"
 	"golang-api-starter/internal/helper/utils"
 	"html/template"
+	"strconv"
 	"sync"
 	"time"
 
@@ -378,7 +379,7 @@ func (c *Controller) LoginPage(ctx *fiber.Ctx) error {
 	return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
 }
 
-func (c *Controller) SendLogin(ctx *fiber.Ctx) error {
+func (c *Controller) SubmitLogin(ctx *fiber.Ctx) error {
 	respCode = fiber.StatusInternalServerError
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	fctx.Fctx.Response().SetStatusCode(respCode)
@@ -391,7 +392,6 @@ func (c *Controller) SendLogin(ctx *fiber.Ctx) error {
 	tpl, _ = tpl.New("message").Parse(html)
 
 	u := new(User)
-
 	if err := fctx.Fctx.BodyParser(u); err != nil {
 		logger.Errorf("BodyParser err: %+v", err)
 		data["errMessage"] = "something went wrong: failed to parse request json"
@@ -415,4 +415,187 @@ func (c *Controller) SendLogin(ctx *fiber.Ctx) error {
 	respCode = fiber.StatusOK
 	fctx.Fctx.Response().SetStatusCode(respCode)
 	return fctx.Fctx.Redirect(homePage, fiber.StatusOK)
+}
+
+func (c *Controller) ListUsersPage(ctx *fiber.Ctx) error {
+	// data for template
+	data := fiber.Map{
+		"errMessage": nil,
+		"users":      Users{},
+		"pagination": helper.Pagination{},
+	}
+	tmplFiles := []string{
+		"web/template/parts/error-dialog.gohtml",
+		"web/template/users/list.gohtml",
+		"web/template/base.gohtml",
+	}
+	tpl := template.Must(template.ParseFiles(tmplFiles...))
+
+	users, pagination := c.service.Get(map[string]interface{}{})
+	data["users"] = users
+	data["pagination"] = pagination
+
+	fctx := &helper.FiberCtx{Fctx: ctx}
+	respCode = fiber.StatusOK
+
+	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
+}
+
+func (c *Controller) UserFormPage(ctx *fiber.Ctx) error {
+	fctx := &helper.FiberCtx{Fctx: ctx}
+	// data for template
+	data := fiber.Map{
+		"errMessage": nil,
+		"user":       &User{},
+		"title":      "Create user",
+	}
+	tmplFiles := []string{
+		"web/template/parts/error-dialog.gohtml",
+		"web/template/users/form.gohtml",
+		"web/template/base.gohtml",
+	}
+	tpl := template.Must(template.ParseFiles(tmplFiles...))
+
+	paramsMap := helper.GetQueryString(ctx.Request().URI().QueryString())
+	u := new(User)
+	// logger.Debugf("user_id: %+v", paramsMap["user_id"])
+
+	if paramsMap["user_id"] != nil { // update user
+		if cfg.DbConf.Driver == "mongodb" {
+			userId := paramsMap["user_id"].(string)
+			u.MongoId = &userId
+		} else {
+			userId, err := strconv.ParseInt(paramsMap["user_id"].(string), 10, 64)
+			if err != nil {
+				return nil
+			}
+
+			u.Id = utils.ToPtr(helper.FlexInt(userId))
+		}
+
+		users, _ := c.service.Get(map[string]interface{}{"id": u.GetId()})
+		if len(users) == 0 {
+			logger.Errorf("something went wrong... failed to find user with id: %+v", u.Id)
+			return nil
+		}
+		data["user"] = users[0]
+		data["title"] = "Update user"
+	} else { // new user
+		data["user"] = nil
+	}
+
+	respCode = fiber.StatusOK
+	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
+}
+
+func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
+	logger.Debugf("user ctrl update form submit\n")
+	respCode = fiber.StatusInternalServerError
+	fctx := &helper.FiberCtx{Fctx: ctx}
+	fctx.Fctx.Response().SetStatusCode(respCode)
+	reqCtx := &helper.ReqContext{Payload: fctx}
+
+	user := &User{}
+	users := []*User{}
+
+	data := fiber.Map{}
+	tmplFiles := []string{"web/template/parts/error-dialog.gohtml"}
+	tpl := template.Must(template.ParseFiles(tmplFiles...))
+
+	html := `{{ template "errorDialog" . }}`
+	tpl, _ = tpl.New("message").Parse(html)
+
+	if invalidJson := reqCtx.Payload.ValidateJson(); invalidJson != nil {
+		data["errMessage"] = "something went wrong: failed to parse request json"
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	}
+
+	userErr, parseErr := reqCtx.Payload.ParseJsonToStruct(user, &users)
+	if parseErr != nil {
+		data["errMessage"] = parseErr.Error()
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	}
+	if userErr == nil {
+		users = append(users, user)
+	}
+
+	for _, user := range users {
+		if validErr := helper.ValidateStruct(*user); validErr != nil {
+			data["errMessage"] = validErr.Error()
+			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		}
+		if user.Id == nil && user.MongoId == nil {
+			data["errMessage"] = "please ensure all records with id for PATCH"
+			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		}
+	}
+
+	_, httpErr := c.service.Update(users)
+	if httpErr.Err != nil {
+		data["errMessage"] = httpErr.Err.Error()
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	}
+
+	respCode = fiber.StatusOK
+	// login success, redirect to target path/url
+	targetPage := "/users"
+	fctx.Fctx.Set("HX-Redirect", targetPage)
+	respCode = fiber.StatusOK
+	fctx.Fctx.Response().SetStatusCode(respCode)
+	return fctx.Fctx.Redirect(targetPage, fiber.StatusOK)
+}
+
+func (c *Controller) SubmitNew(ctx *fiber.Ctx) error {
+	logger.Debugf("user ctrl create form submit \n")
+
+	respCode = fiber.StatusInternalServerError
+	fctx := &helper.FiberCtx{Fctx: ctx}
+	fctx.Fctx.Response().SetStatusCode(respCode)
+	reqCtx := &helper.ReqContext{Payload: fctx}
+
+	c.service.ctx = ctx
+	user := &User{}
+	users := []*User{}
+
+	data := fiber.Map{}
+	tmplFiles := []string{"web/template/parts/error-dialog.gohtml"}
+	tpl := template.Must(template.ParseFiles(tmplFiles...))
+
+	html := `{{ template "errorDialog" . }}`
+	tpl, _ = tpl.New("message").Parse(html)
+
+	if invalidJson := reqCtx.Payload.ValidateJson(); invalidJson != nil {
+		data["errMessage"] = invalidJson.Error()
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	}
+
+	userErr, parseErr := reqCtx.Payload.ParseJsonToStruct(user, &users)
+	if parseErr != nil {
+		data["errMessage"] = parseErr.Error()
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	}
+	if userErr == nil {
+		users = append(users, user)
+	}
+
+	for _, user := range users {
+		if validErr := helper.ValidateStruct(*user); validErr != nil {
+			data["errMessage"] = validErr.Error()
+			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		}
+	}
+
+	_, httpErr := c.service.Create(users)
+	if httpErr.Err != nil {
+		data["errMessage"] = httpErr.Err.Error()
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	}
+
+	targetPage := "/users"
+	fctx.Fctx.Set("HX-Redirect", targetPage)
+	respCode = fiber.StatusCreated
+	fctx.Fctx.Response().SetStatusCode(respCode)
+	return fctx.Fctx.Redirect(targetPage, fiber.StatusOK)
 }

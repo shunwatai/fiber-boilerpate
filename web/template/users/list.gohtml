@@ -1,0 +1,44 @@
+{{ define "title"}}<title>Users</title>{{ end }}
+      
+{{ define "content"}}
+  <h1 class="text-2xl mx-auto">Users</h1>
+
+  {{ template "errorDialog" . }}
+
+  <!-- https://play.tailwindcss.com/haDGueJm6h -->
+  <div id="user-list" class="m-2">
+    <div class="flex mb-2 gap-2">
+      <a href="/users/form">
+        <button class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2">
+          New
+        </button>
+      </a>
+      <button disabled class="disabled flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2">
+        Delete
+        <div id="spinner" class="htmx-indicator animate-spin w-5 h-5 rounded-full m-auto border-2 border-solid border-slate-500 border-t-transparent"></div>
+      </button>
+    </div>
+    <table class="w-full table-auto border-collapse border border-slate-500 [&>tbody>*:nth-child(even)]:bg-slate-100">
+      <tr class="bg-slate-400">
+        <th class="border border-slate-600 text-center"></th>
+        <th class="border border-slate-600 text-center">login name</th>
+        <th class="border border-slate-600 text-center">email</th>
+        <th class="border border-slate-600 text-center">first name</th>
+        <th class="border border-slate-600 text-center">last name</th>
+        <th class="border border-slate-600 text-center">disabled</th>
+      </tr>
+      {{- range .users }}
+      <tr>
+        <td class="border border-slate-700 text-center"><input type="checkbox" name="ids" value={{.Id}} /></td>
+        <td class="border border-slate-700 text-center"><a class="block" href="/users/form?userId={{.Id}}">{{.Name}}</a></td>
+        <td class="border border-slate-700 text-center"><a class="block" href="/users/form?userId={{.Id}}">{{.Email}}</a></td>
+        <td class="border border-slate-700 text-center"><a class="block" href="/users/form?userId={{.Id}}">{{if .FirstName}}{{.FirstName}}{{else}}&nbsp{{end}}</a></td>
+        <td class="border border-slate-700 text-center"><a class="block" href="/users/form?userId={{.Id}}">{{if .LastName}}{{.LastName}}{{else}}&nbsp{{end}}</a></td>
+        <td class="border border-slate-700 text-center"><input type="checkbox" name="disabled" {{ if .Disabled }} readonly checked {{end}} /></td>
+      </tr>
+      {{- end }}
+    </table>
+  </div>
+{{end}}
+
+{{ define "footer" }}<div></div>{{ end }}

@@ -25,7 +25,7 @@ type User struct {
 	MongoId   *string                `json:"_id,omitempty" bson:"_id,omitempty" validate:"omitempty,id_custom_validation"` // https://stackoverflow.com/a/20739427
 	Id        *helper.FlexInt        `json:"id" db:"id" bson:"id,omitempty" example:"2" validate:"omitempty,id_custom_validation"`
 	Name      string                 `json:"name" db:"name" bson:"name,omitempty" example:"emma" validate:"required,alphanum"`
-	Password  *string                `json:"password,omitempty" db:"password" bson:"password,omitempty" example:"password"`
+	Password  *string                `json:"password,omitempty" db:"password" bson:"password,omitempty" example:"password" validate:"omitempty,min=4"`
 	Email     *string                `json:"email,omitempty" db:"email" bson:"email,omitempty" example:"xxx@example.com"`
 	FirstName *string                `json:"firstName" db:"first_name" bson:"first_name,omitempty" example:"Emma"`
 	LastName  *string                `json:"lastName" db:"last_name" bson:"last_name,omitempty" example:"Watson"`

@@ -13,10 +13,12 @@ It is running by fiber with basic CRUD routes which follows the Controller-Servi
 - With a logging wrapper by `zap` which uses as middleware for writing the request's logs in `log/`, the log file may be used for centralised log server like ELK or Signoz. 
 
 # Todo
+- [ ] Need more test cases
 - [ ] Try `bubbletea` for `cmd/gen/gen.go`
 - [ ] Try Oauth
 - [ ] Web template by htmx
-    - [ ] Login page
+    - [x] Login page
+    - [x] Forget page
     - [ ] CRUD users,todos etc.
         - [ ] searching
         - [ ] pagination
