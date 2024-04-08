@@ -49,7 +49,11 @@ oauth:
   google:
     key: "xxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com"
     secret: "GOCSPX-xxxxxxxxxxxxxxxxxxxxx"
-    callbackUrl: "http://xxxxxxxxxxxxxx/oauth/google/callback"
+    callbackUrl: "http://localhost:7000/oauth/google/callback"
+  github:
+    key: "xyxyxyxyxyxyxyxyxyxy"
+    secret: "xzxzxzxzxzxzxzxzxzxzxzxzxzxzxzxzxzxzxzxz"
+    callbackUrl: "http://localhost:7000/api/oauth/github/callback"
 
 notification:
   smtp:

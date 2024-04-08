@@ -34,6 +34,7 @@ func GetRoutes(router fiber.Router) {
 			userForm.Get("/", ctrl.UserFormPage)
 			userPage.Post("/", ctrl.SubmitNew)
 			userPage.Patch("/", ctrl.SubmitUpdate)
+			userPage.Delete("/", ctrl.SubmitDelete)
 		})
 	})
 

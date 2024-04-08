@@ -2,7 +2,7 @@ package helper
 
 import (
 	"fmt"
-	"log"
+	logger "golang-api-starter/internal/helper/logger/zap_log"
 	"strconv"
 )
 
@@ -26,11 +26,14 @@ func ConvertNumberSliceToString(i interface{}) ([]string, error) {
 		for _, v := range i.([]float64) {
 			stringSlice = append(stringSlice, strconv.Itoa(int(v)))
 		}
+	case []FlexInt:
+		for _, v := range i.([]FlexInt) {
+			stringSlice = append(stringSlice, strconv.Itoa(int(v)))
+		}
 	default:
 		msg := "failed to handle %+v (%T)\n"
-		log.Printf(msg, i, i)
+		logger.Errorf(msg, i, i)
 		return nil, fmt.Errorf(msg, i, i)
-		// fmt.Printf("failed to handle %+v (%T)\n", v, v)
 	}
 
 	return stringSlice, nil

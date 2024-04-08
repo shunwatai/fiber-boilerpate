@@ -244,7 +244,7 @@ func (c *Controller) Update(ctx *fiber.Ctx) error {
 
 func (c *Controller) Delete(ctx *fiber.Ctx) error {
 	delIds := struct {
-		Ids []int64 `json:"ids" validate:"required,unique"`
+		Ids []helper.FlexInt `json:"ids" validate:"required,unique"`
 	}{}
 
 	mongoDelIds := struct {
@@ -598,4 +598,62 @@ func (c *Controller) SubmitNew(ctx *fiber.Ctx) error {
 	respCode = fiber.StatusCreated
 	fctx.Fctx.Response().SetStatusCode(respCode)
 	return fctx.Fctx.Redirect(targetPage, fiber.StatusOK)
+}
+
+func (c *Controller) SubmitDelete(ctx *fiber.Ctx) error {
+	logger.Debugf("user ctrl form delete submit \n")
+
+	respCode = fiber.StatusInternalServerError
+	fctx := &helper.FiberCtx{Fctx: ctx}
+	fctx.Fctx.Response().SetStatusCode(respCode)
+	reqCtx := &helper.ReqContext{Payload: fctx}
+
+	c.service.ctx = ctx
+
+	data := fiber.Map{}
+	tmplFiles := []string{"web/template/parts/error-dialog.gohtml"}
+	tpl := template.Must(template.ParseFiles(tmplFiles...))
+
+	html := `{{ template "errorDialog" . }}`
+	tpl, _ = tpl.New("message").Parse(html)
+
+	if invalidJson := reqCtx.Payload.ValidateJson(); invalidJson != nil {
+		data["errMessage"] = invalidJson.Error()
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	}
+
+	delIds := struct {
+		Ids []helper.FlexInt `json:"ids" validate:"required,unique"`
+	}{}
+
+	mongoDelIds := struct {
+		Ids []string `json:"ids" validate:"required,unique"`
+	}{}
+
+	intIdsErr, strIdsErr := reqCtx.Payload.ParseJsonToStruct(&delIds, &mongoDelIds)
+	if intIdsErr != nil && strIdsErr != nil {
+		logger.Errorf("failed to parse req json, %+v\n", errors.Join(intIdsErr, strIdsErr).Error())
+		return fctx.JsonResponse(respCode, map[string]interface{}{"message": errors.Join(intIdsErr, strIdsErr).Error()})
+	}
+	if len(delIds.Ids) == 0 && len(mongoDelIds.Ids) == 0 {
+		return fctx.JsonResponse(respCode, map[string]interface{}{"message": "please check the req json like the follow: {\"ids\":[]}"})
+	}
+	logger.Debugf("deletedIds: %+v, mongoIds: %+v\n", delIds, mongoDelIds)
+
+	var err error
+
+	if cfg.DbConf.Driver == "mongodb" {
+		_, err = c.service.Delete(mongoDelIds.Ids)
+	} else {
+		idsString, _ := helper.ConvertNumberSliceToString(delIds.Ids)
+		_, err = c.service.Delete(idsString)
+	}
+	if err != nil {
+		data["errMessage"] = err.Error()
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	}
+
+	fctx.Fctx.Response().SetStatusCode(fiber.StatusNoContent)
+	fctx.Fctx.Set("HX-Refresh", "true")
+	return nil
 }
