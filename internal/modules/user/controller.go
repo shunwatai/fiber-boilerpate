@@ -129,13 +129,6 @@ func (c *Controller) Create(ctx *fiber.Ctx) error {
 				map[string]interface{}{"message": validErr.Error()},
 			)
 		}
-		if user.Id == nil {
-			continue
-		} else if existing, err := c.service.GetById(map[string]interface{}{
-			"id": user.GetId(),
-		}); err == nil && user.CreatedAt == nil {
-			user.CreatedAt = existing[0].CreatedAt
-		}
 	}
 
 	results, httpErr := c.service.Create(users)
@@ -198,25 +191,6 @@ func (c *Controller) Update(ctx *fiber.Ctx) error {
 				respCode,
 				map[string]interface{}{"message": "please ensure all records with id for PATCH"},
 			)
-		}
-
-		conditions := map[string]interface{}{}
-		conditions["id"] = user.GetId()
-
-		existing, err := c.service.GetById(conditions)
-		if len(existing) == 0 {
-			respCode = fiber.StatusNotFound
-			return fctx.JsonResponse(
-				respCode,
-				map[string]interface{}{
-					"message": errors.Join(
-						errors.New("cannot update non-existing records..."),
-						err,
-					).Error(),
-				},
-			)
-		} else if user.CreatedAt == nil {
-			user.CreatedAt = existing[0].CreatedAt
 		}
 	}
 

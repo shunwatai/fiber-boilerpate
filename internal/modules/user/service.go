@@ -117,6 +117,10 @@ func (s *Service) Create(users []*User) ([]*User, *helper.HttpErr) {
 	newUserNames := []string{}
 	for _, user := range users {
 		newUserNames = append(newUserNames, user.Name)
+		// handle if id present for update but not intend to change pw
+		if (user.Id != nil || user.MongoId != nil) && user.Password == nil {
+			continue
+		}
 		// hash plain password
 		if err := hashUserPassword(user.Password); err != nil {
 			return nil, &helper.HttpErr{fiber.StatusInternalServerError, err}
@@ -125,10 +129,32 @@ func (s *Service) Create(users []*User) ([]*User, *helper.HttpErr) {
 
 	// check if duplicated by "name"
 	existingUsers, _ := s.repo.Get(map[string]interface{}{"name": newUserNames, "exactMatch": map[string]bool{"name": true}})
-	if len(existingUsers) > 0 {
-		errMsg := fmt.Sprintf("user service create error: provided user name(s) %+v already exists.\n", newUserNames)
-		logger.Errorf(errMsg)
-		return nil, &helper.HttpErr{fiber.StatusConflict, fmt.Errorf(errMsg)}
+
+	for _, existing := range existingUsers {
+		index := IndexOfDuplicatedName(users, existing)
+		// new user without duplicated name
+		if index < 0 {
+			continue
+		}
+
+		// new user duplicated name with existing user
+		if index > -1 && (users[index].Id == nil && users[index].MongoId == nil) {
+			errMsg := fmt.Sprintf("user service create error: provided user name(s) %+v already exists.", newUserNames)
+			logger.Errorf(errMsg)
+			return nil, &helper.HttpErr{fiber.StatusConflict, fmt.Errorf(errMsg)}
+		}
+
+		// existing user (id given in json request) do update(upsert)
+		if (users[index].Id != nil && *users[index].Id == *existing.Id) || (users[index].MongoId != nil && *users[index].MongoId == *existing.MongoId) {
+			if users[index].CreatedAt == nil {
+				users[index].CreatedAt = existing.CreatedAt
+			}
+			if users[index].Password == nil {
+				users[index].Password = existing.Password
+			}
+		} else {
+			return nil, &helper.HttpErr{fiber.StatusConflict, fmt.Errorf("something went wrong, ID+Name not match with existing")}
+		}
 	}
 
 	results, err := s.repo.Create(users)
@@ -199,7 +225,7 @@ func (s *Service) Update(users []*User) ([]*User, *helper.HttpErr) {
 		if user.CreatedAt == nil {
 			user.CreatedAt = originalUser.CreatedAt
 		}
-		if user.Password == nil {
+		if user.Password == nil || len(*user.Password) == 0 {
 			user.Password = originalUser.Password
 		} else {
 			hashUserPassword(user.Password)
@@ -280,4 +306,13 @@ func (s *Service) Refresh(user *User) (map[string]interface{}, *helper.HttpErr) 
 	} else {
 		return userTokenResponse, nil
 	}
+}
+
+func IndexOfDuplicatedName(users Users, existingUser *User) int {
+	for i, u := range users {
+		if u.Name == existingUser.Name {
+			return i
+		}
+	}
+	return -1
 }

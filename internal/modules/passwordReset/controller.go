@@ -341,8 +341,10 @@ func (c *Controller) SendResetEmail(ctx *fiber.Ctx) error {
 
 // PasswordResetPage will retrun a html reset form after user open the "reset url" in their mailbox
 func (c *Controller) PasswordResetPage(ctx *fiber.Ctx) error {
+	respCode = fiber.StatusInternalServerError
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	fctx.Fctx.Response().SetStatusCode(respCode)
 	// data for template
 	data := map[string]interface{}{
 		"errMessage": nil,
@@ -367,21 +369,18 @@ func (c *Controller) PasswordResetPage(ctx *fiber.Ctx) error {
 	logger.Debugf("users: %v", len(users))
 	if len(users) == 0 {
 		data["errMessage"] = fmt.Sprintf("email not found: %s", email)
-		fctx.Fctx.Response().SetStatusCode(respCode)
 		return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
 	}
 
 	passwordResets, _ := c.service.Get(map[string]interface{}{"user_id": users[0].GetId(), "is_used": false})
 	if len(passwordResets) == 0 {
 		data["errMessage"] = "something went wrong, please try to send reset password again"
-		fctx.Fctx.Response().SetStatusCode(respCode)
 		return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(*passwordResets[0].TokenHash), []byte(token))
 	if err != nil {
 		data["errMessage"] = "something went wrong, please try to send reset password again"
-		fctx.Fctx.Response().SetStatusCode(respCode)
 		return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
 	}
 

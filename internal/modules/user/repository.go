@@ -42,9 +42,7 @@ func (r *Repository) Get(queries map[string]interface{}) ([]*User, *helper.Pagin
 }
 
 func (r *Repository) Create(users []*User) ([]*User, error) {
-	for _, user := range users {
-		logger.Debugf("user repo add: %+v", user)
-	}
+	logger.Debugf("user repo create")
 	rows, err := r.db.Save(Users(users))
 
 	var records Users
