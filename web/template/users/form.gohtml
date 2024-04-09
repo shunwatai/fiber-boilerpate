@@ -16,6 +16,7 @@
         hx-target-5*="#errorMessage"
         hx-indicator="#spinner"
         hx-disabled-elt="input, button"
+        hx-vals="js:{password:setPasswordNullIfEmpty()}"
       >
         {{if ne .user nil}}
           <input name="id" type="hidden" value="{{if ne .user.MongoId nil}}{{.user.MongoId}}{{else}}{{.user.Id}}{{end}}" />
@@ -28,7 +29,7 @@
         <input name="email" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .user nil}}required{{end}} value="{{if ne .user nil}}{{.user.Email}}{{end}}" />
 
         <label for="password" class="{{if eq .user nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 mr-auto my-auto">Password</label>
-        <input name="password" type="password" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .user nil}}required{{end}} />
+        <input name="password" id="password" type="password" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .user nil}}required{{end}} />
 
         <label for="firstName" class="{{if eq .user nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 mr-auto my-auto">First Name</label>
         <input name="firstName" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .user nil}}required{{end}} value="{{if ne .user nil}}{{.user.FirstName}}{{end}}" />
@@ -43,6 +44,13 @@
       </form>
     </div>
   </div>
+  <script>
+    function setPasswordNullIfEmpty(){
+      const password = document.getElementById("password")
+      if (!password.value) return null
+      return password.value
+    }
+  </script>
 {{end}}
 
 {{ define "footer" }}<div></div>{{ end }}

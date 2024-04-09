@@ -431,7 +431,8 @@ func (c *Controller) ListUsersPage(ctx *fiber.Ctx) error {
 	}
 	tpl := template.Must(template.ParseFiles(tmplFiles...))
 
-	users, pagination := c.service.Get(map[string]interface{}{})
+	paramsMap := helper.GetQueryString(ctx.Request().URI().QueryString())
+	users, pagination := c.service.Get(paramsMap)
 	data["users"] = users
 	data["pagination"] = pagination
 
@@ -491,7 +492,7 @@ func (c *Controller) UserFormPage(ctx *fiber.Ctx) error {
 }
 
 func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
-	logger.Debugf("user ctrl update form submit\n")
+	logger.Debugf("user ctrl form update submit\n")
 	respCode = fiber.StatusInternalServerError
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	fctx.Fctx.Response().SetStatusCode(respCode)
@@ -538,17 +539,18 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 	}
 
-	respCode = fiber.StatusOK
-	// login success, redirect to target path/url
-	targetPage := "/users"
-	fctx.Fctx.Set("HX-Redirect", targetPage)
-	respCode = fiber.StatusOK
-	fctx.Fctx.Response().SetStatusCode(respCode)
-	return fctx.Fctx.Redirect(targetPage, fiber.StatusOK)
+	fctx.Fctx.Response().SetStatusCode(fiber.StatusOK)
+	if len(users) == 1 {
+		targetPage := "/users"
+		fctx.Fctx.Set("HX-Redirect", targetPage)
+		return nil
+	}
+	data["successMessage"] = "Update success."
+	return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 }
 
 func (c *Controller) SubmitNew(ctx *fiber.Ctx) error {
-	logger.Debugf("user ctrl create form submit \n")
+	logger.Debugf("user ctrl form create submit \n")
 
 	respCode = fiber.StatusInternalServerError
 	fctx := &helper.FiberCtx{Fctx: ctx}

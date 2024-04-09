@@ -1,4 +1,9 @@
 {{ define "errorDialog"}}
+  <div id="successMessage" class="mx-auto text-green-600 text-xs">
+    {{if $.successMessage}}
+      Success: {{ $.successMessage }}
+    {{end}}
+  </div>
   <div id="errorMessage" class="mx-auto text-red-600 text-xs">
     {{if $.errMessage}}
       ERROR: {{ $.errMessage }}

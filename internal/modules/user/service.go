@@ -175,6 +175,9 @@ func (s *Service) Update(users []*User) ([]*User, *helper.HttpErr) {
 	// USELESS, can simply set that column as UNIQUE in DB's table.
 	// check conflict of existing name
 	for _, user := range users {
+		if len(user.Name) == 0 {
+			continue
+		}
 		conflicts, _ := s.repo.Get(map[string]interface{}{
 			"name": user.Name,
 			"exactMatch": map[string]bool{
