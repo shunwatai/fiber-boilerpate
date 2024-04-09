@@ -19,9 +19,13 @@ It is running by fiber with basic CRUD routes which follows the Controller-Servi
 - [ ] Web template by htmx
     - [x] Login page
     - [x] Forget page
-    - [ ] CRUD users,todos etc.
-        - [ ] searching
-        - [ ] pagination
+    - [x] Users page CRUD
+        - [x] Users list
+        - [x] User form
+    - [ ] Todos page
+        - [ ] Todos list
+        - [ ] Todo form
+        - [ ] Todo form upload file
 - [ ] DB try views and joining in repository
 
 # Quick start by docker-compose
