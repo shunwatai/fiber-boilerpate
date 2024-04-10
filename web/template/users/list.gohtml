@@ -6,7 +6,7 @@
   {{ template "errorDialog" . }}
 
   <!-- https://play.tailwindcss.com/haDGueJm6h -->
-  <form id="user-list" class="m-2" hx-ext="json-enc" hx-indicator="#spinner" hx-disabled-elt="input, button" autocomplete="off">
+  <form id="user-list" class="m-2" hx-ext="json-enc" hx-indicator="#spinner" hx-disabled-elt="input, button" autocomplete="off" x-data="userListState">
     <div class="flex mb-2 gap-2">
       <a href="/users/form">
         <button type="button" class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2">
@@ -14,12 +14,14 @@
         </button>
       </a>
       <button 
-        class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2"
+        :class="`${checkedCount.length===0?'opacity-50':''} flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2`"
         type="button"
         hx-delete="/users"
         hx-vals="js:{ids:getIdsAsArray()}"
+        hx-confirm="Click confirm to delete"
+        :disabled="checkedCount.length===0"
       >
-        Delete
+        Delete <span x-show="checkedCount.length>0" x-text="`(${checkedCount.length})`"></span>
         <div id="spinner" class="htmx-indicator animate-spin w-5 h-5 rounded-full m-auto border-2 border-solid border-slate-500 border-t-transparent"></div>
       </button>
       <button 
@@ -45,7 +47,7 @@
       </tr>
       {{- range .users }}
       <tr>
-        <td class="border border-slate-700 text-center"><input type="checkbox" name="ids" value={{.Id}} /></td>
+        <td class="border border-slate-700 text-center"><input type="checkbox" name="ids" value={{.Id}} @click="handleCheck" /></td>
         <td class="border border-slate-700 text-center"><a class="block" href="/users/form?userId={{.Id}}">{{.Name}}</a></td>
         <td class="border border-slate-700 text-center"><a class="block" href="/users/form?userId={{.Id}}">{{.Email}}</a></td>
         <td class="border border-slate-700 text-center"><a class="block" href="/users/form?userId={{.Id}}">{{if .FirstName}}{{.FirstName}}{{else}}&nbsp{{end}}</a></td>
@@ -102,8 +104,21 @@
         return (JSON.stringify(body))
       }
     })
+
+    function userListState(){
+      return {
+        checkedCount: [],
+        handleCheck: function (e){
+          if (e.target.checked)
+            this.checkedCount.push(e.target.value)
+          else
+            this.checkedCount.splice(this.checkedCount.findIndex((checked)=>checked===e.target.value),1)
+          
+          //console.log("checkedCount",this.checkedCount.length)
+        }
+      }
+    }
   </script>
 {{end}}
 
 {{ define "footer" }}<div></div>{{ end }}
-

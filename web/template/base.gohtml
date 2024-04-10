@@ -5,11 +5,33 @@
     <script src="/static/3p/htmx/htmx-1.9.11.min.js"></script>
     <script src="/static/3p/htmx/json-enc.js"></script>
     <script src="/static/3p/htmx/response-targets.js"></script>
+    <script src="/static/3p/sweetalert/sweetalert2-11.10.7.js"></script>
+    <script defer src="/static/3p/alpinejs/alpinejs-3.13.8.min.js"></script>
     <link href="/static/css/output.css" rel="stylesheet">
     <link href="/static/css/htmx.css" rel="stylesheet">
   </head>
   <body class="flex flex-col justify-center gap-2" hx-ext="response-targets">
     {{ template "content" . }}
+
+    <script>
+      document.addEventListener("htmx:confirm", function(e) {
+        e.preventDefault()
+        if (!e.target.hasAttribute('hx-confirm')) {
+          e.detail.issueRequest(true);
+          return;
+        }
+        Swal.fire({
+          title: "Proceed?",
+          text: `${e.detail.question||""}`,
+          confirmButtonText: "Confirm",
+          showCancelButton: true,
+          reverseButtons: true,
+          confirmButtonColor: "#d33",
+        }).then(function(result) {
+          if(result.isConfirmed) e.detail.issueRequest(true) // use true to skip window.confirm
+        })
+      })
+    </script>
   </body>
   <footer>
     {{ template "footer" . }}
