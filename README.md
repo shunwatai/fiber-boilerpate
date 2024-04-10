@@ -44,9 +44,7 @@ I try following the standards from [project-layout](https://github.com/golang-st
 ├── compose-prod.yaml
 ├── configs                         # config files for storing the ENV variables read by viper
 │   ├── docker.yaml
-│   ├── docker.yaml.sample
-│   ├── localhost.yaml
-│   └── localhost.yaml.sample
+│   └── localhost.yaml
 ├── db-backup
 ├── db.env                          # read by compose-db.yaml when initiating dev DBs
 ├── Dockerfile                      # read by compose-dev.yaml
@@ -61,7 +59,7 @@ I try following the standards from [project-layout](https://github.com/golang-st
 │   ├── database                    # the databases implementations
 │   ├── helper
 │   ├── middleware
-│   ├── modules                     # all modules store here, and following the "route-controller-service-repository" pattern
+│   ├── modules                     # all APIs store here, they follow the "route-controller-service-repository" pattern
 │   └── notification                # email notification functions here
 ├── log                             # storing the API log files
 │   └── requests.log
@@ -83,12 +81,11 @@ I try following the standards from [project-layout](https://github.com/golang-st
     └── template
 ```
 
-
 # Quick start by docker-compose
-1. [Start the databases](#start-databases-for-development)
-2. [Run database migrations](#run-migration)
-3. [Set the database in config](#for-run-by-docker)
-3. [Start fiber api](#start-by-docker)
+1. [Start the databases containers](#start-databases-for-development)
+2. [Run database migrations](migrations/README.md#run-migration)
+3. [Set the database in configs/docker.yaml](#for-run-by-docker)
+3. [Start fiber api by docker](#start-by-docker)
 4. [Test the apis by curl](#test-sample-APIs)
 
 # Install dependencies
@@ -220,6 +217,9 @@ The `cmd/gen/gen.go` is for generating new module without tedious copy & paste, 
 [Detail usage](cmd/gen/README.md)
 
 # API details
+## Users
+[readme](internal/modules/users/README.md)
+
 ## Password reset
 [readme](internal/modules/passwordReset/README.md)
 
