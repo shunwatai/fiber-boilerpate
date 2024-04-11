@@ -87,6 +87,7 @@ I try following the standards from [project-layout](https://github.com/golang-st
 3. [Set the database in configs/docker.yaml](#for-run-by-docker)
 3. [Start fiber api by docker](#start-by-docker)
 4. [Test the apis by curl](#test-sample-APIs)
+5. [Try the user's web](internal/modules/user/README.md#web-crud)
 
 # Install dependencies
 If run the Fiber server without docker, install the following go packages.
