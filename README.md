@@ -218,7 +218,7 @@ The `cmd/gen/gen.go` is for generating new module without tedious copy & paste, 
 
 # API details
 ## Users
-[readme](internal/modules/users/README.md)
+[readme](internal/modules/user/README.md)
 
 ## Password reset
 [readme](internal/modules/passwordReset/README.md)
