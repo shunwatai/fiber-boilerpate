@@ -210,6 +210,7 @@ make tw-watch
 curl --request GET \
   --url http://localhost:7000/ping
 ```
+![](./assets/screenshots/curl_ping.gif)
 
 ## login
 
@@ -221,6 +222,7 @@ curl --request POST \
   --header 'Content-Type: application/json' \
   --data '{"name":"admin","password":"admin"}'
 ```
+![](./assets/screenshots/curl_login.gif)
 
 # Generate new module
 The `cmd/gen/gen.go` is for generating new module without tedious copy & paste, find & replace.
