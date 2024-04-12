@@ -290,7 +290,7 @@ func (c *Controller) SendResetEmailPage(ctx *fiber.Ctx) error {
 	}
 
 	tmplFiles := []string{
-		"web/template/parts/error-dialog.gohtml",
+		"web/template/parts/popup.gohtml",
 		"web/template/reset-password/send-reset-email.gohtml",
 		"web/template/base.gohtml",
 	}
@@ -308,13 +308,10 @@ func (c *Controller) SendResetEmail(ctx *fiber.Ctx) error {
 		"errMessage": nil,
 	}
 
-	tmplFiles := []string{"web/template/parts/error-dialog.gohtml"}
+	tmplFiles := []string{"web/template/parts/popup.gohtml"}
 	tpl := template.Must(template.ParseFiles(tmplFiles...))
 
-	html := `
-	{{ template "errorDialog" . }}
-	<div id="message" class="mx-auto text-xs">{{$.message}}</div>
-	`
+	html := `{{ template "popup" . }}`
 	tpl, _ = tpl.New("message").Parse(html)
 
 	fctx := &helper.FiberCtx{Fctx: ctx}
@@ -333,7 +330,7 @@ func (c *Controller) SendResetEmail(ctx *fiber.Ctx) error {
 		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 	}
 
-	data["message"] = "Reset email has been sent, please check your mailbox"
+	data["successMessage"] = "Reset email has been sent, please check your mailbox"
 
 	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
 	return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
@@ -351,7 +348,7 @@ func (c *Controller) PasswordResetPage(ctx *fiber.Ctx) error {
 	}
 
 	tmplFiles := []string{
-		"web/template/parts/error-dialog.gohtml",
+		"web/template/parts/popup.gohtml",
 		"web/template/reset-password/reset-form.gohtml",
 		"web/template/base.gohtml",
 	}
@@ -412,10 +409,10 @@ func (c *Controller) ChangePassword(ctx *fiber.Ctx) error {
 		"updated":    false,
 	}
 
-	tmplFiles := []string{"web/template/parts/error-dialog.gohtml"}
+	tmplFiles := []string{"web/template/parts/popup.gohtml"}
 	tpl := template.Must(template.ParseFiles(tmplFiles...))
 
-	html := `{{ template "errorDialog" . }}`
+	html := `{{ template "popup" . }}`
 	tpl, _ = tpl.New("message").Parse(html)
 
 	u := new(user.User)

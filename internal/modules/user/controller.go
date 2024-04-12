@@ -339,7 +339,7 @@ func (c *Controller) LoginPage(ctx *fiber.Ctx) error {
 		"errMessage": nil,
 	}
 	tmplFiles := []string{
-		"web/template/parts/error-dialog.gohtml",
+		"web/template/parts/popup.gohtml",
 		"web/template/login.gohtml",
 		"web/template/base.gohtml",
 	}
@@ -359,10 +359,10 @@ func (c *Controller) SubmitLogin(ctx *fiber.Ctx) error {
 	fctx.Fctx.Response().SetStatusCode(respCode)
 	data := fiber.Map{}
 
-	tmplFiles := []string{"web/template/parts/error-dialog.gohtml"}
+	tmplFiles := []string{"web/template/parts/popup.gohtml"}
 	tpl := template.Must(template.ParseFiles(tmplFiles...))
 
-	html := `{{ template "errorDialog" . }}`
+	html := `{{ template "popup" . }}`
 	tpl, _ = tpl.New("message").Parse(html)
 
 	u := new(User)
@@ -399,7 +399,7 @@ func (c *Controller) ListUsersPage(ctx *fiber.Ctx) error {
 		"pagination": helper.Pagination{},
 	}
 	tmplFiles := []string{
-		"web/template/parts/error-dialog.gohtml",
+		"web/template/parts/popup.gohtml",
 		"web/template/users/list.gohtml",
 		"web/template/base.gohtml",
 	}
@@ -426,7 +426,7 @@ func (c *Controller) UserFormPage(ctx *fiber.Ctx) error {
 		"title":      "Create user",
 	}
 	tmplFiles := []string{
-		"web/template/parts/error-dialog.gohtml",
+		"web/template/parts/popup.gohtml",
 		"web/template/users/form.gohtml",
 		"web/template/base.gohtml",
 	}
@@ -476,10 +476,10 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 	users := []*User{}
 
 	data := fiber.Map{}
-	tmplFiles := []string{"web/template/parts/error-dialog.gohtml"}
+	tmplFiles := []string{"web/template/parts/popup.gohtml"}
 	tpl := template.Must(template.ParseFiles(tmplFiles...))
 
-	html := `{{ template "errorDialog" . }}`
+	html := `{{ template "popup" . }}`
 	tpl, _ = tpl.New("message").Parse(html)
 
 	if invalidJson := reqCtx.Payload.ValidateJson(); invalidJson != nil {
@@ -536,10 +536,10 @@ func (c *Controller) SubmitNew(ctx *fiber.Ctx) error {
 	users := []*User{}
 
 	data := fiber.Map{}
-	tmplFiles := []string{"web/template/parts/error-dialog.gohtml"}
+	tmplFiles := []string{"web/template/parts/popup.gohtml"}
 	tpl := template.Must(template.ParseFiles(tmplFiles...))
 
-	html := `{{ template "errorDialog" . }}`
+	html := `{{ template "popup" . }}`
 	tpl, _ = tpl.New("message").Parse(html)
 
 	if invalidJson := reqCtx.Payload.ValidateJson(); invalidJson != nil {
@@ -587,10 +587,10 @@ func (c *Controller) SubmitDelete(ctx *fiber.Ctx) error {
 	c.service.ctx = ctx
 
 	data := fiber.Map{}
-	tmplFiles := []string{"web/template/parts/error-dialog.gohtml"}
+	tmplFiles := []string{"web/template/parts/popup.gohtml"}
 	tpl := template.Must(template.ParseFiles(tmplFiles...))
 
-	html := `{{ template "errorDialog" . }}`
+	html := `{{ template "popup" . }}`
 	tpl, _ = tpl.New("message").Parse(html)
 
 	if invalidJson := reqCtx.Payload.ValidateJson(); invalidJson != nil {

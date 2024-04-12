@@ -3,7 +3,7 @@
 {{ define "content"}}
   <h1 class="text-2xl mx-auto">{{.title}}</h1>
 
-  {{ template "errorDialog" . }}
+  {{ template "popup" . }}
 
   <!-- user: {{.user}} -->
 
@@ -26,16 +26,16 @@
         <input name="name" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .user nil}}required{{end}} value="{{if ne .user nil}}{{.user.Name}}{{end}}" />
 
         <label for="email" class="{{if eq .user nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 mr-auto my-auto">Email</label>
-        <input name="email" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .user nil}}required{{end}} value="{{if ne .user nil}}{{.user.Email}}{{end}}" />
+        <input name="email" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .user nil}}required{{end}} value="{{if and (ne .user nil) (ne .user.Email nil)}}{{.user.Email}}{{end}}" />
 
         <label for="password" class="{{if eq .user nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 mr-auto my-auto">Password</label>
         <input name="password" id="password" type="password" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .user nil}}required{{end}} />
 
         <label for="firstName" class="{{if eq .user nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 mr-auto my-auto">First Name</label>
-        <input name="firstName" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .user nil}}required{{end}} value="{{if ne .user nil}}{{.user.FirstName}}{{end}}" />
+        <input name="firstName" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .user nil}}required{{end}} value="{{if and (ne .user nil) (ne .user.FirstName nil)}}{{.user.FirstName}}{{end}}" />
 
         <label for="lastName" class="{{if eq .user nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 mr-auto my-auto">Last Name</label>
-        <input name="lastName" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .user nil}}required{{end}} value="{{if ne .user nil}}{{.user.LastName}}{{end}}" />
+        <input name="lastName" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .user nil}}required{{end}} value="{{if and (ne .user nil) (ne .user.LastName nil)}}{{.user.LastName}}{{end}}" />
 
         <button type="submit" class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2">
           {{if eq .user nil}}Add{{else}}Update{{end}}

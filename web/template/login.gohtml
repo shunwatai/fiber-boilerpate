@@ -7,7 +7,8 @@
     class="flex flex-col mx-auto gap-4 p-2 w-[28vw]"
     hx-post="/login"
     hx-ext="json-enc"
-    hx-target-5*="#errorMessage"
+    hx-target-5*="#popupMessage"
+    hx-swap="outerHTML"
     hx-indicator="#spinner"
     hx-disabled-elt="input, button"
   >
@@ -22,7 +23,7 @@
     <div class="flex justify-end text-xs">
       <a href="/password-resets/forgot">forget password</a>
     </div>
-    {{ template "errorDialog" . }}
+    {{ template "popup" . }}
     <button type="submit" class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2 mx-auto">
       Login
       <div id="spinner" class="htmx-indicator animate-spin w-5 h-5 rounded-full m-auto border-2 border-solid border-slate-500 border-t-transparent"></div>
