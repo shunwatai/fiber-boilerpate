@@ -14,8 +14,8 @@ build:
 clean: 
 	find ./build/ -type f -executable -delete
 
-docker-dev: docker-dev-build docker-dev-up    # docker-compose -f compose-dev.yaml up --build -d
-docker-prod: docker-prod-build docker-prod-up # docker-compose -f compose-prod.yaml up --build -d
+docker-dev: docker-dev-build docker-dev-up
+docker-prod: docker-prod-build docker-prod-up
 
 docker-dev-build: 
 	docker-compose -f compose-dev.yaml build fiber-api-dev --build-arg UID=$$(id -u)

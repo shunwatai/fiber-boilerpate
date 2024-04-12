@@ -1,19 +1,21 @@
 # Fiber boilerpate
-This project is for learning purpose, just a starter project for myself to learn go and start a REST API quicker.
+This is my personal repo just for fun which for myself startng a golang REST API quicker and learn about golang.
 
-It is running by fiber with basic CRUD routes which follows the Controller-Service-Repository pattern like Spring or Laravel's structure.
+It runs by fiber with basic CRUD routes which follows the Controller-Service-Repository pattern like Spring boot or Laravel's structure.
 
 # Features
-- With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` for storing records in DB. Just raw sql without ORM.
+- With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` for accessing records in DB in `internal/database/`. Just raw sql without ORM.
 - With example modules like `users`, `todos`, `documents` etc. in `interal/modules/`, with CRUD APIs.
+- HTMX web templates.
 - With a [script](#generate-new-module) `cmd/gen/gen.go` for generate new module to `internal/modules/`.
 - With the example of JWT auth in the [login API](#login).
 - Can generate swagger doc.
 - Make use of `viper` for loading env variables in config.
-- With a logging wrapper by `zap` which uses as middleware for writing the request's logs in `log/`, the log file may be used for centralised log server like ELK or Signoz. 
+- With a logging wrapper by `zap` which uses as middleware for writing the request's logs in `log/`, the log file maybe used for centralised log server like ELK or Signoz. 
 
 # Todo
 - [ ] Need more test cases
+- [ ] Add GET `/me`
 - [ ] Try `bubbletea` for `cmd/gen/gen.go`
 - [ ] Try Oauth
 - [ ] Web template by htmx
@@ -158,6 +160,11 @@ air
 Run the dev container
 ```
 make docker-dev
+```
+or
+```
+docker-compose -f compose-dev.yaml build fiber-api-dev --build-arg UID=$(id -u) && \
+docker-compose -f compose-dev.yaml up -d
 ```
 
 Check status
