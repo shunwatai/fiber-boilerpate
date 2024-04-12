@@ -6,7 +6,7 @@ It runs by fiber with basic CRUD routes which follows the Controller-Service-Rep
 # Features
 - With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` for accessing records in DB in `internal/database/`. Just raw sql without ORM.
 - With example modules like `users`, `todos`, `documents` etc. in `interal/modules/`, with CRUD APIs.
-- HTMX web templates.
+- `HTMX` web templates with `tailwind` & `alpinejs`.
 - With a [script](#generate-new-module) `cmd/gen/gen.go` for generate new module to `internal/modules/`.
 - With the example of JWT auth in the [login API](#login).
 - Can generate swagger doc.
@@ -88,7 +88,7 @@ I try following the standards from [project-layout](https://github.com/golang-st
 2. [Run database migrations](migrations/README.md#run-migration)
 3. [Set the database in configs/docker.yaml](#for-run-by-docker)
 3. [Start fiber api by docker](#start-by-docker)
-4. [Test the apis by curl](#test-sample-APIs)
+4. [Test the login api by curl for getting the JWT](#login)
 5. [Try the user's web](internal/modules/user/README.md#web-crud)
 
 # Install dependencies
@@ -212,6 +212,9 @@ curl --request GET \
 ```
 
 ## login
+
+There is a default `admin` user with password `admin` once the DB migrations ran.
+
 ```
 curl --request POST \
   --url http://localhost:7000/api/auth/login \
