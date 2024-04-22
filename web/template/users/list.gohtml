@@ -1,124 +1,110 @@
-{{ define "title"}}<title>Users</title>{{ end }}
-      
-{{ define "content"}}
-  <h1 class="text-2xl mx-auto">Users</h1>
+{{ define "list"}}
+  <div class="rounded-lg border border-gray-200" id="userTable">
+    <div class="overflow-x-auto rounded-t-lg">
+      <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+        <thead class="ltr:text-left rtl:text-right">
+          <tr>
+            <th class="sticky inset-y-0 start-0 bg-white px-4 py-2">
+              <label for="SelectAll" class="sr-only">Select All</label>
+              <input type="checkbox" id="SelectAll" class="size-5 rounded border-gray-300" />
+            </th>
+            <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900">login name</th>
+            <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900">email</th>
+            <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900">first name</th>
+            <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900">last name</th>
+            <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900">disabled</th>
+          </tr>
+        </thead>
 
-  {{ template "popup" . }}
-
-  <!-- https://play.tailwindcss.com/haDGueJm6h -->
-  <form id="user-list" class="m-2" hx-ext="json-enc" hx-indicator="#spinner" hx-disabled-elt="input, button" autocomplete="off" x-data="userListState">
-    <div class="flex mb-2 gap-2">
-      <a href="/users/form">
-        <button type="button" class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2">
-          New
-        </button>
-      </a>
-      <button 
-        :class="`${checkedCount.length===0?'opacity-50':''} flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2 text-red-500`"
-        type="button"
-        hx-delete="/users"
-        hx-vals="js:{ids:getIdsAsArray()}"
-        hx-confirm="Click confirm to delete"
-        :disabled="checkedCount.length===0"
-      >
-        Delete <span x-show="checkedCount.length>0" x-text="`(${checkedCount.length})`"></span>
-        <div id="spinner" class="htmx-indicator animate-spin w-5 h-5 rounded-full m-auto border-2 border-solid border-slate-500 border-t-transparent"></div>
-      </button>
-      <button 
-        class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2 ml-auto"
-        type="button"
-        hx-target="#popupMessage"
-        hx-patch="/users"
-        hx-ext="submit-array"
-        hx-swap="outerHTML"
-      >
-        Update
-        <div id="spinner" class="htmx-indicator animate-spin w-5 h-5 rounded-full m-auto border-2 border-solid border-slate-500 border-t-transparent"></div>
-      </button>
+        <tbody class="divide-y divide-gray-200">
+        {{- range .users }}
+        <tr>
+          <td class="text-center sticky inset-y-0 start-0 bg-white px-4 py-2"><input class="size-5 rounded border-gray-300" type="checkbox" name="ids" value={{.Id}} @click="handleCheck" /></td>
+          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/users/form?userId={{.Id}}">{{.Name}}</a></td>
+          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/users/form?userId={{.Id}}">{{.Email}}</a></td>
+          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/users/form?userId={{.Id}}">{{if .FirstName}}{{.FirstName}}{{else}}&nbsp{{end}}</a></td>
+          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/users/form?userId={{.Id}}">{{if .LastName}}{{.LastName}}{{else}}&nbsp{{end}}</a></td>
+          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><input class="size-5 rounded border-gray-300" type="checkbox" name="disabled" id={{.Id}} value={{.Name}} {{ if .Disabled }} checked {{end}} /></td>
+        </tr>
+        {{- end }}
+        </tbody>
+      </table>
     </div>
-    <table class="w-full table-auto border-collapse border border-slate-500 [&>tbody>*:nth-child(even)]:bg-slate-100">
-      <tr class="bg-slate-400">
-        <th class="border border-slate-600 text-center"></th>
-        <th class="border border-slate-600 text-center">login name</th>
-        <th class="border border-slate-600 text-center">email</th>
-        <th class="border border-slate-600 text-center">first name</th>
-        <th class="border border-slate-600 text-center">last name</th>
-        <th class="border border-slate-600 text-center">disabled</th>
-      </tr>
-      {{- range .users }}
-      <tr>
-        <td class="border border-slate-700 text-center"><input type="checkbox" name="ids" value={{.Id}} @click="handleCheck" /></td>
-        <td class="border border-slate-700 text-center"><a class="block" href="/users/form?userId={{.Id}}">{{.Name}}</a></td>
-        <td class="border border-slate-700 text-center"><a class="block" href="/users/form?userId={{.Id}}">{{.Email}}</a></td>
-        <td class="border border-slate-700 text-center"><a class="block" href="/users/form?userId={{.Id}}">{{if .FirstName}}{{.FirstName}}{{else}}&nbsp{{end}}</a></td>
-        <td class="border border-slate-700 text-center"><a class="block" href="/users/form?userId={{.Id}}">{{if .LastName}}{{.LastName}}{{else}}&nbsp{{end}}</a></td>
-        <td class="border border-slate-700 text-center"><input type="checkbox" name="disabled" id={{.Id}} value={{.Name}} {{ if .Disabled }} checked {{end}} /></td>
-      </tr>
-      {{- end }}
-    </table>
-  </form>
 
-  <script>
-    function getIdsAsArray() {
-      // Get all the checked checkboxes
-      const checkboxes = document.querySelectorAll('input[type="checkbox"][name="ids"]:checked');
+    <div class="rounded-b-lg border-t border-gray-200 px-4 py-2">
+      <ol class="flex justify-between gap-1 text-xs font-medium">
+        <li class="my-auto flex w-full"><div class="w-fix my-auto">items / page:</div>
+          <select
+            name="items"
+            id="items"
+            class="w-fit size-8 px-2 rounded-lg border border-gray-100 bg-white text-gray-700 sm:text-sm"
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+          </select>
+          </li>
 
-      // Create an array to store the selected ids
-      const ids = [];
+        <li class="my-auto flex w-full justify-center">
+          <button
+            hx-get="/users/list?{{.pagination.PrevPage}}"
+            hx-target="#userTable"
+            hx-swap="outerHTML"
+            class="inline-flex size-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+          >
+            <span class="sr-only">Prev Page</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-3 w-3"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
 
-      // Loop through the checkboxes and add the ids to the array
-      checkboxes.forEach(function(checkbox) {
-        ids.push(checkbox.value);
-      });
+          <select
+            name="page"
+            class="w-fit size-8 px-2 rounded-lg border border-gray-100 bg-white text-gray-700 sm:text-sm"
+            hx-get="/users/list"
+            hx-include="[id='items']"
+            hx-target="#userTable"
+            hx-swap="outerHTML"
+          >
+            {{- range $page := Iterate .pagination.TotalPages }}
+              <option  value="{{ $page }}" {{ if eq $page $.pagination.Page }} selected {{end}}>
+                <a href="/users?page={{$.pagination.Page}}&items={{$.pagination.Items}}">{{ $page }}</a>
+              </option>
+            {{- end }}
+          </select>
+          <button
+            hx-get="/users/list?{{.pagination.NextPage}}"
+            hx-target="#userTable"
+            hx-swap="outerHTML"
+            class="inline-flex size-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+          >
+            <span class="sr-only">Next Page</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-3 w-3"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button> 
+        </li>
 
-      // Create the request JSON
-      const requestData = {
-        ids: ids.length > 0 ? ids : [] // Ensure that the ids property is always an array
-      };
-
-      return ids;
-    }
-
-    function getDisabledForUpdate() {
-      // Get all the checkboxes
-      const checkboxes = document.querySelectorAll('input[type="checkbox"][name="disabled"]');
-      const results = [];
-
-      checkboxes.forEach(function(checkbox) {
-        results.push({id:checkbox.id,name:checkbox.value,disabled:checkbox.checked});
-      });
-
-      //console.log("results:", results)
-      return results;
-    }
-
-    htmx.defineExtension('submit-array', {
-      onEvent: function (name, evt) {
-        if (name === "htmx:configRequest") {
-          evt.detail.headers['Content-Type'] = "application/json"
-        }
-      },
-      encodeParameters: function(xhr, parameters, elt) {
-        xhr.overrideMimeType('application/json') // override default mime type
-        const body = getDisabledForUpdate()
-        return (JSON.stringify(body))
-      }
-    })
-
-    function userListState(){
-      return {
-        checkedCount: [],
-        handleCheck: function (e){
-          if (e.target.checked)
-            this.checkedCount.push(e.target.value)
-          else
-            this.checkedCount.splice(this.checkedCount.findIndex((checked)=>checked===e.target.value),1)
-          
-          //console.log("checkedCount",this.checkedCount.length)
-        }
-      }
-    }
-  </script>
+        <li class="my-auto flex w-full justify-end">total records:{{.pagination.Count}}</span></li>
+      </ol>
+    </div>
+  </div>
 {{end}}
-
-{{ define "footer" }}<div></div>{{ end }}

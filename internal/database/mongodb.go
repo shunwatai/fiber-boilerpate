@@ -174,6 +174,7 @@ func (m *Mongodb) getConditionsFromQuerystring(
 	var limit int64
 	var offset int64 = (pagination.Page - 1) * pagination.Items
 	if pagination.Items == 0 {
+		pagination.Items = pagination.Count
 		limit = pagination.Count
 	} else {
 		limit = pagination.Items
@@ -191,6 +192,8 @@ func (m *Mongodb) getConditionsFromQuerystring(
 			}(),
 		},
 	)
+
+	pagination.SetPageUrls()
 
 	return selectStmt, options, pagination
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	logger "golang-api-starter/internal/helper/logger/zap_log"
 	"log"
 	"net/url"
 	"strconv"
@@ -46,7 +47,12 @@ func (fi *FlexInt) UnmarshalJSON(b []byte) error {
 }
 
 func GetQueryString(queryString []byte) map[string]interface{} {
-	params, err := url.ParseQuery(string(queryString))
+	decodedQuerystring, err := url.QueryUnescape(string(queryString))
+	if err != nil {
+		logger.Errorf("decodedQuerystring err: %+v", err)
+	}
+	logger.Debugf("decodedQuerystring: %+v", decodedQuerystring)
+	params, err := url.ParseQuery(decodedQuerystring)
 	if err != nil {
 		log.Printf("ParseQuery err: %+v\n", err.Error())
 	}

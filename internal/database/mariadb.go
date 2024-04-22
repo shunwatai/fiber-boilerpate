@@ -133,6 +133,7 @@ func (m *MariaDb) constructSelectStmtFromQuerystring(
 	var limit string
 	var offset string = strconv.Itoa(int((pagination.Page - 1) * pagination.Items))
 	if pagination.Items == 0 {
+		pagination.Items = pagination.Count
 		limit = strconv.Itoa(int(pagination.Count))
 	} else {
 		limit = strconv.Itoa(int(pagination.Items))
@@ -146,6 +147,8 @@ func (m *MariaDb) constructSelectStmtFromQuerystring(
 		pagination.OrderBy["key"], pagination.OrderBy["by"],
 		limit, offset,
 	)
+
+	pagination.SetPageUrls()
 
 	return selectStmt, pagination, bindvarMap
 }

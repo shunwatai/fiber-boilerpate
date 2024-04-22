@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -31,6 +32,33 @@ type Pagination struct {
 	Count      int64             `json:"count"`      // total records
 	OrderBy    map[string]string `json:"orderBy"`    // orderBy
 	TotalPages int64             `json:"totalPages"` // ceil(count / items)
+	NextPage   string            `json:"nextPage"`   // next page url
+	PrevPage   string            `json:"prevPage"`   // prev page url
+}
+
+func (p *Pagination) SetPageUrls() {
+	p.setNextPageUrl()
+	p.setPrevPageUrl()
+}
+
+func (p *Pagination) setNextPageUrl() {
+	var nextPageUrl string
+	if p.Page >= p.TotalPages {
+		nextPageUrl = fmt.Sprintf("items=%d&page=%d&orderBy=%s.%s", p.Items, p.Page, p.OrderBy["key"], p.OrderBy["by"])
+	} else {
+		nextPageUrl = fmt.Sprintf("items=%d&page=%d&orderBy=%s.%s", p.Items, p.Page+1, p.OrderBy["key"], p.OrderBy["by"])
+	}
+	p.NextPage = nextPageUrl
+}
+
+func (p *Pagination) setPrevPageUrl() {
+	var prevPageUrl string
+	if p.Page <= 1 {
+		prevPageUrl = fmt.Sprintf("items=%d&page=%d&orderBy=%s.%s", p.Items, p.Page, p.OrderBy["key"], p.OrderBy["by"])
+	} else {
+		prevPageUrl = fmt.Sprintf("items=%d&page=%d&orderBy=%s.%s", p.Items, p.Page-1, p.OrderBy["key"], p.OrderBy["by"])
+	}
+	p.PrevPage = prevPageUrl
 }
 
 func getDefaultPagination() *Pagination {
@@ -48,9 +76,9 @@ func getDefaultPagination() *Pagination {
 	}
 }
 
-// get the pagination struct according to the req querystring 
+// get the pagination struct according to the req querystring
 // key: page(page number), items(number of rows per page)
-func GetPagination(queries map[string]interface{}) *Pagination{
+func GetPagination(queries map[string]interface{}) *Pagination {
 	pagination := getDefaultPagination()
 
 	if queries["page"] != nil && queries["items"] != nil {
@@ -67,7 +95,7 @@ func GetPagination(queries map[string]interface{}) *Pagination{
 
 // ensure the queries only contains the keys that match with table's columns,
 // clean the irrelevant keys from the queries
-func SanitiseQuerystring(cols []string, queries map[string]interface{}){
+func SanitiseQuerystring(cols []string, queries map[string]interface{}) {
 	tmpColsMap := map[string]struct{}{}
 	for _, col := range cols {
 		tmpColsMap[col] = struct{}{}

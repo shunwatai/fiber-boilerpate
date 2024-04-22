@@ -28,13 +28,12 @@ func GetRoutes(router fiber.Router) {
 
 	viewRoute.Route("/users", func(userPage fiber.Router) {
 		userPage.Get("/", ctrl.ListUsersPage)
-		// userPage.Patch("/", ctrl.SubmitBulkUpdate)
-		// userPage.Delete("/", ctrl.SubmitBulkDelete)
+		userPage.Get("/list", ctrl.GetUserList)
+		userPage.Delete("/", ctrl.SubmitDelete)
+		userPage.Patch("/", ctrl.SubmitUpdate)
+		userPage.Post("/", ctrl.SubmitNew)
 		userPage.Route("/form", func(userForm fiber.Router) {
 			userForm.Get("/", ctrl.UserFormPage)
-			userPage.Post("/", ctrl.SubmitNew)
-			userPage.Patch("/", ctrl.SubmitUpdate)
-			userPage.Delete("/", ctrl.SubmitDelete)
 		})
 	})
 
