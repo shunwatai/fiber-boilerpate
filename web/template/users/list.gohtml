@@ -6,7 +6,7 @@
           <tr>
             <th class="sticky inset-y-0 start-0 bg-white px-4 py-2">
               <label for="SelectAll" class="sr-only">Select All</label>
-              <input type="checkbox" id="SelectAll" class="size-5 rounded border-gray-300" />
+              <input type="checkbox" id="selectAll" class="size-5 rounded border-gray-300" @click="toggleSelectAll" />
             </th>
             <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900">login name</th>
             <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900">email</th>
@@ -38,10 +38,15 @@
             name="items"
             id="items"
             class="w-fit size-8 px-2 rounded-lg border border-gray-100 bg-white text-gray-700 sm:text-sm"
+            hx-get="/users/list"
+            hx-include="[name='page']"
+            hx-target="#userTable"
+            hx-swap="outerHTML"
           >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
+            <option value="5"   {{ if eq 5   $.pagination.Items }} selected {{ end }}>5</option>
+            <option value="15"  {{ if eq 15  $.pagination.Items }} selected {{ end }}>15</option>
+            <option value="25"  {{ if eq 25  $.pagination.Items }} selected {{ end }}>25</option>
+            <option value="100" {{ if eq 100 $.pagination.Items }} selected {{ end }}>100</option>
           </select>
           </li>
 
@@ -76,9 +81,7 @@
             hx-swap="outerHTML"
           >
             {{- range $page := Iterate .pagination.TotalPages }}
-              <option  value="{{ $page }}" {{ if eq $page $.pagination.Page }} selected {{end}}>
-                <a href="/users?page={{$.pagination.Page}}&items={{$.pagination.Items}}">{{ $page }}</a>
-              </option>
+              <option  value="{{ $page }}" {{ if eq $page $.pagination.Page }} selected {{ end }}> {{ $page }} </option>
             {{- end }}
           </select>
           <button

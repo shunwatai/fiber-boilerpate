@@ -97,6 +97,19 @@
             this.checkedCount.splice(this.checkedCount.findIndex((checked)=>checked===e.target.value),1)
           
           //console.log("checkedCount",this.checkedCount.length)
+        },
+        toggleSelectAll: function(){
+          const selectAllCheckbox = document.getElementById("selectAll")
+          const checkboxes = document.querySelectorAll('input[type="checkbox"][name="ids"]');
+            checkboxes.forEach((checkbox) => {
+              if (selectAllCheckbox.checked){
+                !checkbox.checked && this.checkedCount.push(checkbox.value)
+                checkbox.checked = true
+              }else{
+                checkbox.checked = false
+                this.checkedCount.splice(0,this.checkedCount.length)
+              }
+            });
         }
       }
     }
