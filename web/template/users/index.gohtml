@@ -4,15 +4,17 @@
   <h1 class="text-2xl mx-auto">Users</h1>
 
   {{ template "popup" . }}
-
   <!-- https://play.tailwindcss.com/haDGueJm6h -->
   <form id="user-list" class="m-2" hx-ext="json-enc" hx-indicator="#spinner" hx-disabled-elt="input, button" autocomplete="off" x-data="userListState">
     <div class="flex mb-2 gap-2">
+      <!-- new btn -->
       <a href="/users/form">
         <button type="button" class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2">
           New
         </button>
       </a>
+
+      <!-- delete btn -->
       <button 
         :class="`${checkedCount.length===0?'opacity-50':''} flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2 text-red-500`"
         type="button"
@@ -24,8 +26,48 @@
         Delete <span x-show="checkedCount.length>0" x-text="`(${checkedCount.length})`"></span>
         <div id="spinner" class="htmx-indicator animate-spin w-5 h-5 rounded-full m-auto border-2 border-solid border-slate-500 border-t-transparent"></div>
       </button>
+
+      <!-- search box -->
+      <div class="relative w-72 mx-auto">
+        <label for="Search" class="sr-only"> Search </label>
+
+        <input
+          id="search"
+          name="search"
+          placeholder="Search for..."
+          class="w-full rounded-md border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm"
+          hx-get="/users/list"
+          hx-trigger="keyup delay:1s from:body"
+          hx-include="[name='page'],[name='items']"
+          hx-target="#userTable"
+          hx-swap="outerHTML"
+        />
+
+        <span class="absolute inset-y-0 end-0 right-0 grid w-10 place-content-center">
+          <button type="button" class="text-gray-600 hover:text-gray-700 cursor-default">
+            <span class="sr-only">Search</span>
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="h-4 w-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
+          </button>
+        </span>
+      </div>
+
+      <!-- update btn -->
       <button 
-        class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2 ml-auto"
+        class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2"
         type="button"
         hx-target="#popupMessage"
         hx-patch="/users"
