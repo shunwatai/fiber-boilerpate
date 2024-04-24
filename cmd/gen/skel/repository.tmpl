@@ -55,6 +55,8 @@ func (r *Repository) Create({{.ModuleName}}s []*{{.StructName}}) ([]*{{.StructNa
 	for _, {{.ModuleName}} := range {{.ModuleName}}s {
 		logger.Debugf("{{.ModuleName}} repo add: %+v", {{.ModuleName}})
 	}
+	database.SetIgnoredCols("search")
+	defer database.SetIgnoredCols()
 	rows, err := r.db.Save({{.StructName}}s({{.ModuleName}}s))
 
 	var records {{.StructName}}s

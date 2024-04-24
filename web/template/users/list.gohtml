@@ -19,12 +19,12 @@
         <tbody class="divide-y divide-gray-200">
         {{- range .users }}
         <tr>
-          <td class="text-center sticky inset-y-0 start-0 bg-white px-4 py-2"><input class="size-5 rounded border-gray-300" type="checkbox" name="ids" value={{.Id}} @click="handleCheck" /></td>
-          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/users/form?userId={{.Id}}">{{.Name}}</a></td>
-          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/users/form?userId={{.Id}}">{{.Email}}</a></td>
-          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/users/form?userId={{.Id}}">{{if .FirstName}}{{.FirstName}}{{else}}&nbsp{{end}}</a></td>
-          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/users/form?userId={{.Id}}">{{if .LastName}}{{.LastName}}{{else}}&nbsp{{end}}</a></td>
-          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><input class="size-5 rounded border-gray-300" type="checkbox" name="disabled" id={{.Id}} value={{.Name}} {{ if .Disabled }} checked {{end}} /></td>
+          <td class="text-center sticky inset-y-0 start-0 bg-white px-4 py-2"><input class="size-5 rounded border-gray-300" type="checkbox" name="ids" value={{if not .MongoId}}{{.Id}}{{else}}{{.MongoId}}{{end}} @click="handleCheck" /></td>
+          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/users/form?userId={{if not .MongoId}}{{.Id}}{{else}}{{.MongoId}}{{end}}">{{.Name}}</a></td>
+          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/users/form?userId={{if not .MongoId}}{{.Id}}{{else}}{{.MongoId}}{{end}}">{{.Email}}</a></td>
+          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/users/form?userId={{if not .MongoId}}{{.Id}}{{else}}{{.MongoId}}{{end}}">{{if .FirstName}}{{.FirstName}}{{else}}&nbsp{{end}}</a></td>
+          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/users/form?userId={{if not .MongoId}}{{.Id}}{{else}}{{.MongoId}}{{end}}">{{if .LastName}}{{.LastName}}{{else}}&nbsp{{end}}</a></td>
+          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><input class="size-5 rounded border-gray-300" type="checkbox" name="disabled" id={{if not .MongoId}}{{.Id}}{{else}}{{.MongoId}}{{end}} value={{.Name}} {{ if .Disabled }} checked {{end}} /></td>
         </tr>
         {{- end }}
         </tbody>

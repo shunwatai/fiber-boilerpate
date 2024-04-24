@@ -5,6 +5,7 @@ import (
 	"golang-api-starter/internal/database"
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
+	"slices"
 
 	//"golang-api-starter/internal/modules/user"
 	"log"
@@ -138,7 +139,9 @@ func (pr PasswordReset) getTags(key ...string) []string {
 				name = fieldName
 			}
 			// fmt.Println(name)
-			cols = append(cols, name)
+			if !slices.Contains(*database.IgnrCols, name) {
+				cols = append(cols, name)
+			}
 		}
 	}
 	return cols

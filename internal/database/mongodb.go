@@ -21,6 +21,7 @@ import (
 type Mongodb struct {
 	*ConnectionInfo
 	TableName string
+	ViewName  *string
 	Db        *mongo.Client
 	ctx       *context.Context
 	mu        sync.Mutex
@@ -198,11 +199,6 @@ func (m *Mongodb) getConditionsFromQuerystring(
 	return selectStmt, options, pagination
 }
 
-// Get all columns []string by m.TableName
-// func (m *Mongodb) GetColumns() []string {
-// 	return []string{}
-// }
-
 func (m *Mongodb) Select(queries map[string]interface{}) (Rows, *helper.Pagination) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -211,7 +207,15 @@ func (m *Mongodb) Select(queries map[string]interface{}) (Rows, *helper.Paginati
 	defer cancel()
 	m.Connect()
 	defer m.Db.Disconnect(ctx)
-	collection := m.Db.Database(fmt.Sprintf("%s", *m.Database)).Collection(fmt.Sprintf("%s", m.TableName))
+
+	var tableName string
+	if m.ViewName != nil {
+		tableName = *m.ViewName
+	} else {
+		tableName = m.TableName
+	}
+
+	collection := m.Db.Database(fmt.Sprintf("%s", *m.Database)).Collection(fmt.Sprintf("%s", tableName))
 
 	var (
 		cur *mongo.Cursor
@@ -278,7 +282,7 @@ func (m *Mongodb) Save(records Records) (Rows, error) {
 			{Key: "$set", Value: record},
 		}, opts)
 		if err != nil {
-			logger.Errorf("update error: %+v",err)
+			logger.Errorf("update error: %+v", err)
 		}
 
 		/* only new created records has res.UpsertedID, existing's Ids appended in the if condition above */

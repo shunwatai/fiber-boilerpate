@@ -8,6 +8,7 @@ import (
 	"golang-api-starter/internal/modules/user"
 	"log"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -130,7 +131,9 @@ func (doc Document) getTags(key ...string) []string {
 				name = fieldName
 			}
 			// fmt.Println(name)
-			cols = append(cols, name)
+			if !slices.Contains(*database.IgnrCols, name) {
+				cols = append(cols, name)
+			}
 		}
 	}
 	return cols

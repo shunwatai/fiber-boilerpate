@@ -53,7 +53,7 @@ func setupPgTestTable(t *testing.T) func(t *testing.T) {
 		log.Printf("failed loading conf, err: %+v\n", err.Error())
 	}
 	zlog.NewZlog()
-	var testDb = GetDatabase("")
+	var testDb = GetDatabase("",nil)
 
 	// create test table
 	testDb.RawQuery(`CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -125,7 +125,7 @@ func TestPgConstructSelectStmtFromQuerystring(t *testing.T) {
 		teardownTest := setupPgTestTable(t)
 		defer teardownTest(t)
 		var tableName = "todos_test"
-		var testDb = GetDatabase(tableName)
+		var testDb = GetDatabase(tableName,nil)
 		testDb.Connect()
 		log.Printf("testDb: %+v\n", testDb)
 

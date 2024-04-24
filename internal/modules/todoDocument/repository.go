@@ -89,6 +89,8 @@ func (r *Repository) Create(todoDocuments []*TodoDocument) ([]*TodoDocument, err
 	for _, todoDocument := range todoDocuments {
 		logger.Debugf("todoDocument repo add: %+v", todoDocument)
 	}
+	database.SetIgnoredCols("search")
+	defer database.SetIgnoredCols()
 	rows, err := r.db.Save(TodoDocuments(todoDocuments))
 
 	var records TodoDocuments

@@ -7,6 +7,7 @@ import (
 	"golang-api-starter/internal/helper/logger/zap_log"
 	"log"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -34,6 +35,7 @@ type User struct {
 	Provider  *string                `json:"provider" db:"provider" bson:"provider,omitempty" example:"google"`
 	CreatedAt *helper.CustomDatetime `json:"createdAt" db:"created_at"  bson:"created_at,omitempty"`
 	UpdatedAt *helper.CustomDatetime `json:"updatedAt" db:"updated_at" bson:"updated_at,omitempty"`
+	Search    *string                `json:"-" db:"search,omitempty" bson:"search,omitempty" example:"google"`
 }
 
 type Users []*User
@@ -123,7 +125,9 @@ func (user User) getTags(key ...string) []string {
 				name = fieldName
 			}
 			// fmt.Println(name)
-			cols = append(cols, name)
+			if !slices.Contains(*database.IgnrCols, name) {
+				cols = append(cols, name)
+			}
 		}
 	}
 	return cols

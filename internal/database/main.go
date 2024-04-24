@@ -59,6 +59,12 @@ type Records interface {
 	GetTags(string) []string
 }
 
+type IgnoredCols []string
+var IgnrCols = new(IgnoredCols)
+func SetIgnoredCols(cols ...string) {
+	*IgnrCols = IgnoredCols(cols)
+}
+
 var cfg = config.Cfg
 
 func GetDbConnection() (*ConnectionInfo, error) {
@@ -109,7 +115,7 @@ func GetDbConnection() (*ConnectionInfo, error) {
 	return nil, fmt.Errorf("GetDbConnection() error, please check the cfg.DbConf.Driver")
 }
 
-func GetDatabase(tableName string) IDatabase {
+func GetDatabase(tableName string, viewName *string) IDatabase {
 	if cfg.DbConf == nil {
 		logger.Errorf("error: DbConf is nil, maybe fail to load the config....")
 	}
@@ -120,6 +126,7 @@ func GetDatabase(tableName string) IDatabase {
 		return &Sqlite{
 			ConnectionInfo: dbConn,
 			TableName:      tableName,
+			ViewName:       viewName,
 		}
 	}
 
@@ -128,6 +135,7 @@ func GetDatabase(tableName string) IDatabase {
 		return &MariaDb{
 			ConnectionInfo: dbConn,
 			TableName:      tableName,
+			ViewName:       viewName,
 		}
 	}
 
@@ -136,6 +144,7 @@ func GetDatabase(tableName string) IDatabase {
 		return &Postgres{
 			ConnectionInfo: dbConn,
 			TableName:      tableName,
+			ViewName:       viewName,
 		}
 	}
 
@@ -144,6 +153,7 @@ func GetDatabase(tableName string) IDatabase {
 		return &Mongodb{
 			ConnectionInfo: dbConn,
 			TableName:      tableName,
+			ViewName:       viewName,
 		}
 	}
 

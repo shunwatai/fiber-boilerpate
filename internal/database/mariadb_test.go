@@ -45,7 +45,7 @@ func setupMariadbTestTable(t *testing.T) func(t *testing.T) {
 		log.Printf("failed loading conf, err: %+v\n", err.Error())
 	}
 	zlog.NewZlog()
-	var testDb = GetDatabase("")
+	var testDb = GetDatabase("",nil)
 
 	// create test table
 	testDb.RawQuery("CREATE TABLE IF NOT EXISTS  `todos_test` ( `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY, `task` varchar(255) NOT NULL, `done` tinyint(1) NOT NULL DEFAULT '0', `created_at` datetime NOT NULL DEFAULT current_timestamp, `updated_at` datetime NOT NULL DEFAULT current_timestamp ON UPDATE CURRENT_TIMESTAMP);")
@@ -97,7 +97,7 @@ func TestMariadbConstructSelectStmtFromQuerystring(t *testing.T) {
 		defer teardownTest(t)
 
 		var tableName = "todos_test"
-		var testDb = GetDatabase(tableName)
+		var testDb = GetDatabase(tableName,nil)
 		testDb.Connect()
 		tests := []mariadbTests{
 			{

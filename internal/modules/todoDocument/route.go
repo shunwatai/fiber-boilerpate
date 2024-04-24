@@ -9,15 +9,16 @@ import (
 )
 
 var (
-	cfg       = config.Cfg
-	tableName = "todo_documents"
-	Repo      = &Repository{}
-	Srvc      = &Service{}
-	ctrl      = &Controller{}
+	cfg               = config.Cfg
+	tableName         = "todo_documents"
+	viewName  *string = nil
+	Repo              = &Repository{}
+	Srvc              = &Service{}
+	ctrl              = &Controller{}
 )
 
 func GetRoutes(router fiber.Router) {
-	db := database.GetDatabase(tableName)
+	db := database.GetDatabase(tableName, viewName)
 	Repo = NewRepository(db)
 	Srvc = NewService(Repo)
 	ctrl = NewController(Srvc)

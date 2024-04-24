@@ -53,6 +53,8 @@ func (r *Repository) Create(logs []*Log) ([]*Log, error) {
 	for _, log := range logs {
 		logger.Debugf("log repo add: %+v", log)
 	}
+	database.SetIgnoredCols("search")
+	defer database.SetIgnoredCols()
 	rows, err := r.db.Save(Logs(logs))
 
 	var records Logs

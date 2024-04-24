@@ -53,6 +53,8 @@ func (r *Repository) Create(documents []*Document) ([]*Document, error) {
 	for _, document := range documents {
 		logger.Debugf("document repo add: %+v", document)
 	}
+	database.SetIgnoredCols("search")
+	defer database.SetIgnoredCols()
 	rows, err := r.db.Save(Documents(documents))
 
 	var records Documents

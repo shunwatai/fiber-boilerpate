@@ -127,6 +127,8 @@ func (r *Repository) Create(todos []*Todo) ([]*Todo, error) {
 	for _, todo := range todos {
 		logger.Debugf("todo repo add: %+v", todo)
 	}
+	database.SetIgnoredCols("search")
+	defer database.SetIgnoredCols()
 	rows, err := r.db.Save(Todos(todos))
 
 	var records Todos

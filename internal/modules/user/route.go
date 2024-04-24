@@ -11,13 +11,14 @@ import (
 var (
 	cfg       = config.Cfg
 	tableName = "users"
+	viewName  = "users_view"
 	Repo      = &Repository{}
 	Srvc      = &Service{}
 	ctrl      = &Controller{}
 )
 
 func GetRoutes(router fiber.Router) {
-	db := database.GetDatabase(tableName)
+	db := database.GetDatabase(tableName, &viewName)
 	Repo = NewRepository(db)
 	Srvc = NewService(Repo)
 	ctrl = NewController(Srvc)

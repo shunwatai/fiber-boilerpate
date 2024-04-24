@@ -55,6 +55,8 @@ func (r *Repository) Create(passwordResets []*PasswordReset) ([]*PasswordReset, 
 	for _, passwordReset := range passwordResets {
 		logger.Debugf("passwordReset repo add: %+v", passwordReset)
 	}
+	database.SetIgnoredCols("search")
+	defer database.SetIgnoredCols()
 	rows, err := r.db.Save(PasswordResets(passwordResets))
 
 	var records PasswordResets

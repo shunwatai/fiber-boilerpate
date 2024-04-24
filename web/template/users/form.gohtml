@@ -19,7 +19,7 @@
         hx-vals="js:{password:setPasswordNullIfEmpty()}"
       >
         {{if ne .user nil}}
-          <input name="id" type="hidden" value="{{if ne .user.MongoId nil}}{{.user.MongoId}}{{else}}{{.user.Id}}{{end}}" />
+          <input name="{{if .user.MongoId}}_id{{else}}id{{end}}" type="hidden" value="{{if .user.MongoId }}{{.user.MongoId}}{{else}}{{.user.Id}}{{end}}" />
         {{end}}
 
         <label for="name" class="{{if eq .user nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 mr-auto my-auto">Login Name</label>

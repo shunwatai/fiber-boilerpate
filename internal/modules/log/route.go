@@ -1,22 +1,23 @@
 package log
 
 import (
-	"golang-api-starter/internal/database"
-	"golang-api-starter/internal/config"
-	"golang-api-starter/internal/middleware/jwtcheck"
 	"github.com/gofiber/fiber/v2"
+	"golang-api-starter/internal/config"
+	"golang-api-starter/internal/database"
+	"golang-api-starter/internal/middleware/jwtcheck"
 )
 
 var (
-	cfg       = config.Cfg
-	tableName = "logs"
-	Repo      = &Repository{}
-	Srvc      = &Service{}
-	ctrl      = &Controller{}
+	cfg               = config.Cfg
+	tableName         = "logs"
+	viewName  *string = nil
+	Repo              = &Repository{}
+	Srvc              = &Service{}
+	ctrl              = &Controller{}
 )
 
 func GetRoutes(router fiber.Router) {
-	db := database.GetDatabase(tableName)
+	db := database.GetDatabase(tableName, viewName)
 	Repo = NewRepository(db)
 	Srvc = NewService(Repo)
 	ctrl = NewController(Srvc)

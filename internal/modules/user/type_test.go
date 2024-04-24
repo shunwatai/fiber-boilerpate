@@ -90,8 +90,8 @@ func TestGetTags(t *testing.T) {
 		input string
 		want  []string
 	}{
-		{name: "test get db tags", input: "db", want: []string{"id", "name", "password", "email", "first_name", "last_name", "disabled", "is_oauth", "provider", "created_at", "updated_at"}},
-		{name: "test get bson tags", input: "bson", want: []string{"_id", "id", "name", "password", "email", "first_name", "last_name", "disabled", "is_oauth", "provider", "created_at", "updated_at"}},
+		{name: "test get db tags", input: "db", want: []string{"id", "name", "password", "email", "first_name", "last_name", "disabled", "is_oauth", "provider", "created_at", "updated_at", "search"}},
+		{name: "test get bson tags", input: "bson", want: []string{"_id", "id", "name", "password", "email", "first_name", "last_name", "disabled", "is_oauth", "provider", "created_at", "updated_at", "search"}},
 		{name: "test get json tags", input: "json", want: []string{"_id", "id", "name", "password", "email", "firstName", "lastName", "disabled", "isOauth", "provider", "createdAt", "updatedAt"}},
 	}
 

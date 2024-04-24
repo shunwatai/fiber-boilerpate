@@ -48,7 +48,7 @@ func DbMigrate(action, dbDriver string) error {
 	log.Printf("db driver: %+v\n", cfg.DbConf.Driver)
 	log.Println(strings.Repeat("*", 50))
 
-	dbConn := db.GetDatabase("")
+	dbConn := db.GetDatabase("", nil)
 	dbConf := dbConn.GetDbConfig()
 	connectionString := dbConn.GetConnectionString()
 

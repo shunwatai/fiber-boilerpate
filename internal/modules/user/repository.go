@@ -43,6 +43,8 @@ func (r *Repository) Get(queries map[string]interface{}) ([]*User, *helper.Pagin
 
 func (r *Repository) Create(users []*User) ([]*User, error) {
 	logger.Debugf("user repo create")
+	database.SetIgnoredCols("search")
+	defer database.SetIgnoredCols()
 	rows, err := r.db.Save(Users(users))
 
 	var records Users
@@ -56,6 +58,8 @@ func (r *Repository) Create(users []*User) ([]*User, error) {
 
 func (r *Repository) Update(users []*User) ([]*User, error) {
 	logger.Debugf("user repo update")
+	database.SetIgnoredCols("search")
+	defer database.SetIgnoredCols()
 	rows, err := r.db.Save(Users(users))
 
 	var records Users
