@@ -8,11 +8,51 @@
               <label for="SelectAll" class="sr-only">Select All</label>
               <input type="checkbox" id="selectAll" class="size-5 rounded border-gray-300" @click="toggleSelectAll" />
             </th>
-            <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900">login name</th>
-            <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900">email</th>
-            <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900">first name</th>
-            <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900">last name</th>
-            <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900">disabled</th>
+            <th 
+              class="text-center whitespace-nowrap px-4 py-2 text-gray-900"
+              name="name"
+              @click="changeSortDirection"
+              x-bind:hx-get="'/users/list?orderBy=' + $el.getAttribute('name') + '.' + sortDirection"
+              hx-include="[name='page'],[name='items']"
+              hx-target="#userTable"
+              hx-swap="outerHTML"
+            >
+              login name
+            </th>
+            <th 
+              class="text-center whitespace-nowrap px-4 py-2 text-gray-900"
+              name="email"
+              @click="changeSortDirection"
+              x-bind:hx-get="'/users/list?orderBy=' + $el.getAttribute('name') + '.' + sortDirection"
+              hx-include="[name='page'],[name='items']"
+              hx-target="#userTable"
+              hx-swap="outerHTML"
+            >
+              email
+            </th>
+            <th 
+              class="text-center whitespace-nowrap px-4 py-2 text-gray-900"
+              name="firstName"
+              @click="changeSortDirection"
+              x-bind:hx-get="'/users/list?orderBy=' + $el.getAttribute('name') + '.' + sortDirection"
+              hx-include="[name='page'],[name='items']"
+              hx-target="#userTable"
+              hx-swap="outerHTML"
+            >
+              first name
+            </th>
+            <th 
+              class="text-center whitespace-nowrap px-4 py-2 text-gray-900"
+              name="lastName"
+              @click="changeSortDirection"
+              x-bind:hx-get="'/users/list?orderBy=' + $el.getAttribute('name') + '.' + sortDirection"
+              hx-include="[name='page'],[name='items']"
+              hx-target="#userTable"
+              hx-swap="outerHTML"
+            >
+              last name
+            </th>
+            <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900"> disabled </th>
           </tr>
         </thead>
 
@@ -39,7 +79,7 @@
             id="items"
             class="w-fit size-8 px-2 rounded-lg border border-gray-100 bg-white text-gray-700 sm:text-sm"
             hx-get="/users/list"
-            hx-include="[name='search'],[name='page']"
+            hx-include="[name='search'],[name='page'],[name='orderBy']"
             hx-target="#userTable"
             hx-swap="outerHTML"
           >
@@ -77,7 +117,7 @@
             name="page"
             class="w-12 size-8 px-2 rounded-lg border border-gray-100 bg-white text-gray-700 sm:text-sm"
             hx-get="/users/list"
-            hx-include="[name='search'],[name='items']"
+            hx-include="[name='search'],[name='items'],[name='orderBy']"
             hx-target="#userTable"
             hx-swap="outerHTML"
           >

@@ -170,7 +170,7 @@ func (m *Sqlite) constructSelectStmtFromQuerystring(
 		defer totalRow.Close()
 		totalRow.Scan(&pagination.Count)
 	}
-	if pagination.Items > 0 {
+	if pagination.Items > 0 && pagination.Count > 0 {
 		pagination.TotalPages = int64(math.Ceil(float64(pagination.Count) / float64(pagination.Items)))
 	}
 	logger.Debugf("pagination: %+v", pagination)

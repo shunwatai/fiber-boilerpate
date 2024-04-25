@@ -79,6 +79,10 @@
       </button>
     </div>
 
+    <!-- hidden input for querystring -->
+    <input hidden readonly type="text" id="orderBy" name="orderBy" value="createdAt.desc" />
+
+    <!-- user table here -->
     {{ template "list" . }}
   </form>
 
@@ -131,6 +135,22 @@
 
     function userListState(){
       return {
+        sortDirection: "desc",
+        changeSortDirection: function(e){
+          const key = e.target.getAttribute("name")
+          const direction = this.sortDirection
+          console.log({key,direction})
+
+          // change the alpine's state
+          if (this.sortDirection==="desc") 
+            this.sortDirection="asc"
+          else 
+            this.sortDirection="desc"
+
+          // set the hidden input field for hx-include to send the requests
+          const orderByEle = document.getElementById("orderBy")
+          orderByEle.value = `${key}.${direction}`
+        },
         checkedCount: [],
         handleCheck: function (e){
           if (e.target.checked)

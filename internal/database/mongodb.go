@@ -166,7 +166,7 @@ func (m *Mongodb) getConditionsFromQuerystring(
 	} else {
 		logger.Debugf("count: %+v", count)
 		pagination.Count = count
-		if pagination.Items > 0 {
+		if pagination.Items > 0 && pagination.Count > 0 {
 			pagination.TotalPages = int64(math.Ceil(float64(pagination.Count) / float64(pagination.Items)))
 		}
 		logger.Debugf("pagination: %+v", pagination)
