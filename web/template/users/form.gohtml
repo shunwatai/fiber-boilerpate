@@ -13,7 +13,7 @@
         class="flex flex-col mx-auto gap-4 p-2 w-[28vw]"
         {{if eq .user nil}}hx-post{{else}}hx-patch{{end}}="/users"
         hx-ext="json-enc"
-        hx-target-5*="#errorMessage"
+        hx-target-5*="#popupMessage"
         hx-indicator="#spinner"
         hx-disabled-elt="input, button"
         hx-vals="js:{password:setPasswordNullIfEmpty()}"

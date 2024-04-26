@@ -37,10 +37,9 @@
           placeholder="Search for..."
           class="w-full rounded-md border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm"
           hx-get="/users/list"
-          hx-trigger="keyup delay:1s from:body"
+          hx-trigger="keyup changed delay:1s"
           hx-include="[name='page'],[name='items']"
           hx-target="#userTable"
-          hx-swap="outerHTML"
         />
 
         <span class="absolute inset-y-0 end-0 right-0 grid w-10 place-content-center">
@@ -70,6 +69,7 @@
         class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2"
         type="button"
         hx-target="#popupMessage"
+        hx-target-5*="#popupMessage"
         hx-patch="/users"
         hx-ext="submit-array"
         hx-swap="outerHTML"
@@ -87,6 +87,13 @@
   </form>
 
   <script>
+    // for refocus the "search input" after search request.
+    // because the input is inside the <form> it will lost focus after request... idk why
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+      const searchBox = document.getElementById("search");
+      window.setTimeout(()=>searchBox.focus(), 0)
+    });
+
     function getIdsAsArray() {
       // Get all the checked checkboxes
       const checkboxes = document.querySelectorAll('input[type="checkbox"][name="ids"]:checked');
