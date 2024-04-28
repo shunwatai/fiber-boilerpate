@@ -1,0 +1,40 @@
+{{ define "title"}}<title>{{.title}}</title>{{ end }}
+      
+{{ define "content"}}
+  {{ template "popup" . }}
+
+  <!-- todo: {{.todo}} -->
+
+  <div id="todo-list" class="m-2">
+    <div class="flex mb-2 gap-2">
+      <form 
+        class="flex flex-col mx-auto gap-4 p-2 w-[28vw]"
+        hx-encoding='multipart/form-data'
+        {{if eq .todo nil}}hx-post{{else}}hx-patch{{end}}="/todos"
+        hx-target-5*="#popupMessage"
+        hx-indicator="#spinner"
+        hx-disabled-elt="input, button"
+        hx-vals='{"done":"false"}'
+      >
+        {{if ne .todo nil}}
+          <input name="{{if .todo.MongoId}}_id{{else}}id{{end}}" type="hidden" value="{{if .todo.MongoId }}{{.todo.MongoId}}{{else}}{{.todo.Id}}{{end}}" />
+        {{end}}
+
+        <label for="task" class="{{if eq .todo nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 mr-auto my-auto">Task name</label>
+        <input name="task" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .todo nil}}required{{end}} value="{{if ne .todo nil}}{{.todo.Task}}{{end}}" />
+
+        <label for="file" class="block font-medium text-slate-700 mr-auto my-auto">Files</label>
+        <input name="file" multiple type="file" accept=".jpg,.png,.pdf" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" value="{{if ne .todo nil}}{{.todo.Documents}}{{end}}" />
+
+        <button type="submit" class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2">
+          {{if eq .todo nil}}Add{{else}}Update{{end}}
+          <div id="spinner" class="htmx-indicator animate-spin w-5 h-5 rounded-full m-auto border-2 border-solid border-slate-500 border-t-transparent"></div>
+        </button>
+      </form>
+    </div>
+  </div>
+  <script>
+  </script>
+{{end}}
+
+{{ define "footer" }}<div></div>{{ end }}

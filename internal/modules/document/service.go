@@ -35,6 +35,10 @@ func NewService(r *Repository) *Service {
 	return &Service{r, nil}
 }
 
+func (s *Service) SetCtx(ctx *fiber.Ctx) {
+	s.ctx = ctx
+}
+
 func (s *Service) GetIdMap(documents Documents) map[string]*Document {
 	documentMap := map[string]*Document{}
 	for _, document := range documents {
@@ -108,7 +112,7 @@ func (s *Service) Create(form *multipart.Form) ([]*Document, *helper.HttpErr) {
 			log.Println("failed to copy file", copyError)
 			return nil, &helper.HttpErr{fiber.StatusInternalServerError, copyError}
 		}
-		// logger.Debugf("uploaded to ", uploadPath)
+		// logger.Debugf("uploaded to %+v", uploadPath)
 
 		sha1Sum := hex.EncodeToString(hash.Sum(nil))
 		// logger.Debugf("file hash: ", sha1Sum, hash.Sum(nil))

@@ -3,10 +3,10 @@
 {{ define "content"}}
   {{ template "popup" . }}
   <!-- https://play.tailwindcss.com/haDGueJm6h -->
-  <form id="user-list" class="m-2" hx-ext="json-enc" hx-indicator="#spinner" hx-disabled-elt="input, button" autocomplete="off" x-data="userListState">
+  <form id="todo-list" class="m-2" hx-ext="json-enc" hx-indicator="#spinner" hx-disabled-elt="input, button" autocomplete="off" x-data="todoListState">
     <div class="flex mb-2 gap-2">
       <!-- new btn -->
-      <a href="/users/form">
+      <a href="/todos/form">
         <button type="button" class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2">
           New
         </button>
@@ -16,7 +16,7 @@
       <button 
         :class="`${checkedCount.length===0?'opacity-50':''} flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2 text-red-500`"
         type="button"
-        hx-delete="/users"
+        hx-delete="/todos"
         hx-vals="js:{ids:getIdsAsArray()}"
         hx-confirm="Click confirm to delete"
         :disabled="checkedCount.length === 0"
@@ -32,13 +32,13 @@
 
         <input
           id="search"
-          name="search"
+          name="task"
           placeholder="Search for..."
           class="w-full rounded-md border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm"
-          hx-get="/users/list"
+          hx-get="/todos/list"
           hx-trigger="keyup changed delay:1s"
           hx-include="[name='page'],[name='items']"
-          hx-target="#userTable"
+          hx-target="#todoTable"
         />
 
         <span class="absolute inset-y-0 end-0 right-0 grid w-10 place-content-center">
@@ -62,26 +62,12 @@
           </button>
         </span>
       </div>
-
-      <!-- update btn -->
-      <button 
-        class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2"
-        type="button"
-        hx-target="#popupMessage"
-        hx-target-5*="#popupMessage"
-        hx-patch="/users"
-        hx-ext="submit-array"
-        hx-swap="outerHTML"
-      >
-        Update
-        <div id="spinner" class="htmx-indicator animate-spin w-5 h-5 rounded-full m-auto border-2 border-solid border-slate-500 border-t-transparent"></div>
-      </button>
     </div>
 
     <!-- hidden input for querystring -->
     <input hidden readonly type="text" id="orderBy" name="orderBy" value="createdAt.desc" />
 
-    <!-- user table here -->
+    <!-- todo table here -->
     {{ template "list" . }}
   </form>
 
@@ -114,13 +100,13 @@
       return ids;
     }
 
-    function getDisabledForUpdate() {
+    function getDoneForUpdate() {
       // Get all the checkboxes
-      const checkboxes = document.querySelectorAll('input[type="checkbox"][name="disabled"]');
+      const checkboxes = document.querySelectorAll('input[type="checkbox"][name="done"]');
       const results = [];
 
       checkboxes.forEach(function(checkbox) {
-        results.push({id:checkbox.id,name:checkbox.value,disabled:checkbox.checked});
+        results.push({id:checkbox.id,task:checkbox.value,done:checkbox.checked});
       });
 
       //console.log("results:", results)
@@ -135,12 +121,12 @@
       },
       encodeParameters: function(xhr, parameters, elt) {
         xhr.overrideMimeType('application/json') // override default mime type
-        const body = getDisabledForUpdate()
+        const body = getDoneForUpdate()
         return (JSON.stringify(body))
       }
     })
 
-    function userListState(){
+    function todoListState(){
       return {
         sortDirection: "desc",
         changeSortDirection: function(e){
@@ -179,7 +165,36 @@
                 this.checkedCount.splice(0,this.checkedCount.length)
               }
             });
-        }
+        },
+        getImageFromApi: async function(url){
+          const response = await fetch(url)
+          const blob = await response.blob()
+          const filename = await this.getFilenameFromResponse(response)
+          console.log({blob,filename})
+          if (filename.includes(".pdf")){
+            return window.open(url)
+          }
+          const base64 = await this.getBase64FromBlob(blob)
+          const image_window = window.open(url, "_blank")
+          image_window.document.write(`<html><head></head><body><img width="300" src=${base64} alt="loading" /></body></html>`);
+        },
+        getBase64FromBlob: async function(blob){
+          const base64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = () => {
+              const base64data = reader.result;
+              resolve(base64data);
+            }
+          });
+          return base64
+        },
+        getFilenameFromResponse: async function(response){
+          const header = response.headers.get('Content-Disposition');
+          const parts = header?.split(';');
+          filename = parts[1].split('=')[1];
+          return filename
+        },
       }
     }
   </script>

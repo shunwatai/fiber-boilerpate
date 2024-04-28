@@ -15,6 +15,11 @@ func ToPtr[T any](v T) *T {
 	return &v
 }
 
+// Deref get the value of pointer. I use it as a helper func in html template.
+func Deref[T any](v *T) T {
+	return *v
+}
+
 // RootDir get the project base path
 // ref: https://stackoverflow.com/a/58294680
 func RootDir(level int) string {

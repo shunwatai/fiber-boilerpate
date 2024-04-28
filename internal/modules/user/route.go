@@ -34,9 +34,8 @@ func GetRoutes(router fiber.Router) {
 	publicViewRoute.Get("/login", ctrl.LoginPage)
 	publicViewRoute.Post("/login", ctrl.SubmitLogin)
 
-	protectedViewRoute := router.Group("", jwtcheck.CheckJwt())
-
-	protectedViewRoute.Route("/users", func(userPage fiber.Router) {
+	protectedViewRoute := router.Group("/users", jwtcheck.CheckJwt())
+	protectedViewRoute.Route("", func(userPage fiber.Router) {
 		userPage.Get("/", ctrl.ListUsersPage)
 		userPage.Get("/list", ctrl.GetUserList)
 		userPage.Delete("/", ctrl.SubmitDelete)
