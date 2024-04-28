@@ -12,7 +12,7 @@ import (
 func TestGetId(t *testing.T) {
 	document := &Document{
 		MongoId: utils.ToPtr("xxxx-xxxx-xxxx-xxxx"),
-		Id:      utils.ToPtr(int64(2)),
+		Id:      utils.ToPtr(helper.FlexInt(2)),
 	}
 
 	tests := []struct {
@@ -52,7 +52,7 @@ func TestStructToMap(t *testing.T) {
 	documents := Documents{
 		&Document{
 			MongoId:   utils.ToPtr("xxxx-xxxx-xxxx-xxxx"),
-			Id:        &id,
+			Id:        utils.ToPtr(helper.FlexInt(id)),
 			FileSize:  1234,
 			CreatedAt: customDatetime,
 			UpdatedAt: customDatetime,

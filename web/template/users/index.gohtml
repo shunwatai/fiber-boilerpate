@@ -127,6 +127,7 @@
       return results;
     }
 
+    // htmx custom ext ref: https://www.submitjson.com/blog/htmx-post-json#solution-2-custom-htmx-json-extension
     htmx.defineExtension('submit-array', {
       onEvent: function (name, evt) {
         if (name === "htmx:configRequest") {
