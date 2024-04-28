@@ -1,0 +1,103 @@
+{{ define "navbar"}}
+  {{ if .showNavbar }}
+  <!-- ref: https://tailwindcomponents.com/component/simple-nav-sidebar -->
+  <!-- page -->
+  <main class="min-h-screen w-full bg-gray-0 text-gray-700" x-data="navbarState">
+    <!-- header page -->
+    <header class="flex w-full items-center justify-between border-b-2 border-gray-200 bg-white p-2">
+      <!-- logo -->
+      <div class="flex items-center space-x-2">
+        <button type="button" class="text-3xl" @click="asideOpen = !asideOpen"><i class="bx bx-menu"></i></button>
+        <div>Logo</div>
+      </div>
+
+      <!-- center header of page name -->
+      <div class="text-2xl mx-auto">{{ .title }}</div>
+
+      <!-- button profile -->
+      <div>
+        <button type="button" @click="profileOpen = !profileOpen" @click.outside="profileOpen = false"
+          class="h-9 w-9 overflow-hidden rounded-full">
+          <!--<img src="https://plchldr.co/i/40x40?bg=111111" alt="plchldr.co" />-->
+          <img src="https://api.dicebear.com/8.x/identicon/svg?seed=golang" alt="profile pic" />
+        </button>
+
+        <!-- dropdown profile -->
+        <div class="absolute right-2 mt-1 w-48 divide-y divide-gray-200 rounded-md border border-gray-200 bg-white shadow-md"
+          x-show="profileOpen" x-transition>
+          <div class="flex items-center space-x-2 p-2">
+            <!--<img src="https://plchldr.co/i/40x40?bg=111111" alt="plchldr.co" class="h-9 w-9 rounded-full" />-->
+            <img src="https://api.dicebear.com/8.x/identicon/svg?seed=golang" alt="profile pic" class="h-9 w-9 rounded-full" />
+            <div class="font-medium">admin</div>
+          </div>
+
+          <div class="flex flex-col space-y-3 p-2 opacity-50">
+            <a href="#" class="transition hover:text-blue-600 cursor-not-allowed">My Profile</a>
+            <a href="#" class="transition hover:text-blue-600 cursor-not-allowed">Edit Profile</a>
+            <a href="#" class="transition hover:text-blue-600 cursor-not-allowed">Settings</a>
+          </div>
+
+          <div class="p-2">
+            <button 
+              class="flex items-center space-x-2 transition hover:text-blue-600" 
+              hx-get="/api/auth/logout"
+              hx-ext="logout"
+            >
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                </path>
+              </svg>
+              <div>Log Out</div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex">
+      <!-- aside -->
+      <aside class="flex w-52 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2" style="height: 90.5vh"
+        x-show="asideOpen">
+        <a href="/users?page=1&items=5&orderBy=createdAt.desc" class="flex items-center space-x-1 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600">
+          <span class="text-2xl"><i class="bx bx-user"></i></span>
+          <span>Users</span>
+        </a>
+        <a href="#" class="cursor-not-allowed flex items-center space-x-1 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600 opacity-50">
+          <span class="text-2xl"><i class="bx bx-check"></i></span>
+          <span>Todos</span>
+        </a>
+      </aside>
+
+      <!-- main content page -->
+      <div class="flex flex-col w-full p-4">
+        {{ template "content" . }}
+      </div>
+    </div>
+
+    <script>
+      function navbarState(){
+        return {
+          profileOpen: false,
+          asideOpen: true,
+        }
+      }
+
+      htmx.defineExtension('logout', {
+        onEvent: function (name, evt) {
+          window.localStorage.clear();
+        },
+        encodeParameters: function(xhr, parameters, elt) {},
+      })
+    </script>
+  </main>
+
+  {{ else }}
+
+  <!-- for non-login pages, dont wrap by navbar -->
+  <div class="flex flex-col w-full p-4">
+    {{ template "content" . }}
+  </div>
+  {{ end }}
+{{ end }}

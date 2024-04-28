@@ -4,7 +4,6 @@ import (
 	"errors"
 	"golang-api-starter/internal/auth"
 	logger "golang-api-starter/internal/helper/logger/zap_log"
-	"html/template"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -41,17 +40,14 @@ func CheckJwt() fiber.Handler {
 
 		if err != nil {
 			if isHtml {
-				tpl := template.Must(template.ParseFiles("web/template/error.gohtml", "web/template/base.gohtml"))
 				c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-				c.Redirect("/error", fiber.StatusPermanentRedirect)
-				return tpl.ExecuteTemplate(c.Response().BodyWriter(), "base.gohtml", fiber.Map{})
+				return c.Redirect("/error", fiber.StatusPermanentRedirect)
 			}
 
 			return c.
 				Status(fiber.StatusUnauthorized).
 				JSON(map[string]interface{}{"message": errors.Join(errors.New(strings.Join(errStr, ". ")), errors.New("failed to get the jwt from both cookie & header")).Error()})
 		}
-		logger.Debugf("22222222")
 
 		c.Locals("claims", claims)
 		return c.Next()

@@ -26,9 +26,7 @@ It runs by fiber with basic CRUD routes which follows the Controller-Service-Rep
         - [x] User form
     - [ ] Todos page
         - [ ] Todos list
-        - [ ] Todo form
-        - [ ] Todo form upload file
-- [ ] DB try views and joining in repository
+        - [ ] Todo form with upload file
 
 # Project structure
 I try following the standards from [project-layout](https://github.com/golang-standards/project-layout) as much as I can.
@@ -85,8 +83,8 @@ I try following the standards from [project-layout](https://github.com/golang-st
 
 # Quick start by docker-compose
 1. [Start the databases containers](#start-databases-for-development)
-2. [Run database migrations](migrations/README.md#run-migration)
-3. [Set the database in configs/docker.yaml](#for-run-by-docker)
+2. [Run migrations with the desired database(pg/mariab/sqlite/mongodb)](migrations/README.md#run-migration)
+3. [Set the db driver in configs/docker.yaml](#for-run-by-docker)
 3. [Start fiber api by docker](#start-by-docker)
 4. [Test the login api by curl for getting the JWT](#login)
 5. [Try the user's web](internal/modules/user/README.md#web-crud)

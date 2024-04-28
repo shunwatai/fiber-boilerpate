@@ -17,7 +17,7 @@
               hx-target="#userTable"
               hx-swap="outerHTML"
             >
-              login name
+              <span class="mx-2">login name</span><span>{{ShowSortingDirection "name" .pagination.OrderBy}}</span>
             </th>
             <th 
               class="text-center whitespace-nowrap px-4 py-2 text-gray-900"
@@ -28,7 +28,7 @@
               hx-target="#userTable"
               hx-swap="outerHTML"
             >
-              email
+              <span class="mx-2">email</span><span>{{ShowSortingDirection "email" .pagination.OrderBy}}</span>
             </th>
             <th 
               class="text-center whitespace-nowrap px-4 py-2 text-gray-900"
@@ -39,7 +39,7 @@
               hx-target="#userTable"
               hx-swap="outerHTML"
             >
-              first name
+              <span class="mx-2">first name</span><span>{{ShowSortingDirection "firstName" .pagination.OrderBy}}</span>
             </th>
             <th 
               class="text-center whitespace-nowrap px-4 py-2 text-gray-900"
@@ -50,7 +50,7 @@
               hx-target="#userTable"
               hx-swap="outerHTML"
             >
-              last name
+              <span class="mx-2">last name</span><span>{{ShowSortingDirection "lastName" .pagination.OrderBy}}</span>
             </th>
             <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900"> disabled </th>
           </tr>

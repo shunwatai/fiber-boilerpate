@@ -17,18 +17,22 @@ func NewController(s *Service) *Controller {
 var respCode = fiber.StatusInternalServerError
 
 func (c *Controller) HomePage(ctx *fiber.Ctx) error {
-	tpl := template.Must(template.ParseFiles("web/template/home.gohtml", "web/template/base.gohtml"))
+	data := fiber.Map{
+		"showNavbar": true,
+		"title":      "Home",
+	}
+	tpl := template.Must(template.ParseFiles("web/template/home.gohtml", "web/template/parts/navbar.gohtml", "web/template/base.gohtml"))
 
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	respCode = fiber.StatusOK
 
 	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
 
-	return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", fiber.Map{})
+	return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
 }
 
 func (c *Controller) ErrorPage(ctx *fiber.Ctx) error {
-	tpl := template.Must(template.ParseFiles("web/template/error.gohtml", "web/template/base.gohtml"))
+	tpl := template.Must(template.ParseFiles("web/template/error.gohtml", "web/template/parts/navbar.gohtml", "web/template/base.gohtml"))
 
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	respCode = fiber.StatusOK

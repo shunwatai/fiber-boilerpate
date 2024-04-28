@@ -23,11 +23,20 @@ func GetRoutes(router fiber.Router) {
 	Srvc = NewService(Repo)
 	ctrl = NewController(Srvc)
 
-	viewRoute := router.Group("")
-	viewRoute.Get("/login", ctrl.LoginPage)
-	viewRoute.Post("/login", ctrl.SubmitLogin)
+	// normal auth from database's users table
+	authRoute := router.Group("/api/auth")
+	authRoute.Post("/login", Login)
+	authRoute.Get("/logout", ctrl.Logout)
+	authRoute.Post("/refresh", Refresh)
 
-	viewRoute.Route("/users", func(userPage fiber.Router) {
+	// web view routes
+	publicViewRoute := router.Group("")
+	publicViewRoute.Get("/login", ctrl.LoginPage)
+	publicViewRoute.Post("/login", ctrl.SubmitLogin)
+
+	protectedViewRoute := router.Group("", jwtcheck.CheckJwt())
+
+	protectedViewRoute.Route("/users", func(userPage fiber.Router) {
 		userPage.Get("/", ctrl.ListUsersPage)
 		userPage.Get("/list", ctrl.GetUserList)
 		userPage.Delete("/", ctrl.SubmitDelete)
@@ -37,11 +46,6 @@ func GetRoutes(router fiber.Router) {
 			userForm.Get("/", ctrl.UserFormPage)
 		})
 	})
-
-	// normal auth from database's users table
-	authRoute := router.Group("/api/auth")
-	authRoute.Post("/login", Login)
-	authRoute.Post("/refresh", Refresh)
 
 	// users routes
 	r := router.Group("/api/users", jwtcheck.CheckJwt())

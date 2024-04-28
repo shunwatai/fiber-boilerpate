@@ -1,8 +1,6 @@
-{{ define "title"}}<title>Users</title>{{ end }}
+{{ define "title"}}<title>{{ .title }}</title>{{ end }}
       
 {{ define "content"}}
-  <h1 class="text-2xl mx-auto">Users</h1>
-
   {{ template "popup" . }}
   <!-- https://play.tailwindcss.com/haDGueJm6h -->
   <form id="user-list" class="m-2" hx-ext="json-enc" hx-indicator="#spinner" hx-disabled-elt="input, button" autocomplete="off" x-data="userListState">
@@ -91,6 +89,7 @@
     // because the input is inside the <form> it will lost focus after request... idk why
     document.body.addEventListener('htmx:afterSwap', function(evt) {
       const searchBox = document.getElementById("search");
+      // ref: https://stackoverflow.com/a/12142227
       window.setTimeout(()=>searchBox.focus(), 0)
     });
 

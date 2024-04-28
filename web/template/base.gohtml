@@ -9,9 +9,10 @@
     <script defer src="/static/3p/alpinejs/alpinejs-3.13.8.min.js"></script>
     <link href="/static/css/output.css" rel="stylesheet">
     <link href="/static/css/htmx.css" rel="stylesheet">
+    <link href='/static/css/boxicons-2.1.4.min.css' rel='stylesheet'>
   </head>
-  <body class="flex flex-col justify-center gap-2" hx-ext="response-targets">
-    {{ template "content" . }}
+  <body class="justify-center gap-2" hx-ext="response-targets">
+    {{ template "navbar" . }}
 
     <script>
       document.addEventListener("htmx:confirm", function(e) {
