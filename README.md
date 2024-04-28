@@ -5,11 +5,11 @@ It runs by fiber with basic CRUD routes which follows the Controller-Service-Rep
 
 # Features
 - With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` for accessing records in DB in `internal/database/`. Just raw sql without ORM.
-- With example modules like `users`, `todos`, `documents` etc. in `interal/modules/`, with CRUD APIs.
+- With example of pre-defined modules like `users`, `todos`, `documents` etc. in `interal/modules/`, with CRUD APIs.
 - `HTMX` web templates with `tailwind` & `alpinejs`.
 - With a [script](#generate-new-module) `cmd/gen/gen.go` for generate new module to `internal/modules/`.
-- With the example of JWT auth in the [login API](#login).
-- Can generate swagger doc.
+- JWT auth, [sample by curl](#login).
+- Can generate swagger doc by `swag`.
 - Make use of `viper` for loading env variables in config.
 - With a logging wrapper by `zap` which uses as middleware for writing the request's logs in `log/`, the log file maybe used for centralised log server like ELK or Signoz. 
 
