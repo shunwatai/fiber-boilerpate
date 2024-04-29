@@ -65,7 +65,7 @@
     </div>
 
     <!-- hidden input for querystring -->
-    <input readonly type="text" id="orderBy" name="orderBy" value="createdAt.desc" />
+    <input hidden readonly type="text" id="orderBy" name="orderBy" />
 
     <!-- todo table here -->
     {{ template "list" . }}
@@ -126,10 +126,29 @@
       }
     })
 
+    function setOrderByIfFoundInQuery(){
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderBy = urlParams.get('orderBy');
+      if (!orderBy) return
+      const orderByEle = document.getElementById("orderBy")
+      orderByEle.value = orderBy
+    }
+    window.onload = setOrderByIfFoundInQuery;
+
     function todoListState(){
       return {
-        sortDirection: "desc",
-        sortKey: "createdAt",
+        sortDirection: (()=>{
+          const urlParams = new URLSearchParams(window.location.search);
+          const orderBy = urlParams.get('orderBy');
+          if (!orderBy) return 'desc'
+          return orderBy.split(".")[1]
+        })(),
+        sortKey: (()=>{
+          const urlParams = new URLSearchParams(window.location.search);
+          const orderBy = urlParams.get('orderBy');
+          if (!orderBy) return 'createdAt'
+          return orderBy.split(".")[0]
+        })(),
         changeSortDirection: function(e){
           const key = e.target.getAttribute("name")
           //console.log({key,direction})

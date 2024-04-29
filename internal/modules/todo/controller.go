@@ -24,6 +24,25 @@ func NewController(s *Service) *Controller {
 
 var respCode = fiber.StatusInternalServerError
 
+// checkUpdateNonExistRecord for the "update" functions to remain the createdAt value without accidental alter the createdAt
+func (c *Controller) checkUpdateNonExistRecord(todo *Todo) error {
+	conditions := map[string]interface{}{}
+	conditions["id"] = todo.GetId()
+
+	existing, err := c.service.GetById(conditions)
+	if len(existing) == 0 {
+		respCode = fiber.StatusNotFound
+		return errors.Join(
+			errors.New("cannot update non-existing records..."),
+			err,
+		)
+	} else if todo.CreatedAt == nil {
+		todo.CreatedAt = existing[0].CreatedAt
+	}
+
+	return nil
+}
+
 func (c *Controller) Get(ctx *fiber.Ctx) error {
 	logger.Debugf("todo ctrl\n")
 	fctx := &helper.FiberCtx{Fctx: ctx}
@@ -166,23 +185,13 @@ func (c *Controller) Update(ctx *fiber.Ctx) error {
 			)
 		}
 
-		conditions := map[string]interface{}{}
-		conditions["id"] = todo.GetId()
-
-		existing, err := c.service.GetById(conditions)
-		if len(existing) == 0 {
-			respCode = fiber.StatusNotFound
+		if err := c.checkUpdateNonExistRecord(todo); err != nil {
 			return fctx.JsonResponse(
 				respCode,
 				map[string]interface{}{
-					"message": errors.Join(
-						errors.New("cannot update non-existing records..."),
-						err,
-					).Error(),
+					"message": err.Error(),
 				},
 			)
-		} else if todo.CreatedAt == nil {
-			todo.CreatedAt = existing[0].CreatedAt
 		}
 	}
 
@@ -490,24 +499,13 @@ func (c *Controller) ToggleDone(ctx *fiber.Ctx) error {
 			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 		}
 
-		conditions := map[string]interface{}{}
-		conditions["id"] = todo.GetId()
-
-		existing, err := c.service.GetById(conditions)
-		if len(existing) == 0 {
-			respCode = fiber.StatusNotFound
+		if err := c.checkUpdateNonExistRecord(todo); err != nil {
 			return fctx.JsonResponse(
 				respCode,
 				map[string]interface{}{
-					"message": errors.Join(
-						errors.New("cannot update non-existing records..."),
-						err,
-					).Error(),
+					"message": err.Error(),
 				},
 			)
-		} else if todo.CreatedAt == nil {
-	logger.Debugf("remain: %+v", todo.CreatedAt)
-			todo.CreatedAt = existing[0].CreatedAt
 		}
 	}
 
@@ -571,23 +569,13 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 		}
 
-		conditions := map[string]interface{}{}
-		conditions["id"] = todo.GetId()
-
-		existing, err := c.service.GetById(conditions)
-		if len(existing) == 0 {
-			respCode = fiber.StatusNotFound
+		if err := c.checkUpdateNonExistRecord(todo); err != nil {
 			return fctx.JsonResponse(
 				respCode,
 				map[string]interface{}{
-					"message": errors.Join(
-						errors.New("cannot update non-existing records..."),
-						err,
-					).Error(),
+					"message": err.Error(),
 				},
 			)
-		} else if todo.CreatedAt == nil {
-			todo.CreatedAt = existing[0].CreatedAt
 		}
 	}
 

@@ -1,11 +1,11 @@
 # Fiber boilerpate
-This is my personal repo just for fun which for myself startng a golang REST API quicker and learn about golang.
+This is my personal repo just for fun which for to spin up a golang REST API quicker and to learn about golang.
 
 It runs by fiber with basic CRUD routes which follows the Controller-Service-Repository pattern like Spring boot or Laravel's structure.
 
 # Features
 - With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` for accessing records in DB in `internal/database/`. Just raw sql without ORM.
-- Swtich to different DB driver by config.
+- Swtich between different DBs driver by changing the `database.engine` in config.
 - With example of pre-defined modules like `users`, `todos`, `documents` etc. in `interal/modules/`, with CRUD APIs.
 - `HTMX` web templates with `tailwind` & `alpinejs`.
 - With a [script](#generate-new-module) `cmd/gen/gen.go` for generate new module in `internal/modules/`.
@@ -17,7 +17,9 @@ It runs by fiber with basic CRUD routes which follows the Controller-Service-Rep
 # Todo
 - [ ] Need more test cases & validations
 - [ ] Add GET `/me`
-- [ ] Try `bubbletea` for `cmd/gen/gen.go`
+- [ ] Generate new module script `cmd/gen/gen.go`
+    - [ ] Try `bubbletea` for better tui interaction
+    - [ ] Support generate web templates
 - [ ] Web template example by htmx
     - [x] Login page
     - [x] Forget page
