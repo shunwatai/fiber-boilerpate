@@ -28,6 +28,7 @@ func GetRoutes(router fiber.Router) {
 		todoPage.Get("/list", ctrl.GetTodoList)
 		todoPage.Delete("/", ctrl.SubmitDelete)
 		todoPage.Patch("/", ctrl.SubmitUpdate)
+		todoPage.Patch("/toggle-done", ctrl.ToggleDone)
 		todoPage.Post("/", ctrl.SubmitNew)
 		todoPage.Route("/form", func(todoForm fiber.Router) {
 			todoForm.Get("/", ctrl.TodoFormPage)

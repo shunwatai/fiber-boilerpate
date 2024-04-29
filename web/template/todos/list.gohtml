@@ -1,7 +1,7 @@
 {{ define "list"}}
   <div class="rounded-lg border border-gray-200" id="todoTable" 
-    hx-trigger="reloadList" hx-get="/todos/list"
-    hx-include="[name='task'],[name='page'],[name='orderBy'],[name='items']"
+    hx-trigger="reloadList" :hx-get="'/todos/list?orderBy='+`${sortKey}.${sortDirection}`"
+    hx-include="[name='page'],[name='items'],[name='orderBy']"
     hx-swap="outerHTML"
   >
     <div class="overflow-x-auto rounded-t-lg">
@@ -16,12 +16,12 @@
               class="text-center whitespace-nowrap px-4 py-2 text-gray-900"
               name="task"
               @click="changeSortDirection"
-              x-bind:hx-get="'/todos/list?orderBy=' + $el.getAttribute('name') + '.' + sortDirection"
+              x-bind:hx-get="'/todos/list?orderBy=' + $el.getAttribute('name') + `.${sortDirection==='desc'?'asc':'desc'}`"
               hx-include="[name='page'],[name='items']"
               hx-target="#todoTable"
               hx-swap="outerHTML"
             >
-              <span class="mx-2">Task</span><span>{{ShowSortingDirection "task" .pagination.OrderBy}}</span>
+              <span name="task" class="mx-2">Task</span><span>{{ShowSortingDirection "task" .pagination.OrderBy}}</span>
             </th>
             <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900"> documents </th>
             <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900"> done </th>
@@ -55,7 +55,7 @@
               name="done" 
               hx-target="#popupMessage"
               hx-target-5*="#popupMessage"
-              hx-patch="/todos"
+              hx-patch="/todos/toggle-done"
               hx-ext="submit-array"
               hx-swap="outerHTML"
             />

@@ -38,3 +38,15 @@ func ConvertNumberSliceToString(i interface{}) ([]string, error) {
 
 	return stringSlice, nil
 }
+
+func ConvertStringToInt(numstr string) (int64, error) {
+	var (
+		num int64
+		err error
+	)
+	if num, err = strconv.ParseInt(numstr, 10, 64); err != nil {
+		logger.Errorf("ConvertStringToInt err:  %+v", err)
+		return num, err
+	}
+	return num, nil
+}

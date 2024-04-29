@@ -1,7 +1,7 @@
 {{ define "popup"}}
 <div x-data="popupState" class="mx-auto" id="popupMessage">
   {{if $.successMessage}}
-  <div role="alert" id="popupBox" hx-swap-oob="true" class="rounded-xl border border-gray-100 bg-white p-4">
+  <div role="alert" id="popupBox" class="rounded-xl border border-gray-100 bg-white p-4">
     <div class="flex items-start gap-4">
       <span class="text-green-600">
         <svg

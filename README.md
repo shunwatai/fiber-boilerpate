@@ -5,28 +5,29 @@ It runs by fiber with basic CRUD routes which follows the Controller-Service-Rep
 
 # Features
 - With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` for accessing records in DB in `internal/database/`. Just raw sql without ORM.
+- Swtich to different DB driver by config.
 - With example of pre-defined modules like `users`, `todos`, `documents` etc. in `interal/modules/`, with CRUD APIs.
 - `HTMX` web templates with `tailwind` & `alpinejs`.
-- With a [script](#generate-new-module) `cmd/gen/gen.go` for generate new module to `internal/modules/`.
-- JWT auth, [sample by curl](#login).
+- With a [script](#generate-new-module) `cmd/gen/gen.go` for generate new module in `internal/modules/`.
+- JWT auth, [login sample by curl](#login).
 - Can generate swagger doc by `swag`.
 - Make use of `viper` for loading env variables in config.
 - With a logging wrapper by `zap` which uses as middleware for writing the request's logs in `log/`, the log file maybe used for centralised log server like ELK or Signoz. 
 
 # Todo
-- [ ] Need more test cases
+- [ ] Need more test cases & validations
 - [ ] Add GET `/me`
 - [ ] Try `bubbletea` for `cmd/gen/gen.go`
-- [ ] Try Oauth
-- [ ] Web template by htmx
+- [ ] Web template example by htmx
     - [x] Login page
     - [x] Forget page
     - [x] Users page CRUD
         - [x] Users list
         - [x] User form
     - [ ] Todos page
-        - [ ] Todos list
+        - [x] Todos list
         - [ ] Todo form with upload file
+- [ ] Try Oauth
 
 # Project structure
 I try following the standards from [project-layout](https://github.com/golang-standards/project-layout) as much as I can.
@@ -176,7 +177,12 @@ make docker-dev-log
 ```
 
 ## For production
-Set the `env` to `prod` in the `configs/<localhost/docker>.yaml`
+### Change config
+Change the values in the `configs/<localhost/docker>.yaml`
+- Change the `server.env` to `prod`
+- Change the `server.host` 
+- Change `jwt.secret` 
+- Change `log.level` higher than `0`
 
 ### Start by docker
 Run the production container

@@ -418,25 +418,27 @@ func (c *Controller) SubmitNew(ctx *fiber.Ctx) error {
 	}
 
 	// add new documents
-	document.Srvc.SetCtx(ctx)
-	documents, httpErr := document.Srvc.Create(form)
-	if httpErr.Err != nil {
-		data["errMessage"] = "failed to upload file(s)"
-		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
-	}
+	if form.File["file"] != nil || len(form.File["file"]) > 0 {
+		document.Srvc.SetCtx(ctx)
+		documents, httpErr := document.Srvc.Create(form)
+		if httpErr.Err != nil {
+			data["errMessage"] = "failed to upload file(s)"
+			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		}
 
-	// add todoDocuments
-	todoDocuments := todoDocument.TodoDocuments{}
-	for _, document := range documents {
-		todoDocuments = append(
-			todoDocuments,
-			&todoDocument.TodoDocument{TodoId: todos[0].GetId(), DocumentId: document.Id},
-		)
-	}
-	_, httpErr = todoDocument.Srvc.Create(todoDocuments)
-	if httpErr.Err != nil {
-		data["errMessage"] = "failed to upload file(s)"
-		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		// add todoDocuments
+		todoDocuments := todoDocument.TodoDocuments{}
+		for _, document := range documents {
+			todoDocuments = append(
+				todoDocuments,
+				&todoDocument.TodoDocument{TodoId: todos[0].GetId(), DocumentId: document.Id},
+			)
+		}
+		_, httpErr = todoDocument.Srvc.Create(todoDocuments)
+		if httpErr.Err != nil {
+			data["errMessage"] = "failed to upload file(s)"
+			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		}
 	}
 
 	targetPage := "/todos?page=1&items=5"
@@ -446,8 +448,8 @@ func (c *Controller) SubmitNew(ctx *fiber.Ctx) error {
 	return fctx.Fctx.Redirect(targetPage, respCode)
 }
 
-func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
-	logger.Debugf("todo ctrl form update submit\n")
+func (c *Controller) ToggleDone(ctx *fiber.Ctx) error {
+	logger.Debugf("todo ctrl form toggle done\n")
 	respCode = fiber.StatusInternalServerError
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	fctx.Fctx.Response().SetStatusCode(respCode)
@@ -477,6 +479,7 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 		todos = append(todos, todo)
 	}
 
+	logger.Debugf("have c: %+v", todo.CreatedAt)
 	for _, todo := range todos {
 		if validErr := helper.ValidateStruct(*todo); validErr != nil {
 			data["errMessage"] = validErr.Error()
@@ -485,6 +488,26 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 		if todo.Id == nil && todo.MongoId == nil {
 			data["errMessage"] = "please ensure all records with id for PATCH"
 			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		}
+
+		conditions := map[string]interface{}{}
+		conditions["id"] = todo.GetId()
+
+		existing, err := c.service.GetById(conditions)
+		if len(existing) == 0 {
+			respCode = fiber.StatusNotFound
+			return fctx.JsonResponse(
+				respCode,
+				map[string]interface{}{
+					"message": errors.Join(
+						errors.New("cannot update non-existing records..."),
+						err,
+					).Error(),
+				},
+			)
+		} else if todo.CreatedAt == nil {
+	logger.Debugf("remain: %+v", todo.CreatedAt)
+			todo.CreatedAt = existing[0].CreatedAt
 		}
 	}
 
@@ -495,13 +518,117 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 	}
 
 	fctx.Fctx.Response().SetStatusCode(fiber.StatusOK)
+	data["successMessage"] = "Update success."
+	fctx.Fctx.Set("HX-Trigger-After-Swap", "reloadList")
+	return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+}
+
+func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
+	logger.Debugf("todo ctrl form update submit\n")
+	respCode = fiber.StatusInternalServerError
+	fctx := &helper.FiberCtx{Fctx: ctx}
+	fctx.Fctx.Response().SetStatusCode(respCode)
+	// reqCtx := &helper.ReqContext{Payload: fctx}
+
+	todo := &Todo{}
+	todos := []*Todo{}
+
+	data := fiber.Map{}
+	tmplFiles := []string{"web/template/parts/popup.gohtml"}
+	tpl := template.Must(template.ParseFiles(tmplFiles...))
+
+	html := `{{ template "popup" . }}`
+	tpl, _ = tpl.New("message").Parse(html)
+
+	form, err := fctx.Fctx.MultipartForm()
+	if err != nil {
+		data["errMessage"] = "failed to parse request formdata"
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	}
+
+	todo.Task = form.Value["task"][0]
+	if form.Value["done"][0] == "false" {
+		todo.Done = utils.ToPtr(false)
+	} else {
+		todo.Done = utils.ToPtr(true)
+	}
+	if len(form.Value["id"]) == 1 {
+		id, _ := helper.ConvertStringToInt(form.Value["id"][0])
+		todo.Id = utils.ToPtr(helper.FlexInt(id))
+	}
+
+	logger.Debugf("patch todo:: %+v, %+v", *todo.Id, todo)
+
+	todos = append(todos, todo)
+
+	for _, todo := range todos {
+		if validErr := helper.ValidateStruct(*todo); validErr != nil {
+			data["errMessage"] = validErr.Error()
+			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		}
+		if todo.Id == nil && todo.MongoId == nil {
+			data["errMessage"] = "please ensure all records with id for PATCH"
+			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		}
+
+		conditions := map[string]interface{}{}
+		conditions["id"] = todo.GetId()
+
+		existing, err := c.service.GetById(conditions)
+		if len(existing) == 0 {
+			respCode = fiber.StatusNotFound
+			return fctx.JsonResponse(
+				respCode,
+				map[string]interface{}{
+					"message": errors.Join(
+						errors.New("cannot update non-existing records..."),
+						err,
+					).Error(),
+				},
+			)
+		} else if todo.CreatedAt == nil {
+			todo.CreatedAt = existing[0].CreatedAt
+		}
+	}
+
+	// update todo
+	_, httpErr := c.service.Update(todos)
+	if httpErr.Err != nil {
+		data["errMessage"] = httpErr.Err.Error()
+		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+	}
+
+	// add todo documents if needed
+	if form.File["file"] != nil || len(form.File["file"]) > 0 {
+		document.Srvc.SetCtx(ctx)
+		documents, httpErr := document.Srvc.Create(form)
+		if httpErr.Err != nil {
+			data["errMessage"] = "failed to upload file(s)"
+			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		}
+
+		// add todoDocuments
+		todoDocuments := todoDocument.TodoDocuments{}
+		for _, document := range documents {
+			todoDocuments = append(
+				todoDocuments,
+				&todoDocument.TodoDocument{TodoId: todos[0].GetId(), DocumentId: document.Id},
+			)
+		}
+		_, httpErr = todoDocument.Srvc.Create(todoDocuments)
+		if httpErr.Err != nil {
+			data["errMessage"] = "failed to upload file(s)"
+			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+		}
+	}
+
+	fctx.Fctx.Response().SetStatusCode(fiber.StatusOK)
 	if len(todos) == 1 {
 		targetPage := fmt.Sprintf("/todos?page=1&items=5")
 		fctx.Fctx.Set("HX-Redirect", targetPage)
 		return nil
 	}
 	data["successMessage"] = "Update success."
-	fctx.Fctx.Set("HX-Trigger", "reloadList")
 	return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 }
 
