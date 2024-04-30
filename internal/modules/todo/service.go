@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"errors"
 	"fmt"
 	"golang-api-starter/internal/database"
 	"golang-api-starter/internal/helper"
@@ -17,6 +18,23 @@ type Service struct {
 
 func NewService(r *Repository) *Service {
 	return &Service{r, nil}
+}
+
+// checkUpdateNonExistRecord for the "update" function to remain the createdAt value without accidental alter the createdAt
+// it may slow, should follow user/service.go's Update to fetch all records at once to reduce db fetching
+func (s *Service) checkUpdateNonExistRecord(todo *Todo) error {
+	conditions := map[string]interface{}{}
+	conditions["id"] = todo.GetId()
+
+	existing, _ := s.repo.Get(conditions)
+	if len(existing) == 0 {
+		respCode = fiber.StatusNotFound
+		return errors.Join(errors.New("cannot update non-existing records..."))
+	} else if todo.CreatedAt == nil {
+		todo.CreatedAt = existing[0].CreatedAt
+	}
+
+	return nil
 }
 
 func (s *Service) Get(queries map[string]interface{}) ([]*Todo, *helper.Pagination) {
@@ -55,6 +73,11 @@ func (s *Service) Create(todos []*Todo) ([]*Todo, *helper.HttpErr) {
 
 func (s *Service) Update(todos []*Todo) ([]*Todo, *helper.HttpErr) {
 	logger.Debugf("todo service update")
+	for _, todo := range todos {
+		if err := s.checkUpdateNonExistRecord(todo); err !=nil{
+			return nil, &helper.HttpErr{fiber.StatusInternalServerError, err}
+		}
+	}
 	results, err := s.repo.Update(todos)
 	return results, &helper.HttpErr{fiber.StatusInternalServerError, err}
 }

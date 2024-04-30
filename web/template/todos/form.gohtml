@@ -5,9 +5,10 @@
 
   <!-- todo: {{.todo}} -->
 
-  <div id="todo-list" class="m-2">
+  <div class="m-2" x-data="todoFormState">
     <div class="flex mb-2 gap-2">
       <form 
+        id="todo-form"
         class="flex flex-col mx-auto gap-4 p-2 w-[28vw]"
         hx-encoding='multipart/form-data'
         {{if eq .todo nil}}hx-post{{else}}hx-patch{{end}}="/todos"
@@ -23,8 +24,29 @@
         <label for="task" class="{{if eq .todo nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 mr-auto my-auto">Task name</label>
         <input name="task" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .todo nil}}required{{end}} value="{{if ne .todo nil}}{{.todo.Task}}{{end}}" />
 
-        <label for="file" class="block font-medium text-slate-700 mr-auto my-auto">Files</label>
+        <label for="file" class="block font-medium text-slate-700 mr-auto my-auto">Add new files</label>
         <input name="file" multiple type="file" accept=".jpg,.png,.pdf" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" value="{{if ne .todo nil}}{{.todo.Documents}}{{end}}" />
+
+        <!-- show existing documents -->
+        {{if .todo}}
+          <hr />
+          <label for="file" class="block font-medium text-slate-700 mr-auto my-auto">Existing files</label>
+          <div class="flex gap-2">
+            {{- range .todo.Documents }}
+              <div class="w-20" id="docBox-{{ GetId .MongoId .Id }}">
+                <div class="relative w-20 h-20 bg-slate-100" name="filePreview">
+                  <div class="text-xs">preview here</div>
+                  <div 
+                    class="w-fit absolute bottom-0 right-0 text-red-500 cursor-pointer bx bx-trash"
+                    id="{{ GetId .MongoId .Id }}"
+                    @click="deleteFile"
+                  ></div>
+                </div>
+                <div class="text-xs" name="fileName">{{.Name}}</div>
+              </div>
+            {{end}}
+          </div>
+        {{end}}
 
         <button type="submit" class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2">
           {{if eq .todo nil}}Add{{else}}Update{{end}}
@@ -33,7 +55,28 @@
       </form>
     </div>
   </div>
+
   <script>
+    function todoFormState(){
+      return {
+        //deleteDocumentIds: [],
+        deleteFile: function(e){
+          //console.log("delete", e.target.id)
+          //this.deleteDocumentIds.push(e.target.id)
+          const todoForm = document.getElementById("todo-form") 
+          const deleteInput = document.createElement("input");
+          deleteInput.name="deleteDocumentIds"
+          deleteInput.value=e.target.id
+          deleteInput.classList.add("text-red-500")
+          deleteInput.classList.add("hidden")
+          deleteInput.setAttribute("readonly","")
+          todoForm.appendChild(deleteInput)
+
+          const docBox = document.getElementById(`docBox-${e.target.id}`)
+          docBox.classList.add("hidden")
+        },
+      }
+    }
   </script>
 {{end}}
 

@@ -13,6 +13,7 @@ It runs by fiber with basic CRUD routes which follows the Controller-Service-Rep
 - Can generate swagger doc by `swag`.
 - Make use of `viper` for loading env variables in config.
 - With a logging wrapper by `zap` which uses as middleware for writing the request's logs in `log/`, the log file maybe used for centralised log server like ELK or Signoz. 
+- Can run in both non-docker or docker environment
 
 # Todo
 - [ ] Need more test cases & validations
@@ -90,9 +91,11 @@ I try following the standards from [project-layout](https://github.com/golang-st
 3. [Set the db driver in configs/docker.yaml](#for-run-by-docker)
 3. [Start fiber api by docker](#start-by-docker)
 4. [Test the login api by curl for getting the JWT](#login)
-5. [Try the user's web](internal/modules/user/README.md#web-crud)
+5. Try the web
+    -  [users page](internal/modules/user/README.md#crud)
+    -  [todos page](internal/modules/todo/README.md#crud)
 
-# Install dependencies
+# Install dependencies (for running without docker)
 If run the Fiber server without docker, install the following go packages.
 ## Air - hot reload
 `air` for fiber hotreload.
@@ -136,7 +139,7 @@ database:
 ...
 ```
 
-# Start databases for development
+# Start databases containers for development
 1. copy and then edit the `db.env` if needed
 ```
 cp db.env.sample db.env
@@ -238,6 +241,9 @@ The `cmd/gen/gen.go` is for generating new module without tedious copy & paste, 
 # API details
 ## Users
 [readme](internal/modules/user/README.md)
+
+## Todos
+[readme](internal/modules/todo/README.md)
 
 ## Password reset
 [readme](internal/modules/passwordReset/README.md)

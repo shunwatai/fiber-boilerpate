@@ -5,9 +5,10 @@
 
   <!-- user: {{.user}} -->
 
-  <div id="user-list" class="m-2">
+  <div class="m-2">
     <div class="flex mb-2 gap-2">
       <form 
+        id="user-form"
         class="flex flex-col mx-auto gap-4 p-2 w-[28vw]"
         {{if eq .user nil}}hx-post{{else}}hx-patch{{end}}="/users"
         hx-ext="json-enc"

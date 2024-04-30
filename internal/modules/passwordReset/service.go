@@ -26,6 +26,23 @@ func NewService(r *Repository) *Service {
 	return &Service{r, nil}
 }
 
+// checkUpdateNonExistRecord for the "update" function to remain the createdAt value without accidental alter the createdAt
+// it may slow, should follow user/service.go's Update to fetch all records at once to reduce db fetching
+func (s *Service) checkUpdateNonExistRecord(passwordReset *PasswordReset) error {
+	conditions := map[string]interface{}{}
+	conditions["id"] = passwordReset.GetId()
+
+	existing, _ := s.repo.Get(conditions)
+	if len(existing) == 0 {
+		respCode = fiber.StatusNotFound
+		return logger.Errorf("cannot update non-existing records...")
+	} else if passwordReset.CreatedAt == nil {
+		passwordReset.CreatedAt = existing[0].CreatedAt
+	}
+
+	return nil
+}
+
 func (s *Service) Get(queries map[string]interface{}) ([]*PasswordReset, *helper.Pagination) {
 	logger.Debugf("passwordReset service get")
 	return s.repo.Get(queries)
@@ -119,6 +136,11 @@ func (s *Service) sendResetPasswordEmail(passwordResets []*PasswordReset) error 
 
 func (s *Service) Update(passwordResets []*PasswordReset) ([]*PasswordReset, *helper.HttpErr) {
 	logger.Debugf("passwordReset service update")
+	for _, passwordReset := range passwordResets {
+		if err := s.checkUpdateNonExistRecord(passwordReset); err !=nil{
+			return nil, &helper.HttpErr{fiber.StatusInternalServerError, err}
+		}
+	}
 	results, err := s.repo.Update(passwordResets)
 	return results, &helper.HttpErr{fiber.StatusInternalServerError, err}
 }

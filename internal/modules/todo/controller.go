@@ -9,6 +9,7 @@ import (
 	"golang-api-starter/internal/modules/document"
 	"golang-api-starter/internal/modules/todoDocument"
 	"html/template"
+	"slices"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -23,25 +24,6 @@ func NewController(s *Service) *Controller {
 }
 
 var respCode = fiber.StatusInternalServerError
-
-// checkUpdateNonExistRecord for the "update" functions to remain the createdAt value without accidental alter the createdAt
-func (c *Controller) checkUpdateNonExistRecord(todo *Todo) error {
-	conditions := map[string]interface{}{}
-	conditions["id"] = todo.GetId()
-
-	existing, err := c.service.GetById(conditions)
-	if len(existing) == 0 {
-		respCode = fiber.StatusNotFound
-		return errors.Join(
-			errors.New("cannot update non-existing records..."),
-			err,
-		)
-	} else if todo.CreatedAt == nil {
-		todo.CreatedAt = existing[0].CreatedAt
-	}
-
-	return nil
-}
 
 func (c *Controller) Get(ctx *fiber.Ctx) error {
 	logger.Debugf("todo ctrl\n")
@@ -185,14 +167,6 @@ func (c *Controller) Update(ctx *fiber.Ctx) error {
 			)
 		}
 
-		if err := c.checkUpdateNonExistRecord(todo); err != nil {
-			return fctx.JsonResponse(
-				respCode,
-				map[string]interface{}{
-					"message": err.Error(),
-				},
-			)
-		}
 	}
 
 	results, httpErr := c.service.Update(todos)
@@ -342,7 +316,8 @@ func (c *Controller) TodoFormPage(ctx *fiber.Ctx) error {
 		"web/template/parts/navbar.gohtml",
 		"web/template/base.gohtml",
 	}
-	tpl := template.Must(template.ParseFiles(tmplFiles...))
+	pagesFunc := helper.TmplCustomFuncs()
+	tpl := template.Must(template.New("").Funcs(pagesFunc).ParseFiles(tmplFiles...))
 
 	paramsMap := helper.GetQueryString(ctx.Request().URI().QueryString())
 	u := new(Todo)
@@ -499,14 +474,6 @@ func (c *Controller) ToggleDone(ctx *fiber.Ctx) error {
 			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 		}
 
-		if err := c.checkUpdateNonExistRecord(todo); err != nil {
-			return fctx.JsonResponse(
-				respCode,
-				map[string]interface{}{
-					"message": err.Error(),
-				},
-			)
-		}
 	}
 
 	_, httpErr := c.service.Update(todos)
@@ -555,7 +522,22 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 		todo.Id = utils.ToPtr(helper.FlexInt(id))
 	}
 
-	logger.Debugf("patch todo:: %+v, %+v", *todo.Id, todo)
+	// remove todoDocument
+	if form.Value["deleteDocumentIds"] != nil && len(form.Value["deleteDocumentIds"]) > 0 {
+		var todoDocumentIds []string
+		todoDocuments, _ := todoDocument.Srvc.Get(map[string]interface{}{"todo_id": form.Value["id"]})
+		// logger.Debugf("todoDocuments %+v", todoDocuments)
+		for _, todoDoc := range todoDocuments {
+			if !slices.Contains(form.Value["deleteDocumentIds"], todoDoc.GetDocumentId()) {
+				continue
+			}
+			todoDocumentIds = append(todoDocumentIds, todoDoc.GetId())
+		}
+		// logger.Debugf("todoDocumentIds %+v", todoDocumentIds)
+		todoDocument.Srvc.Delete(todoDocumentIds)
+	}
+
+	//logger.Debugf("patch todo: %+v, %+v", *todo.Id, todo)
 
 	todos = append(todos, todo)
 
@@ -569,14 +551,6 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 		}
 
-		if err := c.checkUpdateNonExistRecord(todo); err != nil {
-			return fctx.JsonResponse(
-				respCode,
-				map[string]interface{}{
-					"message": err.Error(),
-				},
-			)
-		}
 	}
 
 	// update todo

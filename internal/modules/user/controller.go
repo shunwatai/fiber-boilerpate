@@ -404,6 +404,7 @@ func (c *Controller) SubmitLogin(ctx *fiber.Ctx) error {
 
 	// login success, redirect to target path/url
 	homePage := "/home"
+	fctx.Fctx.Response().SetStatusCode(fiber.StatusOK)
 	fctx.Fctx.Set("HX-Redirect", homePage)
 	return nil
 }
