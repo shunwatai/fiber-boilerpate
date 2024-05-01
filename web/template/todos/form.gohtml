@@ -25,7 +25,17 @@
         <input name="task" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" {{if eq .todo nil}}required{{end}} value="{{if ne .todo nil}}{{.todo.Task}}{{end}}" />
 
         <label for="file" class="block font-medium text-slate-700 mr-auto my-auto">Add new files</label>
-        <input name="file" multiple type="file" accept=".jpg,.png,.pdf" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" value="{{if ne .todo nil}}{{.todo.Documents}}{{end}}" />
+        <div class="flex flex-col items-left">
+          <label class="bx bx-cloud-upload w-fit flex flex-col items-center p-2 rounded-lg shadow-sm tracking-wide border cursor-pointer">
+            <span class="mt-2">Browse</span>
+            <input @change="showSelectedFiles" name="file" multiple type="file" accept=".jpg,.png,.pdf" type='file' class="hidden" />
+          </label>
+          <ul id="uploadFiles" class="text-sm list-disc list-inside">
+            <template x-for="file in uploadFiles">
+              <li x-text="file.name" class="cursor-pointer" @click="openSelectedFile(`${file.name}`)"></div>
+            </template>
+          </ul>
+        </div>
 
         <!-- show existing documents -->
         {{if .todo}}
@@ -35,7 +45,7 @@
             {{- range .todo.Documents }}
               <div class="w-20" id="docBox-{{ GetId .MongoId .Id }}">
                 <div class="relative w-20 h-20 bg-slate-100" name="filePreview">
-                  <div class="text-xs">preview here</div>
+                  <div class="text-xs block w-full h-full cursor-pointer" @click='openUrlInNewWindow("/api/documents/{{ GetId .MongoId .Id }}/download")' x-init="addPreviewEle('/api/documents/{{ GetId .MongoId .Id }}/download', $el)"></div>
                   <div 
                     class="w-fit absolute bottom-0 right-0 text-red-500 cursor-pointer bx bx-trash"
                     id="{{ GetId .MongoId .Id }}"
@@ -60,6 +70,10 @@
     function todoFormState(){
       return {
         //deleteDocumentIds: [],
+        /**
+         * deleteFile remove the existing file. 
+         * it hides the file element and add new <input /> with value of documentId which will submit to API for deletion 
+         */
         deleteFile: function(e){
           //console.log("delete", e.target.id)
           //this.deleteDocumentIds.push(e.target.id)
@@ -75,6 +89,20 @@
           const docBox = document.getElementById(`docBox-${e.target.id}`)
           docBox.classList.add("hidden")
         },
+        uploadFiles: [],
+        showSelectedFiles: function(e){
+          this.uploadFiles.splice(0,this.uploadFiles.length)
+          const selectedFiles = e.target.files;
+          //console.log({selectedFiles})
+          Array.from(selectedFiles).forEach(file=>{
+            this.uploadFiles.push(file)
+          })
+        },
+        openSelectedFile: async function(filename){
+          const file = this.uploadFiles.find(f=>f.name===filename)
+          //console.log({file})
+          window.open(await fileToBase64(file))
+        }
       }
     }
   </script>

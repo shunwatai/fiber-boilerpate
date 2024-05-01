@@ -38,7 +38,7 @@
             <ul class="w-1/3 mx-auto text-start list-disc list-inside">
             {{- range .Documents }}
               <li 
-                @click='getImageFromApi("/api/documents/{{ GetId .MongoId .Id }}/download")'
+                @click='openUrlInNewWindow("/api/documents/{{ GetId .MongoId .Id }}/download")'
                 class="cursor-pointer"
               >
                 {{ .Name }}

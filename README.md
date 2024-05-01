@@ -1,7 +1,7 @@
-# Fiber boilerpate
-This is my personal repo just for fun which for to spin up a golang REST API quicker and to learn about golang.
+# Fiber REST boilerpate with HTMX
+This is my personal repo just for fun which for spinning up golang REST API quicker and to learn about golang and HTMX.
 
-It runs by fiber with basic CRUD routes which follows the Controller-Service-Repository pattern like Spring boot or Laravel's structure.
+It runs by fiber with pre-defined CRUD examples which follows the Controller-Service-Repository pattern like Spring boot or Laravel's architecture.
 
 # Features
 - With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` for accessing records in DB in `internal/database/`. Just raw sql without ORM.
@@ -18,6 +18,7 @@ It runs by fiber with basic CRUD routes which follows the Controller-Service-Rep
 # Todo
 - [ ] Need more test cases & validations
 - [ ] Add GET `/me`
+- [ ] Tons of refactors...
 - [ ] Generate new module script `cmd/gen/gen.go`
     - [ ] Try `bubbletea` for better tui interaction
     - [ ] Support generate web templates
@@ -25,12 +26,15 @@ It runs by fiber with basic CRUD routes which follows the Controller-Service-Rep
     - [x] Login page
     - [x] Forget page
     - [x] Users page CRUD
-        - [x] Users list
-        - [x] User form
+        - [x] list page
+        - [x] form page
     - [ ] Todos page
-        - [x] Todos list
-        - [ ] Todo form with upload file
-- [ ] Try Oauth
+        - [x] list page
+        - [x] form page
+        - [x] upload files
+        - [x] delete files
+        - [ ] preview files
+- [ ] Try Oauth (goth? or oauth2-proxy?)
 
 # Project structure
 I try following the standards from [project-layout](https://github.com/golang-standards/project-layout) as much as I can.
@@ -86,7 +90,7 @@ I try following the standards from [project-layout](https://github.com/golang-st
 ```
 
 # Quick start by docker-compose
-1. [Start the databases containers](#start-databases-for-development)
+1. [Start the databases containers](#start-databases-for-development). Can skip this if use Sqlite.
 2. [Run migrations with the desired database(pg/mariab/sqlite/mongodb)](migrations/README.md#run-migration)
 3. [Set the db driver in configs/docker.yaml](#for-run-by-docker)
 3. [Start fiber api by docker](#start-by-docker)

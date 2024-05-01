@@ -824,6 +824,10 @@ select {
   bottom: 0px;
 }
 
+.bottom-0 {
+  bottom: 0px;
+}
+
 .end-0 {
   inset-inline-end: 0px;
 }
@@ -846,10 +850,6 @@ select {
 
 .top-0 {
   top: 0px;
-}
-
-.bottom-0 {
-  bottom: 0px;
 }
 
 .z-50 {
@@ -941,6 +941,27 @@ select {
   height: 2rem;
 }
 
+.size-max {
+  width: -moz-max-content;
+  width: max-content;
+  height: -moz-max-content;
+  height: max-content;
+}
+
+.size-full {
+  width: 100%;
+  height: 100%;
+}
+
+.size-\[5rem\] {
+  width: 5rem;
+  height: 5rem;
+}
+
+.h-20 {
+  height: 5rem;
+}
+
 .h-3 {
   height: 0.75rem;
 }
@@ -961,8 +982,8 @@ select {
   height: 2.25rem;
 }
 
-.h-20 {
-  height: 5rem;
+.h-full {
+  height: 100%;
 }
 
 .min-h-screen {
@@ -979,6 +1000,10 @@ select {
 
 .w-12 {
   width: 3rem;
+}
+
+.w-20 {
+  width: 5rem;
 }
 
 .w-3 {
@@ -1024,10 +1049,6 @@ select {
 
 .w-full {
   width: 100%;
-}
-
-.w-20 {
-  width: 5rem;
 }
 
 .min-w-full {
@@ -1266,14 +1287,28 @@ select {
   background-color: rgb(254 242 242 / var(--tw-bg-opacity));
 }
 
+.bg-slate-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(241 245 249 / var(--tw-bg-opacity));
+}
+
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
-.bg-slate-100 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(241 245 249 / var(--tw-bg-opacity));
+.bg-cover {
+  background-size: cover;
+}
+
+.object-contain {
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.object-cover {
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 
 .p-2 {
@@ -1346,12 +1381,28 @@ select {
   line-height: 1rem;
 }
 
+.text-\[100\%\] {
+  font-size: 100%;
+}
+
+.text-\[5rem\] {
+  font-size: 5rem;
+}
+
+.text-\[4rem\] {
+  font-size: 4rem;
+}
+
 .font-bold {
   font-weight: 700;
 }
 
 .font-medium {
   font-weight: 500;
+}
+
+.tracking-wide {
+  letter-spacing: 0.025em;
 }
 
 .text-gray-500 {
@@ -1409,6 +1460,11 @@ select {
   color: rgb(51 65 85 / var(--tw-text-opacity));
 }
 
+.text-black {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
+}
+
 .placeholder-slate-400::-moz-placeholder {
   --tw-placeholder-opacity: 1;
   color: rgb(148 163 184 / var(--tw-placeholder-opacity));
@@ -1463,6 +1519,17 @@ select {
 
 .\[a-zA-Z\:\\-\\\.\] {
   a-z-a--z: \-\.;
+}
+
+.before\:block::before {
+  content: var(--tw-content);
+  display: block;
+}
+
+.before\:size-\[5rem\]::before {
+  content: var(--tw-content);
+  width: 5rem;
+  height: 5rem;
 }
 
 .after\:ml-0::after {

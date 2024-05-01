@@ -25,6 +25,15 @@ func NewService(r *Repository) *Service {
 	return &Service{r, nil}
 }
 
+func (s *Service) SetCtx(ctx *fiber.Ctx) {
+	s.ctx = ctx
+}
+
+func (s *Service) GetLoggedInUsername() string {
+	username := s.ctx.Locals("claims").(jwt.MapClaims)["username"]
+	return username.(string)
+}
+
 /* this func for generate the jwt claims like the access & refresh tokens */
 func GenerateUserToken(user User, tokenType string) *jwt.Token {
 	var expireTime = &jwt.NumericDate{time.Now().Add(time.Minute * 10)} // 10 mins for access token?

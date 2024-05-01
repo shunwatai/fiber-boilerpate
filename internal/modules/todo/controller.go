@@ -8,6 +8,7 @@ import (
 	"golang-api-starter/internal/helper/utils"
 	"golang-api-starter/internal/modules/document"
 	"golang-api-starter/internal/modules/todoDocument"
+	"golang-api-starter/internal/modules/user"
 	"html/template"
 	"slices"
 	"strconv"
@@ -244,6 +245,8 @@ func (c *Controller) Delete(ctx *fiber.Ctx) error {
 }
 
 func (c *Controller) ListTodosPage(ctx *fiber.Ctx) error {
+	user.Srvc.SetCtx(ctx)
+	username := user.Srvc.GetLoggedInUsername()
 	// data for template
 	data := fiber.Map{
 		"errMessage": nil,
@@ -251,6 +254,7 @@ func (c *Controller) ListTodosPage(ctx *fiber.Ctx) error {
 		"title":      "Todos",
 		"todos":      Todos{},
 		"pagination": helper.Pagination{},
+		"username":   username,
 	}
 	tmplFiles := []string{
 		"web/template/parts/popup.gohtml",
@@ -302,6 +306,8 @@ func (c *Controller) GetTodoList(ctx *fiber.Ctx) error {
 }
 
 func (c *Controller) TodoFormPage(ctx *fiber.Ctx) error {
+	user.Srvc.SetCtx(ctx)
+	username := user.Srvc.GetLoggedInUsername()
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	// data for template
 	data := fiber.Map{
@@ -309,6 +315,7 @@ func (c *Controller) TodoFormPage(ctx *fiber.Ctx) error {
 		"showNavbar": true,
 		"todo":       &Todo{},
 		"title":      "Create todo",
+		"username":   username,
 	}
 	tmplFiles := []string{
 		"web/template/parts/popup.gohtml",
