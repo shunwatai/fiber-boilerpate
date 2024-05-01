@@ -4,21 +4,32 @@ This is my personal repo just for fun which for spinning up golang REST API quic
 It runs by fiber with pre-defined CRUD examples which follows the Controller-Service-Repository pattern like Spring boot or Laravel's architecture.
 
 # Features
-- With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` for accessing records in DB in `internal/database/`. Just raw sql without ORM.
-- Swtich between different DBs driver by changing the `database.engine` in config.
-- With example of pre-defined modules like `users`, `todos`, `documents` etc. in `interal/modules/`, with CRUD APIs.
+- With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` in [`internal/database/`](internal/database). Just raw sql without ORM.
+    - Swtich between different DBs driver by changing the `database.engine` in config.
+- With example of pre-defined modules like `users`, `todos`, `documents` etc. in [`interal/modules/`](interal/modules/)
+    - with CRUD APIs and support Filtering, Sorting, Pagination etc. basic REST functionalities which also integrated in the [web example](internal/modules/user/README.md#crud).
 - `HTMX` web templates with `tailwind` & `alpinejs`.
 - With a [script](#generate-new-module) `cmd/gen/gen.go` for generate new module in `internal/modules/`.
 - JWT auth, [login sample by curl](#login).
 - Can generate swagger doc by `swag`.
 - Make use of `viper` for loading env variables in config.
 - With a logging wrapper by `zap` which uses as middleware for writing the request's logs in `log/`, the log file maybe used for centralised log server like ELK or Signoz. 
-- Can run in both non-docker or docker environment
+- Can run in both non-docker or docker environment.
+
+# Quick start by docker-compose
+1. [Start the databases containers](#start-databases-containers-for-development). Skip this if use Sqlite.
+2. [Run migrations with the desired database(pg/mariab/sqlite/mongodb)](migrations/README.md#run-migration)
+3. [Set the db driver in configs/docker.yaml](#for-run-by-docker)
+3. [Start fiber api by docker](#start-by-docker)
+4. [Test the login api by curl for getting the JWT](#login)
+5. Try the web
+    -  [users page](internal/modules/user/README.md#crud)
+    -  [todos page](internal/modules/todo/README.md#crud)
 
 # Todo
 - [ ] Need more test cases & validations
 - [ ] Add GET `/me`
-- [ ] Tons of refactors...
+- [ ] Need tons of refactors...
 - [ ] Generate new module script `cmd/gen/gen.go`
     - [ ] Try `bubbletea` for better tui interaction
     - [ ] Support generate web templates
@@ -33,7 +44,8 @@ It runs by fiber with pre-defined CRUD examples which follows the Controller-Ser
         - [x] form page
         - [x] upload files
         - [x] delete files
-        - [ ] preview files
+        - [x] preview files
+        - [ ] search by file name (may add a db migration for a view joining todos & documents)
 - [ ] Try Oauth (goth? or oauth2-proxy?)
 
 # Project structure
@@ -72,11 +84,11 @@ I try following the standards from [project-layout](https://github.com/golang-st
 ├── log                             # storing the API log files
 │   └── requests.log
 ├── main.go                         # the fiber starting point
-├── Makefile
+├── Makefile                        # you get the idea
 ├── migrations                      # storing the DB migration files
 ├── node_modules                    # because of tailwind
-├── package.json
-├── package-lock.json
+├── package.json                    # because of tailwind
+├── package-lock.json               # because of tailwind
 ├── qrcodes                         # my stuffs
 ├── README.Docker.md
 ├── README.md
@@ -85,19 +97,9 @@ I try following the standards from [project-layout](https://github.com/golang-st
 │   ├── xxx.pdf
 │   └── yyy.jpg
 └── web                             # serving the HTMX templates and web's libs
-    ├── static
-    └── template
+    ├── static                      # css & js & 3rd parties libs
+    └── template                    # web templates for the modules like user, todo etc.
 ```
-
-# Quick start by docker-compose
-1. [Start the databases containers](#start-databases-for-development). Can skip this if use Sqlite.
-2. [Run migrations with the desired database(pg/mariab/sqlite/mongodb)](migrations/README.md#run-migration)
-3. [Set the db driver in configs/docker.yaml](#for-run-by-docker)
-3. [Start fiber api by docker](#start-by-docker)
-4. [Test the login api by curl for getting the JWT](#login)
-5. Try the web
-    -  [users page](internal/modules/user/README.md#crud)
-    -  [todos page](internal/modules/todo/README.md#crud)
 
 # Install dependencies (for running without docker)
 If run the Fiber server without docker, install the following go packages.
@@ -123,7 +125,7 @@ go install github.com/swaggo/swag/cmd/swag@latest
 `npx` for running the tailwindcss command for frontend html template dev
 
 # Config
-## Edit config
+## Copy sample config
 ### For run without docker
 ```
 cp configs/localhost.yaml.sample configs/localhost.yaml
