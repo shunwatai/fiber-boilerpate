@@ -1,4 +1,4 @@
-# Fiber REST boilerpate with HTMX
+# Fiber REST boilerplate with HTMX
 This is my personal repo just for fun which for spinning up golang REST API quicker and to learn about golang and HTMX.
 
 It runs by fiber with pre-defined CRUD examples which follows the Controller-Service-Repository pattern like Spring boot or Laravel's architecture.
