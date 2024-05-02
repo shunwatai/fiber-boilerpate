@@ -36,10 +36,10 @@ docker-prod-down:
 	docker-compose -f compose-prod.yaml down
 
 docker-dev-log: 
-	docker-compose -f compose-dev.yaml logs -f
+	docker-compose -f compose-dev.yaml logs -f fiber-api-dev 
 
 docker-prod-log: 
-	docker-compose -f compose-prod.yaml logs -f
+	docker-compose -f compose-prod.yaml logs -f fiber-api-prod
 
 migrate-up: 
 	go run main.go migrate-up $(filter-out $@,$(MAKECMDGOALS))

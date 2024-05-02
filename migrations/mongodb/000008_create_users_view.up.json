@@ -14,6 +14,8 @@
           "disabled": 1,
           "is_oauth": 1,
           "provider": 1,
+          "created_at": 1,
+          "updated_at": 1,
           "search": {
             "$concat": [
               { "$ifNull": ["$name", ""] },

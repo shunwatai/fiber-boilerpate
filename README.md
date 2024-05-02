@@ -6,7 +6,7 @@ It runs by fiber with pre-defined CRUD examples which follows the Controller-Ser
 # Features
 - With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` in [`internal/database/`](internal/database). Just raw sql without ORM.
     - Swtich between different DBs driver by changing the `database.engine` in config.
-- With example of pre-defined modules like `users`, `todos`, `documents` etc. in [`interal/modules/`](interal/modules/)
+- With example of pre-defined modules like `users`, `todos`, `documents` etc. in [`internal/modules/`](internal/modules/)
     - with CRUD APIs and support Filtering, Sorting, Pagination etc. basic REST functionalities which also integrated in the [web example](internal/modules/user/README.md#crud).
 - `HTMX` web templates with `tailwind` & `alpinejs`.
 - With a [script](#generate-new-module) `cmd/gen/gen.go` for generate new module in `internal/modules/`.

@@ -48,6 +48,7 @@ services:
       - api
 
   # web client for mongo
+  # sample connection string: mongodb://user:password@mongodb-dev:27017/fiber-starter?authSource=admin&sslmode=disable
   nosqlclient:
     image: mongoclient/mongoclient
     ports:
