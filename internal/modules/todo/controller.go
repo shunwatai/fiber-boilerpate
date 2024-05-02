@@ -422,7 +422,7 @@ func (c *Controller) SubmitNew(ctx *fiber.Ctx) error {
 		for _, document := range documents {
 			todoDocuments = append(
 				todoDocuments,
-				&todoDocument.TodoDocument{TodoId: todos[0].GetId(), DocumentId: document.Id},
+				&todoDocument.TodoDocument{TodoId: todos[0].GetId(), DocumentId: document.GetId()},
 			)
 		}
 		_, httpErr = todoDocument.Srvc.Create(todoDocuments)
@@ -527,6 +527,10 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 	if len(form.Value["id"]) == 1 {
 		id, _ := helper.ConvertStringToInt(form.Value["id"][0])
 		todo.Id = utils.ToPtr(helper.FlexInt(id))
+		if cfg.DbConf.Driver == "mongodb" {
+			todo.MongoId = utils.ToPtr(form.Value["id"][0])
+			todo.Id = nil
+		}
 	}
 
 	// remove todoDocument
@@ -557,7 +561,6 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 			data["errMessage"] = "please ensure all records with id for PATCH"
 			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 		}
-
 	}
 
 	// update todo
@@ -581,7 +584,7 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 		for _, document := range documents {
 			todoDocuments = append(
 				todoDocuments,
-				&todoDocument.TodoDocument{TodoId: todos[0].GetId(), DocumentId: document.Id},
+				&todoDocument.TodoDocument{TodoId: todos[0].GetId(), DocumentId: document.GetId()},
 			)
 		}
 		_, httpErr = todoDocument.Srvc.Create(todoDocuments)

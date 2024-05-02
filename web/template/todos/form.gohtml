@@ -18,7 +18,7 @@
         hx-vals='{"done":"false"}'
       >
         {{if ne .todo nil}}
-          <input name="{{if .todo.MongoId}}_id{{else}}id{{end}}" type="hidden" value="{{if .todo.MongoId }}{{.todo.MongoId}}{{else}}{{.todo.Id}}{{end}}" />
+          <input name="id" type="hidden" value="{{if .todo.MongoId }}{{.todo.MongoId}}{{else}}{{.todo.Id}}{{end}}" />
         {{end}}
 
         <label for="task" class="{{if eq .todo nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 mr-auto my-auto">Task name</label>

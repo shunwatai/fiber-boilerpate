@@ -36,11 +36,19 @@ func TmplCustomFuncs() template.FuncMap {
 		},
 		// DerefBool get the value of *bool
 		"DerefBool": utils.Deref[bool],
+		// GetId get either int ID or mongo ID
 		"GetId": func(mongoId *string, id *FlexInt) string {
 			if mongoId == nil {
-				return strconv.Itoa(int(*id)) 
+				return strconv.Itoa(int(*id))
 			}
 			return *mongoId
+		},
+		// GetIdKeyName return either _id or id for the html's attribute based on mongoId
+		"GetIdKeyName": func() string {
+			if cfg.DbConf.Driver == "mongodb" {
+				return "_id"
+			}
+			return "id"
 		},
 	}
 }

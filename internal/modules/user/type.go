@@ -28,11 +28,11 @@ type User struct {
 	Name      string                 `json:"name" db:"name" bson:"name,omitempty" example:"emma" validate:"required,alphanum"`
 	Password  *string                `json:"password,omitempty" db:"password" bson:"password,omitempty" example:"password" validate:"omitempty,min=4"`
 	Email     *string                `json:"email,omitempty" db:"email" bson:"email,omitempty" example:"xxx@example.com"`
-	FirstName *string                `json:"firstName" db:"first_name" bson:"first_name,omitempty" example:"Emma"`
-	LastName  *string                `json:"lastName" db:"last_name" bson:"last_name,omitempty" example:"Watson"`
+	FirstName *string                `json:"firstName,omitempty" db:"first_name" bson:"first_name,omitempty" example:"Emma"`
+	LastName  *string                `json:"lastName,omitempty" db:"last_name" bson:"last_name,omitempty" example:"Watson"`
 	Disabled  bool                   `json:"disabled" db:"disabled" bson:"disabled,omitempty" example:"false"`
 	IsOauth   bool                   `json:"isOauth" db:"is_oauth" bson:"is_oauth,omitempty" example:"false"`
-	Provider  *string                `json:"provider" db:"provider" bson:"provider,omitempty" example:"google"`
+	Provider  *string                `json:"provider,omitempty" db:"provider" bson:"provider,omitempty" example:"google"`
 	CreatedAt *helper.CustomDatetime `json:"createdAt" db:"created_at"  bson:"created_at,omitempty"`
 	UpdatedAt *helper.CustomDatetime `json:"updatedAt" db:"updated_at" bson:"updated_at,omitempty"`
 	Search    *string                `json:"-" db:"search,omitempty" bson:"search,omitempty" example:"google"`

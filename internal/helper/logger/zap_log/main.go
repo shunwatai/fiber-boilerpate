@@ -37,15 +37,24 @@ type ZapLog struct {
 var cfg = config.Cfg
 var Zlog = &ZapLog{}
 
+// Set up lumberjack as a logger:
+var logFile = &lumberjack.Logger{
+	// Filename:   fmt.Sprintf("./log/%s", "requests.log"), // Or any other path
+	MaxSize:    500,  // MB; after this size, a new log file is created
+	MaxBackups: 10,   // Number of backups to keep
+	MaxAge:     28,   // Days
+	Compress:   true, // Compress the backups using gzip
+}
+
 func NewZlog() {
 	Zlog.Output = OutputTypes{
 		File:    slices.Contains(cfg.Logging.Zap.Output, "file"),
 		Console: slices.Contains(cfg.Logging.Zap.Output, "console"),
 	}
-	Zlog.Filename = &cfg.Logging.Zap.Filename
 	Zlog.Level = cfg.Logging.Level
 	Zlog.DebugSymbol = cfg.Logging.DebugSymbol
-	*Zlog.Filename = "requests.log" // default logfile name under logs/
+	Zlog.Filename = &cfg.Logging.Zap.Filename
+	logFile.Filename = fmt.Sprintf("./log/%s", *Zlog.Filename)
 }
 
 func (zl *ZapLog) SetDebugSymbol(symbol *string) *ZapLog {
@@ -116,15 +125,6 @@ func fileLogger(filename string, outputTypes OutputTypes) (*zap.Logger, error) {
 	consoleEncoder := zapcore.NewConsoleEncoder(config)
 
 	// Open the log file
-	// Set up lumberjack as a logger:
-	logFile := &lumberjack.Logger{
-		Filename:   fmt.Sprintf("./log/%s", filename), // Or any other path
-		MaxSize:    500,                               // MB; after this size, a new log file is created
-		MaxBackups: 10,                                // Number of backups to keep
-		MaxAge:     28,                                // Days
-		Compress:   true,                              // Compress the backups using gzip
-	}
-
 	// Default logFile without log rotate
 	// logFilePath := fmt.Sprintf("./log/%s", filename)
 	// logFile, err := os.OpenFile(logFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)

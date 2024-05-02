@@ -106,7 +106,7 @@
       const results = [];
 
       checkboxes.forEach(function(checkbox) {
-        results.push({id:checkbox.id,task:checkbox.value,done:checkbox.checked});
+        results.push({ {{ GetIdKeyName }}:checkbox.id,task:checkbox.value,done:checkbox.checked});
       });
 
       //console.log("results:", results)
