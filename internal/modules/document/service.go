@@ -9,7 +9,6 @@ import (
 	"golang-api-starter/internal/database"
 	"golang-api-starter/internal/helper"
 	logger "golang-api-starter/internal/helper/logger/zap_log"
-	"image"
 	"image/jpeg"
 	"io"
 	"log"
@@ -210,7 +209,7 @@ func (s *Service) GetDocument(queries map[string]interface{}) ([]byte, string, s
 		return nil, "", "", fmt.Errorf("not found")
 	}
 
-	logger.Debugf("filePath: %+v\n", repoData[0].FilePath)
+	logger.Debugf("filePath: %+v", repoData[0].FilePath)
 	f, err := os.Open(repoData[0].FilePath)
 	if err != nil {
 		return nil, "", "", fmt.Errorf("failed to open file, %+v", err.Error())
@@ -221,7 +220,7 @@ func (s *Service) GetDocument(queries map[string]interface{}) ([]byte, string, s
 	if err != nil {
 		return nil, "", "", fmt.Errorf("failed to get file type, %+v", err.Error())
 	}
-	logger.Debugf("fileType: ", fileType)
+	logger.Debugf("fileType: %+v", fileType)
 	fileBytes, fileErr := os.ReadFile(repoData[0].FilePath)
 	if fileErr != nil {
 		return nil, "", "", fmt.Errorf("failed to get file type, %+v", fileErr.Error())
@@ -232,14 +231,15 @@ func (s *Service) GetDocument(queries map[string]interface{}) ([]byte, string, s
 	jpgPngRegex := regexp.MustCompile(`png|jpg|jpeg|jpe`)
 	if size != 0 && strings.Contains(fileType, "image") && jpgPngRegex.MatchString(fileType) {
 		buf := new(bytes.Buffer)
-		img, _, err := image.Decode(bytes.NewReader(fileBytes))
+		imgBytes := bytes.NewReader(fileBytes)
+		img, err := imaging.Decode(imgBytes)
 		if err != nil {
-			log.Fatalln("image.Decode err: ", err)
+			return nil, "", "", logger.Errorf("image.Decode err: %+v", err)
 		}
 		resizedImg := imaging.Resize(img, int(size), 0, imaging.Lanczos)
 		err = jpeg.Encode(buf, resizedImg, nil)
 		if err != nil {
-			log.Fatalln("jpeg.Encode err: ", err)
+			return nil, "", "", logger.Errorf("jpeg.Encode err: %+v", err)
 		}
 
 		return buf.Bytes(), "image/jpeg", fileName, nil

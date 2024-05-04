@@ -6,16 +6,17 @@ import (
 	"golang-api-starter/internal/config"
 	zlog "golang-api-starter/internal/helper/logger/zap_log"
 	"golang-api-starter/internal/middleware/logging"
-	"golang-api-starter/internal/modules/document"
-	"golang-api-starter/internal/modules/log"
-	"golang-api-starter/internal/modules/oauth"
-	"golang-api-starter/internal/modules/passwordReset"
-	"golang-api-starter/internal/modules/qrcode"
 	"golang-api-starter/internal/modules/sample"
-	"golang-api-starter/internal/modules/todo"
-	"golang-api-starter/internal/modules/todoDocument"
-	"golang-api-starter/internal/modules/user"
-	"golang-api-starter/internal/modules/web"
+  "golang-api-starter/internal/modules/document"
+  "golang-api-starter/internal/modules/group"
+  "golang-api-starter/internal/modules/log"
+  "golang-api-starter/internal/modules/oauth"
+  "golang-api-starter/internal/modules/passwordReset"
+  "golang-api-starter/internal/modules/qrcode"
+  "golang-api-starter/internal/modules/todo"
+  "golang-api-starter/internal/modules/todoDocument"
+  "golang-api-starter/internal/modules/user"
+  "golang-api-starter/internal/modules/web"
 	"golang-api-starter/web/static"
 	lg "log"
 	"net/http"
@@ -90,9 +91,9 @@ func (f *Fiber) LoadAllRoutes() {
 	}))
 
 	router := f.App.Group("", logging.Logger()) // add logging to all routes
-	sample.GetRoutes(router)                    // sample routes for testing
-	web.GetRoutes(router)
+	sample.GetRoutes(router) // sample routes for testing
 	document.GetRoutes(router)
+	group.GetRoutes(router)
 	log.GetRoutes(router)
 	oauth.GetRoutes(router)
 	passwordReset.GetRoutes(router)
@@ -100,6 +101,7 @@ func (f *Fiber) LoadAllRoutes() {
 	todo.GetRoutes(router)
 	todoDocument.GetRoutes(router)
 	user.GetRoutes(router)
+	web.GetRoutes(router)
 
 	// a custom 404 handler instead of default "Cannot GET /page-not-found"
 	// ref: https://github.com/gofiber/fiber/issues/748#issuecomment-687503079

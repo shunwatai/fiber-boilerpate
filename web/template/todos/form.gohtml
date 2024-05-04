@@ -45,7 +45,7 @@
             {{- range .todo.Documents }}
               <div class="w-20" id="docBox-{{ GetId .MongoId .Id }}">
                 <div class="relative w-20 h-20 bg-slate-100" name="filePreview">
-                  <div class="text-xs block w-full h-full cursor-pointer" @click='openUrlInNewWindow("/api/documents/{{ GetId .MongoId .Id }}/download")' x-init="addPreviewEle('/api/documents/{{ GetId .MongoId .Id }}/download', $el)"></div>
+                  <div class="text-xs block w-full h-full cursor-pointer" @click='openUrlInNewWindow("/api/documents/{{ GetId .MongoId .Id }}/download")' x-init="addPreviewEle('/api/documents/{{ GetId .MongoId .Id }}/download?size=200', $el)"></div>
                   <div 
                     class="w-fit absolute bottom-0 right-0 text-red-500 cursor-pointer bx bx-trash"
                     id="{{ GetId .MongoId .Id }}"

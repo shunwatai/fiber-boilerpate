@@ -282,7 +282,7 @@ func (m *Mongodb) Save(records Records) (Rows, error) {
 			{Key: "$set", Value: record},
 		}, opts)
 		if err != nil {
-			logger.Errorf("update error: %+v", err)
+			return nil, logger.Errorf("save error: %+v", err)
 		}
 
 		/* only new created records has res.UpsertedID, existing's Ids appended in the if condition above */

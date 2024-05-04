@@ -1,0 +1,16 @@
+[
+  {
+    "create": "groups"
+  },
+  {
+    "createIndexes": "groups",
+    "indexes": [
+      {
+        "key": { "name": 1 },
+        "name": "groups_name_key",
+        "unique": true
+      }
+    ],
+    "writeConcern": { "w": "majority" }
+  }
+]

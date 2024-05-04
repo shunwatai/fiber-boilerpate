@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS "groups";
+DROP SEQUENCE IF EXISTS "groups_id_seq";

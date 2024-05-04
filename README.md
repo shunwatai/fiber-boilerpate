@@ -41,11 +41,17 @@ It runs by fiber with pre-defined CRUD examples which follows the Controller-Ser
         - [x] form page
     - [ ] Todos page
         - [x] list page
+            - [ ] search by file name (may add a db migration for a view joining todos & documents)
         - [x] form page
-        - [x] upload files
-        - [x] delete files
+            - [x] upload files
+            - [x] delete files
         - [x] preview files
-        - [ ] search by file name (may add a db migration for a view joining todos & documents)
+    - [ ] Groups page
+        - [ ] list page
+        - [ ] form page
+            - [ ] manage users
+- [ ] Group permssions for ACL
+- [ ] Try Redis/Valkey for caching GET?
 - [ ] Try Oauth (goth? or oauth2-proxy?)
 
 # Project structure
