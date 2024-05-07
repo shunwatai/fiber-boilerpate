@@ -53,6 +53,8 @@ func TestStructToMap(t *testing.T) {
 		&User{
 			MongoId:   utils.ToPtr("xxxx-xxxx-xxxx-xxxx"),
 			Id:        utils.ToPtr(helper.FlexInt(id)),
+			FirstName: utils.ToPtr("first"),
+			LastName:  utils.ToPtr("last"),
 			CreatedAt: customDatetime,
 			UpdatedAt: customDatetime,
 		},
@@ -64,7 +66,7 @@ func TestStructToMap(t *testing.T) {
 		want  []map[string]interface{}
 	}{
 		{name: "test StructToMap", input: users, want: []map[string]interface{}{
-			{"_id": "xxxx-xxxx-xxxx-xxxx", "id": float64(2), "created_at": timeJson, "updated_at": timeJson, "first_name": nil, "last_name": nil, "disabled": false, "name": "", "is_oauth": false, "provider": nil},
+			{"_id": "xxxx-xxxx-xxxx-xxxx", "id": float64(2), "created_at": timeJson, "updated_at": timeJson, "first_name": "first", "last_name": "last", "disabled": false, "name": "", "is_oauth": false},
 		}},
 	}
 
