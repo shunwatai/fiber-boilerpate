@@ -2,10 +2,12 @@ package group
 
 import (
 	"fmt"
-	"github.com/gofiber/fiber/v2"
 	"golang-api-starter/internal/database"
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
+	"golang-api-starter/internal/modules/groupUser"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type Service struct {
@@ -31,6 +33,10 @@ func (s *Service) checkUpdateNonExistRecord(group *Group) error {
 		group.CreatedAt = existing[0].CreatedAt
 	}
 
+	if len(group.Type) == 0 {
+		group.Type = existing[0].Type
+	}
+
 	return nil
 }
 
@@ -42,13 +48,13 @@ func (s *Service) isDuplicated(group *Group) error {
 
 	existing, _ := s.repo.Get(conditions)
 	// no duplicated, return
-	if len(existing) == 0 { 
+	if len(existing) == 0 {
 		return nil
 	}
 
 	if existing[0].Name == group.Name {
 		respCode = fiber.StatusConflict
-		return logger.Errorf(fmt.Sprintf("group wiht name:%s already exists...", group.Name))
+		return logger.Errorf(fmt.Sprintf("group with name:%s already exists...", group.Name))
 	}
 
 	return nil
@@ -88,6 +94,24 @@ func (s *Service) Update(groups []*Group) ([]*Group, *helper.HttpErr) {
 	for _, group := range groups {
 		if err := s.checkUpdateNonExistRecord(group); err != nil {
 			return nil, &helper.HttpErr{fiber.StatusInternalServerError, err}
+		}
+
+		// update groupUsers table
+		if len(group.Users) > 0 {
+			groupUsers := []*groupUser.GroupUser{}
+			for _, u := range group.Users {
+				groupUsers = append(groupUsers, &groupUser.GroupUser{GroupId: group.GetId(), UserId: u.GetId()})
+			}
+
+			existingGroupUsers, _ := groupUser.Srvc.Get(map[string]interface{}{"group_id": group.GetId()})
+			existingGroupUsersIds := []string{}
+			for _, gu := range existingGroupUsers {
+				existingGroupUsersIds = append(existingGroupUsersIds, gu.GetId())
+			}
+			if len(existingGroupUsersIds) > 0 {
+				groupUser.Srvc.Delete(existingGroupUsersIds)
+			}
+			groupUser.Srvc.Create(groupUsers)
 		}
 	}
 	results, err := s.repo.Update(groups)

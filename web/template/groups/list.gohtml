@@ -1,0 +1,131 @@
+{{ define "list"}}
+  <div class="rounded-lg border border-gray-200" id="groupTable">
+    <div class="overflow-x-auto rounded-t-lg">
+      <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+        <thead class="ltr:text-left rtl:text-right">
+          <tr>
+            <th class="sticky inset-y-0 start-0 bg-white px-4 py-2">
+              <label for="SelectAll" class="sr-only">Select All</label>
+              <input type="checkbox" id="selectAll" class="size-5 rounded border-gray-300" @click="toggleSelectAll" />
+            </th>
+            <th 
+              class="text-center whitespace-nowrap px-4 py-2 text-gray-900"
+              name="name"
+              @click="changeSortDirection"
+              x-bind:hx-get="'/groups/list?orderBy=' + $el.getAttribute('name') + '.' + sortDirection"
+              hx-include="[name='page'],[name='items']"
+              hx-target="#groupTable"
+              hx-swap="outerHTML"
+            >
+              <span class="mx-2">name</span><span>{{ShowSortingDirection "name" .pagination.OrderBy}}</span>
+            </th>
+            <th 
+              class="text-center whitespace-nowrap px-4 py-2 text-gray-900"
+              name="type"
+              @click="changeSortDirection"
+              x-bind:hx-get="'/groups/list?orderBy=' + $el.getAttribute('type') + '.' + sortDirection"
+              hx-include="[name='page'],[name='items']"
+              hx-target="#groupTable"
+              hx-swap="outerHTML"
+            >
+              <span class="mx-2">type</span><span>{{ShowSortingDirection "type" .pagination.OrderBy}}</span>
+            </th>
+            <th class="text-center whitespace-nowrap px-4 py-2 text-gray-900"> disabled </th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-200">
+        {{- range .groups }}
+        <tr>
+          <td class="text-center sticky inset-y-0 start-0 bg-white px-4 py-2"><input class="size-5 rounded border-gray-300" type="checkbox" name="ids" value={{if not .MongoId}}{{.Id}}{{else}}{{.MongoId}}{{end}} @click="handleCheck" /></td>
+          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/groups/form?groupId={{if not .MongoId}}{{.Id}}{{else}}{{.MongoId}}{{end}}">{{.Name}}</a></td>
+          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><a class="block" href="/groups/form?groupId={{if not .MongoId}}{{.Id}}{{else}}{{.MongoId}}{{end}}">{{.Type}}</a></td>
+          <td class="text-center whitespace-nowrap px-4 py-2 font-medium text-gray-900"><input class="size-5 rounded border-gray-300" type="checkbox" name="disabled" id={{if not .MongoId}}{{.Id}}{{else}}{{.MongoId}}{{end}} value={{.Name}} {{ if .Disabled }} checked {{end}} /></td>
+        </tr>
+        {{- end }}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="rounded-b-lg border-t border-gray-200 px-4 py-2">
+      <ol class="flex justify-between gap-1 text-xs font-medium">
+        <li class="my-auto flex w-full"><div class="w-fix my-auto">items / page:</div>
+          <select
+            name="items"
+            id="items"
+            class="w-fit size-8 px-2 rounded-lg border border-gray-100 bg-white text-gray-700 sm:text-sm"
+            hx-get="/groups/list"
+            hx-include="[name='search'],[name='page'],[name='orderBy']"
+            hx-target="#groupTable"
+            hx-swap="outerHTML"
+          >
+            <option value="5"   {{ if eq 5   $.pagination.Items }} selected {{ end }}>5</option>
+            <option value="15"  {{ if eq 15  $.pagination.Items }} selected {{ end }}>15</option>
+            <option value="25"  {{ if eq 25  $.pagination.Items }} selected {{ end }}>25</option>
+            <option value="100" {{ if eq 100 $.pagination.Items }} selected {{ end }}>100</option>
+          </select>
+          </li>
+
+        <li class="my-auto flex w-full justify-center">
+          <button
+            hx-get="/groups/list?{{.pagination.PrevPage}}"
+            hx-include="[name='search']"
+            hx-target="#groupTable"
+            hx-swap="outerHTML"
+            class="inline-flex size-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+          >
+            <span class="sr-only">Prev Page</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-3 w-3"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+
+          <select
+            name="page"
+            class="w-12 size-8 px-2 rounded-lg border border-gray-100 bg-white text-gray-700 sm:text-sm"
+            hx-get="/groups/list"
+            hx-include="[name='search'],[name='items'],[name='orderBy']"
+            hx-target="#groupTable"
+            hx-swap="outerHTML"
+          >
+            {{- range $page := Iterate .pagination.TotalPages }}
+              <option  value="{{ $page }}" {{ if eq $page $.pagination.Page }} selected {{ end }}> {{ $page }} </option>
+            {{- end }}
+          </select>
+          <button
+            hx-get="/groups/list?{{.pagination.NextPage}}"
+            hx-include="[name='search']"
+            hx-target="#groupTable"
+            hx-swap="outerHTML"
+            class="inline-flex size-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+          >
+            <span class="sr-only">Next Page</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-3 w-3"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button> 
+        </li>
+
+        <li class="my-auto flex w-full justify-end">total records:{{.pagination.Count}}</span></li>
+      </ol>
+    </div>
+  </div>
+{{end}}

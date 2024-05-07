@@ -1,4 +1,4 @@
-package group
+package groupUser
 
 import (
 	"encoding/json"
@@ -6,42 +6,67 @@ import (
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
 	"golang-api-starter/internal/modules/user"
+	"slices"
+
+	//"golang-api-starter/internal/modules/user"
 	"log"
 	"reflect"
-	"slices"
 	"strconv"
 	"strings"
 
 	"github.com/iancoleman/strcase"
 )
 
-type Group struct {
-	MongoId   *string                `json:"_id,omitempty" bson:"_id,omitempty" validate:"omitempty,id_custom_validation"`
+type GroupUser struct {
+	MongoId   *string                `json:"_id,omitempty" bson:"_id,omitempty" validate:"omitempty,id_custom_validation"` // https://stackoverflow.com/a/20739427
 	Id        *helper.FlexInt        `json:"id" db:"id" bson:"id,omitempty" example:"2" validate:"omitempty,id_custom_validation"`
-	Name      string                 `json:"name" db:"name" bson:"name,omitempty" validate:"required"`
-	Type      string                 `json:"type,omitempty" db:"type" bson:"type,omitempty"`
-	Users     []*user.User           `json:"users"`
-	Disabled  bool                   `json:"disabled" db:"disabled" bson:"disabled,omitempty" validate:"boolean"`
+	GroupId   interface{}            `json:"groupId" db:"group_id" bson:"group_id,omitempty" validate:"omitempty,id_custom_validation"`
+	UserId    interface{}            `json:"userId" db:"user_id" bson:"user_id,omitempty" validate:"omitempty,id_custom_validation"`
+	User      *user.User             `json:"user"`
 	CreatedAt *helper.CustomDatetime `json:"createdAt" db:"created_at" bson:"created_at,omitempty"`
 	UpdatedAt *helper.CustomDatetime `json:"updatedAt" db:"updated_at" bson:"updated_at,omitempty"`
 }
 
-type Groups []*Group
+type GroupUsers []*GroupUser
 
-func (g *Group) GetId() string {
+func (gu *GroupUser) GetId() string {
 	if cfg.DbConf.Driver == "mongodb" {
-		return *g.MongoId
+		return *gu.MongoId
 	} else {
-		return strconv.Itoa(int(*g.Id))
+		return strconv.Itoa(int(*gu.Id))
 	}
 }
 
-func (gs Groups) StructToMap() []map[string]interface{} {
+func (gu *GroupUser) GetGroupId() string {
+	if cfg.DbConf.Driver == "mongodb" {
+		groupId, ok := gu.GroupId.(string)
+		if !ok {
+			return ""
+		}
+		return groupId
+	} else {
+		return strconv.Itoa(int(gu.GroupId.(int64)))
+	}
+}
+
+func (gu *GroupUser) GetUserId() string {
+	if cfg.DbConf.Driver == "mongodb" {
+		userId, ok := gu.UserId.(string)
+		if !ok {
+			return ""
+		}
+		return userId
+	} else {
+		return strconv.Itoa(int(gu.UserId.(int64)))
+	}
+}
+
+func (gus GroupUsers) StructToMap() []map[string]interface{} {
 	mapsResults := []map[string]interface{}{}
-	for _, g := range gs {
+	for _, gu := range gus {
 		tmp := map[string]interface{}{}
 		result := map[string]interface{}{}
-		data, _ := json.Marshal(g)
+		data, _ := json.Marshal(gu)
 		json.Unmarshal(data, &tmp)
 		for k, v := range tmp {
 			result[strcase.ToSnake(k)] = v
@@ -52,32 +77,32 @@ func (gs Groups) StructToMap() []map[string]interface{} {
 	return mapsResults
 }
 
-func (gs Groups) rowsToStruct(rows database.Rows) []*Group {
+func (gus GroupUsers) rowsToStruct(rows database.Rows) []*GroupUser {
 	defer rows.Close()
 
-	records := make([]*Group, 0)
+	records := make([]*GroupUser, 0)
 	for rows.Next() {
-		var g Group
-		err := rows.StructScan(&g)
+		var gu GroupUser
+		err := rows.StructScan(&gu)
 		if err != nil {
 			log.Fatalf("Scan: %v", err)
 		}
-		records = append(records, &g)
+		records = append(records, &gu)
 	}
 
 	return records
 }
 
-func (gs Groups) GetTags(key string) []string {
-	if len(gs) == 0 {
+func (gus GroupUsers) GetTags(key string) []string {
+	if len(gus) == 0 {
 		return []string{}
 	}
 
-	return gs[0].getTags(key)
+	return gus[0].getTags(key)
 }
 
-func (gs *Groups) printValue() {
-	for _, v := range *gs {
+func (gus *GroupUsers) printValue() {
+	for _, v := range *gus {
 		if v.Id != nil {
 			logger.Debugf("existing --> id: %+v, v: %+v\n", v.GetId(), *v)
 		} else {
@@ -88,7 +113,7 @@ func (gs *Groups) printValue() {
 
 // get the tags by key(json / db / bson) name from the struct
 // ref: https://stackoverflow.com/a/40865028
-func (g Group) getTags(key ...string) []string {
+func (gu GroupUser) getTags(key ...string) []string {
 	var tag string
 	if len(key) == 1 {
 		tag = key[0]
@@ -99,7 +124,7 @@ func (g Group) getTags(key ...string) []string {
 	}
 
 	cols := []string{}
-	val := reflect.ValueOf(g)
+	val := reflect.ValueOf(gu)
 	for i := 0; i < val.Type().NumField(); i++ {
 		t := val.Type().Field(i)
 		fieldName := t.Name

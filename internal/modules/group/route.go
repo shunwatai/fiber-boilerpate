@@ -1,19 +1,19 @@
 package group
 
 import (
-	"golang-api-starter/internal/database"
-	"golang-api-starter/internal/config"
-	"golang-api-starter/internal/middleware/jwtcheck"
 	"github.com/gofiber/fiber/v2"
+	"golang-api-starter/internal/config"
+	"golang-api-starter/internal/database"
+	"golang-api-starter/internal/middleware/jwtcheck"
 )
 
 var (
-	cfg       = config.Cfg
-	tableName = "groups"
+	cfg               = config.Cfg
+	tableName         = "groups"
 	viewName  *string = nil
-	Repo      = &Repository{}
-	Srvc      = &Service{}
-	ctrl      = &Controller{}
+	Repo              = &Repository{}
+	Srvc              = &Service{}
+	ctrl              = &Controller{}
 )
 
 func GetRoutes(router fiber.Router) {
@@ -21,6 +21,19 @@ func GetRoutes(router fiber.Router) {
 	Repo = NewRepository(db)
 	Srvc = NewService(Repo)
 	ctrl = NewController(Srvc)
+
+	// web view routes
+	protectedViewRoute := router.Group("/groups", jwtcheck.CheckJwt())
+	protectedViewRoute.Route("", func(userPage fiber.Router) {
+		userPage.Get("/", ctrl.ListGroupsPage)
+		userPage.Get("/list", ctrl.GetGroupList)
+		userPage.Delete("/", ctrl.SubmitDelete)
+		userPage.Patch("/", ctrl.SubmitUpdate)
+		userPage.Post("/", ctrl.SubmitNew)
+		userPage.Route("/form", func(userForm fiber.Router) {
+			userForm.Get("/", ctrl.GroupFormPage)
+		})
+	})
 
 	r := router.Group("/api/groups", jwtcheck.CheckJwt())
 	r.Get("/", GetAll)

@@ -1,0 +1,189 @@
+{{ define "title"}}<title>{{ .title }}</title>{{ end }}
+      
+{{ define "content"}}
+  {{ template "popup" . }}
+  <!-- https://play.tailwindcss.com/haDGueJm6h -->
+  <form id="group-list" class="m-2" hx-ext="json-enc" hx-indicator="#spinner" hx-disabled-elt="input, button" autocomplete="off" x-data="groupListState">
+    <div class="flex mb-2 gap-2">
+      <!-- new btn -->
+      <a href="/groups/form">
+        <button type="button" class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2">
+          New
+        </button>
+      </a>
+
+      <!-- delete btn -->
+      <button 
+        :class="`${checkedCount.length===0?'opacity-50':''} flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2 text-red-500`"
+        type="button"
+        hx-delete="/groups"
+        hx-vals="js:{ids:getIdsAsArray()}"
+        hx-confirm="Click confirm to delete"
+        :disabled="checkedCount.length === 0"
+        x-on:htmx:after-swap.window="checkedCount = checkedCount.slice()" {{/* need this to refresh the checkCount in order to add 'disabled' attribute after clicking the Update btn, idk why the 'disabled' disappeared after 'update' request */}}
+      >
+        Delete <span x-show="checkedCount.length>0" x-text="`(${checkedCount.length})`"></span>
+        <div id="spinner" class="htmx-indicator animate-spin w-5 h-5 rounded-full m-auto border-2 border-solid border-slate-500 border-t-transparent"></div>
+      </button>
+
+      <!-- search box -->
+      <div class="relative w-72 mx-auto">
+        <label for="Search" class="sr-only"> Search </label>
+
+        <input
+          id="search"
+          name="search"
+          placeholder="Search for..."
+          class="w-full rounded-md border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm"
+          hx-get="/groups/list"
+          hx-trigger="keyup changed delay:1s"
+          hx-include="[name='page'],[name='items']"
+          hx-target="#groupTable"
+        />
+
+        <span class="absolute inset-y-0 end-0 right-0 grid w-10 place-content-center">
+          <button type="button" class="text-gray-600 hover:text-gray-700 cursor-default">
+            <span class="sr-only">Search</span>
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="h-4 w-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
+          </button>
+        </span>
+      </div>
+
+      <!-- update btn -->
+      <button 
+        class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2"
+        type="button"
+        hx-target="#popupMessage"
+        hx-target-5*="#popupMessage"
+        hx-patch="/groups"
+        hx-ext="submit-array"
+        hx-swap="outerHTML"
+      >
+        Update
+        <div id="spinner" class="htmx-indicator animate-spin w-5 h-5 rounded-full m-auto border-2 border-solid border-slate-500 border-t-transparent"></div>
+      </button>
+    </div>
+
+    <!-- hidden input for querystring -->
+    <input hidden readonly type="text" id="orderBy" name="orderBy" value="createdAt.desc" />
+
+    <!-- group table here -->
+    {{ template "list" . }}
+  </form>
+
+  <script>
+    // for refocus the "search input" after search request.
+    // because the input is inside the <form> it will lost focus after request... idk why
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+      const searchBox = document.getElementById("search");
+      // ref: https://stackoverflow.com/a/12142227
+      window.setTimeout(()=>searchBox.focus(), 0)
+    });
+
+    function getIdsAsArray() {
+      // Get all the checked checkboxes
+      const checkboxes = document.querySelectorAll('input[type="checkbox"][name="ids"]:checked');
+
+      // Create an array to store the selected ids
+      const ids = [];
+
+      // Loop through the checkboxes and add the ids to the array
+      checkboxes.forEach(function(checkbox) {
+        ids.push(checkbox.value);
+      });
+
+      // Create the request JSON
+      const requestData = {
+        ids: ids.length > 0 ? ids : [] // Ensure that the ids property is always an array
+      };
+
+      return ids;
+    }
+
+    function getDisabledForUpdate() {
+      // Get all the checkboxes
+      const checkboxes = document.querySelectorAll('input[type="checkbox"][name="disabled"]');
+      const results = [];
+
+      checkboxes.forEach(function(checkbox) {
+        results.push({ {{ GetIdKeyName }}:checkbox.id,name:checkbox.value,disabled:checkbox.checked});
+      });
+
+      //console.log("results:", results)
+      return results;
+    }
+
+    // htmx custom ext ref: https://www.submitjson.com/blog/htmx-post-json#solution-2-custom-htmx-json-extension
+    htmx.defineExtension('submit-array', {
+      onEvent: function (name, evt) {
+        if (name === "htmx:configRequest") {
+          evt.detail.headers['Content-Type'] = "application/json"
+        }
+      },
+      encodeParameters: function(xhr, parameters, elt) {
+        xhr.overrideMimeType('application/json') // override default mime type
+        const body = getDisabledForUpdate()
+        return (JSON.stringify(body))
+      }
+    })
+
+    function groupListState(){
+      return {
+        sortDirection: "desc",
+        changeSortDirection: function(e){
+          const key = e.target.getAttribute("name")
+          const direction = this.sortDirection
+          console.log({key,direction})
+
+          // change the alpine's state
+          if (this.sortDirection==="desc") 
+            this.sortDirection="asc"
+          else 
+            this.sortDirection="desc"
+
+          // set the hidden input field for hx-include to send the requests
+          const orderByEle = document.getElementById("orderBy")
+          orderByEle.value = `${key}.${direction}`
+        },
+        checkedCount: [],
+        handleCheck: function (e){
+          if (e.target.checked)
+            this.checkedCount.push(e.target.value)
+          else
+            this.checkedCount.splice(this.checkedCount.findIndex((checked)=>checked===e.target.value),1)
+          
+          //console.log("checkedCount",this.checkedCount.length)
+        },
+        toggleSelectAll: function(){
+          const selectAllCheckbox = document.getElementById("selectAll")
+          const checkboxes = document.querySelectorAll('input[type="checkbox"][name="ids"]');
+            checkboxes.forEach((checkbox) => {
+              if (selectAllCheckbox.checked){
+                !checkbox.checked && this.checkedCount.push(checkbox.value)
+                checkbox.checked = true
+              }else{
+                checkbox.checked = false
+                this.checkedCount.splice(0,this.checkedCount.length)
+              }
+            });
+        }
+      }
+    }
+  </script>
+{{end}}
+
+{{ define "footer" }}<div></div>{{ end }}
