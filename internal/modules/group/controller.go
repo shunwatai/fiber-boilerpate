@@ -317,6 +317,7 @@ func (c *Controller) GroupFormPage(ctx *fiber.Ctx) error {
 	}
 	tmplFiles := []string{
 		"web/template/parts/popup.gohtml",
+		"web/template/groups/form-users-manage.gohtml",
 		"web/template/groups/form.gohtml",
 		"web/template/parts/navbar.gohtml",
 		"web/template/base.gohtml",
