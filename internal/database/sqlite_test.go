@@ -1,3 +1,5 @@
+//go:build integration
+
 package database
 
 import (
@@ -19,7 +21,7 @@ func setupSqliteTestTable(t *testing.T) func(t *testing.T) {
 		log.Printf("failed loading conf, err: %+v\n", err.Error())
 	}
 	zlog.NewZlog()
-	var testDb = GetDatabase("todos_test",nil)
+	var testDb = GetDatabase("todos_test", nil)
 	testDb.Connect()
 
 	// create test table
@@ -79,7 +81,7 @@ func TestSqliteConstructSelectStmtFromQuerystring(t *testing.T) {
 	defer teardownTest(t)
 
 	var tableName = "todos_test"
-	var testDb = GetDatabase(tableName,nil)
+	var testDb = GetDatabase(tableName, nil)
 	testDb.Connect()
 	tests := []sqliteTests{
 		{

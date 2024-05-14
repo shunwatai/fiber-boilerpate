@@ -6,8 +6,13 @@ It runs by fiber with pre-defined CRUD examples which follows the Controller-Ser
 # Features
 - With implementations of `postgres`, `sqlite`, `mariadb`, `mongodb` in [`internal/database/`](internal/database). Just raw sql without ORM.
     - Swtich between different DBs driver by changing the `database.engine` in config.
-- With example of pre-defined modules like `users`, `todos`, `documents` etc. in [`internal/modules/`](internal/modules/)
-    - with CRUD APIs and support Filtering, Sorting, Pagination etc. basic REST functionalities which also integrated in the [web example](internal/modules/user/README.md#crud).
+- With example of pre-defined modules in [`internal/modules/`](internal/modules/). They come with CRUD APIs and support Filtering, Sorting, Pagination etc. 
+    - [User](internal/modules/user/README.md#crud)
+    - [Group](internal/modules/group/README.md#crud) 
+        - example of assigning users
+        - TBD access control of modules
+    - [Todo](internal/modules/todo/README.md#crud) 
+        - example of request by form-data for uploading documents
 - `HTMX` web templates with `tailwind` & `alpinejs`.
 - With a [script](#generate-new-module) `cmd/gen/gen.go` for generate new module in `internal/modules/`.
 - JWT auth, [login sample by curl](#login).
@@ -269,26 +274,21 @@ ref: https://stackoverflow.com/a/49999321
 go test -v -race ./... -count=1
 ```
 
-## Run specific database tests
-
-### Run sqlite's tests
+## Run integration (database related) tests
 ```
-go test -v ./internal/database -run TestSqliteConstructSelectStmtFromQuerystring -count=1
+go test -v -race ./... -count=1 --tags=integration
 ```
 
-### Run mariadb's tests
-```
-go test -v ./internal/database -run TestMariadbConstructSelectStmtFromQuerystring -count=1
-```
+### Run specific database tests
 
-### Run postgres's tests
-```
-go test -v ./internal/database -run TestPgConstructSelectStmtFromQuerystring -count=1
-```
+Substitude with specific `test name`:
+    - `TestSqliteConstructSelectStmtFromQuerystring`
+    - `TestMariadbConstructSelectStmtFromQuerystring`
+    - `TestPgConstructSelectStmtFromQuerystring`
+    - `TestMongodbConstructSelectStmtFromQuerystring`
 
-### Run mongodb's tests
 ```
-go test -v ./internal/database -run TestMongodbConstructSelectStmtFromQuerystring -count=1
+go test -v ./internal/database -run <test name> -count=1 --tags=integration
 ```
 
 # Swagger

@@ -1,3 +1,5 @@
+//go:build integration
+
 package database
 
 import (
@@ -42,18 +44,18 @@ func setupPgTestTable(t *testing.T) func(t *testing.T) {
 	t.Logf("setup postgres test table\n")
 	cfg.LoadEnvVariables()
 	cfg.Vpr.Set("database.engine", "postgres")
-	t.Logf("conf??? %+v, %+v,%+v,%+v,%+v,\n", 
-	*cfg.DbConf.PostgresConf.Host,
-	*cfg.DbConf.PostgresConf.Port,
-	*cfg.DbConf.PostgresConf.User,
-	*cfg.DbConf.PostgresConf.Pass,
-	*cfg.DbConf.PostgresConf.Database,
+	t.Logf("conf??? %+v, %+v,%+v,%+v,%+v,\n",
+		*cfg.DbConf.PostgresConf.Host,
+		*cfg.DbConf.PostgresConf.Port,
+		*cfg.DbConf.PostgresConf.User,
+		*cfg.DbConf.PostgresConf.Pass,
+		*cfg.DbConf.PostgresConf.Database,
 	)
 	if err := cfg.Vpr.Unmarshal(cfg); err != nil {
 		log.Printf("failed loading conf, err: %+v\n", err.Error())
 	}
 	zlog.NewZlog()
-	var testDb = GetDatabase("",nil)
+	var testDb = GetDatabase("", nil)
 
 	// create test table
 	testDb.RawQuery(`CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -125,7 +127,7 @@ func TestPgConstructSelectStmtFromQuerystring(t *testing.T) {
 		teardownTest := setupPgTestTable(t)
 		defer teardownTest(t)
 		var tableName = "todos_test"
-		var testDb = GetDatabase(tableName,nil)
+		var testDb = GetDatabase(tableName, nil)
 		testDb.Connect()
 		log.Printf("testDb: %+v\n", testDb)
 
