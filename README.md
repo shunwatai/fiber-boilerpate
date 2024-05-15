@@ -34,11 +34,7 @@ It runs by fiber with pre-defined CRUD examples which follows the Controller-Ser
 
 # Todo
 - [ ] Need more test cases & validations
-- [ ] Add GET `/me`
 - [ ] Need tons of refactors...
-- [ ] Generate new module script `cmd/gen/gen.go`
-    - [ ] Try `bubbletea` for better tui interaction
-    - [ ] Support generate web templates
 - [ ] Web template example by htmx
     - [x] Login page
     - [x] Forget page
@@ -56,7 +52,17 @@ It runs by fiber with pre-defined CRUD examples which follows the Controller-Ser
         - [x] list page
         - [x] form page
             - [x] manage users
+            - [ ] add a section for managing the ACL for accessing the modules
 - [ ] Group permssions for ACL
+    - [x] Add `group` module for managing users
+    - [x] Add `resource` module for defining the resources(modules) to be control
+    - [x] Add `permission_type` module for defining the types like `read`,`add`,`delete` etc.
+    - [ ] Add `group_resource_acl` module for storing the ACLs info
+    - [ ] Add middleware for checking the group's permission at route.go
+    - [ ] Add GET `/me`
+- [ ] Generate new module script `cmd/gen/gen.go`
+    - [ ] Try `bubbletea` for better tui interaction
+    - [ ] Support generate web templates
 - [ ] Try Redis/Valkey for caching GET?
 - [ ] Try Oauth (goth? or oauth2-proxy?)
 

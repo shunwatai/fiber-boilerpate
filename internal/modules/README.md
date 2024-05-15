@@ -2,7 +2,7 @@
 
 All APIs modules are here seperated by their folder name, and following the controller-service-repository architecture. 
 
-Each of them should have contains the following files:
+Each of them should contain the following files:
 
 - `type.go`: All the structs should put in this file. Other backend frameworks may call it as `model`, `entity` etc.
 
@@ -49,4 +49,3 @@ TBC
 TBC
 ## web
 TBC
-
