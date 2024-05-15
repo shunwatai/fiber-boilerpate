@@ -9,11 +9,14 @@ import (
 	"golang-api-starter/internal/modules/sample"
   "golang-api-starter/internal/modules/document"
   "golang-api-starter/internal/modules/group"
+  "golang-api-starter/internal/modules/groupResourceAcl"
   "golang-api-starter/internal/modules/groupUser"
   "golang-api-starter/internal/modules/log"
   "golang-api-starter/internal/modules/oauth"
   "golang-api-starter/internal/modules/passwordReset"
+  "golang-api-starter/internal/modules/permissionType"
   "golang-api-starter/internal/modules/qrcode"
+  "golang-api-starter/internal/modules/resource"
   "golang-api-starter/internal/modules/todo"
   "golang-api-starter/internal/modules/todoDocument"
   "golang-api-starter/internal/modules/user"
@@ -95,11 +98,14 @@ func (f *Fiber) LoadAllRoutes() {
 	sample.GetRoutes(router) // sample routes for testing
 	document.GetRoutes(router)
 	group.GetRoutes(router)
+	groupResourceAcl.GetRoutes(router)
 	groupUser.GetRoutes(router)
 	log.GetRoutes(router)
 	oauth.GetRoutes(router)
 	passwordReset.GetRoutes(router)
+	permissionType.GetRoutes(router)
 	qrcode.GetRoutes(router)
+	resource.GetRoutes(router)
 	todo.GetRoutes(router)
 	todoDocument.GetRoutes(router)
 	user.GetRoutes(router)

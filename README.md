@@ -30,6 +30,7 @@ It runs by fiber with pre-defined CRUD examples which follows the Controller-Ser
 5. Try the web
     -  [users page](internal/modules/user/README.md#crud)
     -  [todos page](internal/modules/todo/README.md#crud)
+    -  [groups page](internal/modules/group/README.md#crud)
 
 # Todo
 - [ ] Need more test cases & validations
@@ -51,10 +52,10 @@ It runs by fiber with pre-defined CRUD examples which follows the Controller-Ser
             - [x] upload files
             - [x] delete files
         - [x] preview files
-    - [ ] Groups page
-        - [ ] list page
-        - [ ] form page
-            - [ ] manage users
+    - [x] Groups page
+        - [x] list page
+        - [x] form page
+            - [x] manage users
 - [ ] Group permssions for ACL
 - [ ] Try Redis/Valkey for caching GET?
 - [ ] Try Oauth (goth? or oauth2-proxy?)
@@ -261,6 +262,9 @@ The `cmd/gen/gen.go` is for generating new module without tedious copy & paste, 
 
 ## Todos
 [readme](internal/modules/todo/README.md)
+
+## Groups
+[readme](internal/modules/group/README.md)
 
 ## Password reset
 [readme](internal/modules/passwordReset/README.md)

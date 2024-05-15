@@ -1,0 +1,25 @@
+[
+  {
+    "create": "resources"
+  },
+  {
+    "insert": "resources",
+    "documents": [
+      {
+        "_id": { "$oid": "66430e4eb08e9d4ff536da71" },
+        "name": "users",
+        "disabled": false
+      },
+      {
+        "_id": { "$oid": "66430e4eb08e9d4ff536da70" },
+        "name": "groups",
+        "disabled": false
+      },
+      {
+        "_id": { "$oid": "66430e4eb08e9d4ff536da6f" },
+        "name": "todos",
+        "disabled": false
+      }
+    ]
+  }
+]

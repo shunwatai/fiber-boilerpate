@@ -1,0 +1,26 @@
+[
+  {
+    "create": "permission_types"
+  },
+  {
+    "insert": "permission_types",
+    "documents": [
+      {
+        "_id": { "$oid": "66444d0433427ab082cde201" },
+        "name": "delete"
+      },
+      {
+        "_id": { "$oid": "66444d0433427ab082cde200" },
+        "name": "edit"
+      },
+      {
+        "_id": { "$oid": "66444d0433427ab082cde1ff" },
+        "name": "add"
+      },
+      {
+        "_id": { "$oid": "66444d0433427ab082cde1fe" },
+        "name": "read"
+      }
+    ]
+  }
+]
