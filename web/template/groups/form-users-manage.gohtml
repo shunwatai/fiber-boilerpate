@@ -3,21 +3,30 @@
     <label for="type" class="{{if eq .group nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 my-auto">Users</label>
     <span @click="toggleAddUserPopup" class="bx bx-plus text-green-400 my-auto text-xl"> </span>
 
-    <div id="addUsersPopup" class="hidden absolute w-4/5 md:w-1/3 rounded-2xl border border-blue-100 bg-white p-4 shadow-lg sm:p-6 lg:p-8" role="alert">
+    <div id="addUsersPopup" class="hidden absolute w-4/5 md:w-1/3 rounded-2xl border border-blue-100 bg-white p-4 shadow-lg lg:p-6" role="alert">
       <div class="flex items-center gap-4">
         <span class="text-green-400 bx bx-plus text-2xl"> </span>
 
         <p class="font-medium sm:text-lg">Select users to be added</p>
       </div>
 
+      <fieldset>
       <div id="availableUsersList" class="mt-4 text-gray-500">
         <template x-for="user in availableUsers" :key="user.id">
-          <div>
-            <input name="availableUsers" :id="user.id" type="checkbox" />
-            <span x-text="user.name"></span> - <span x-text="user.email"></span>
-          </div>
+          <label :for="user.id" class="flex cursor-pointer items-start gap-4 my-2">
+            <div class="flex items-center">
+              &#8203;
+              <input class="size-4 rounded border-gray-300" name="availableUsers" :id="user.id" type="checkbox" />
+            </div>
+            <div>
+              <strong class="font-medium text-gray-900">
+                <span x-text="user.name"></span> - <span x-text="user.email"></span>
+              </strong>
+            </div>
+          </label>
         </template>
       </div>
+      </fieldset>
 
       <div class="mt-6 sm:flex sm:gap-4">
         <button

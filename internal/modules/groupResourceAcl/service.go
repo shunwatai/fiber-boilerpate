@@ -34,6 +34,14 @@ func (s *Service) checkUpdateNonExistRecord(groupResourceAcl *GroupResourceAcl) 
 	return nil
 }
 
+func (s *Service) GetGroupIdMap(gras []*GroupResourceAcl) map[string][]*GroupResourceAcl {
+	groupResourceAclsMap := map[string][]*GroupResourceAcl{}
+	for _, gra := range gras {
+		groupResourceAclsMap[gra.GetGroupId()] = append(groupResourceAclsMap[gra.GetGroupId()], gra)
+	}
+	return groupResourceAclsMap
+}
+
 func (s *Service) Get(queries map[string]interface{}) ([]*GroupResourceAcl, *helper.Pagination) {
 	logger.Debugf("groupResourceAcl service get")
 	return s.repo.Get(queries)

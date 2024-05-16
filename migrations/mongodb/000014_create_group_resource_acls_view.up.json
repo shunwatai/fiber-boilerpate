@@ -1,0 +1,67 @@
+[
+  {
+    "create": "group_resource_acls_view",
+    "viewOn": "group_resource_acls",
+    "pipeline": [
+      {
+        "$addFields": {
+          "groupIdObjectId": {
+            "$toObjectId": "$group_id"
+          },
+          "resourceIdObjectId": {
+            "$toObjectId": "$resource_id"
+          },
+          "permissionTypeIdObjectId": {
+            "$toObjectId": "$permission_type_id"
+          }
+        }
+      },
+      {
+        "$lookup": {
+          "from": "groups",
+          "localField": "groupIdObjectId",
+          "foreignField": "_id",
+          "as": "group"
+        }
+      },
+      {
+        "$unwind": "$group"
+      },
+      {
+        "$lookup": {
+          "from": "resources",
+          "localField": "resourceIdObjectId",
+          "foreignField": "_id",
+          "as": "resource"
+        }
+      },
+      {
+        "$unwind": "$resource"
+      },
+      {
+        "$lookup": {
+          "from": "permission_types",
+          "localField": "permissionTypeIdObjectId",
+          "foreignField": "_id",
+          "as": "permission_type"
+        }
+      },
+      {
+        "$unwind": "$permission_type"
+      },
+      {
+        "$project": {
+          "_id": 1,
+          "group_id": 1,
+          "group_name": "$group.name",
+          "resource_id": 1,
+          "resource_name": "$resource.name",
+          "permission_type_id": 1,
+          "permission_type": "$permission_type.name",
+          "created_at": 1,
+          "updated_at": 1
+        }
+      }
+    ]
+  }
+]

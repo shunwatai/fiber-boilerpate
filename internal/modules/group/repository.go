@@ -5,6 +5,7 @@ import (
 	"golang-api-starter/internal/helper"
 	logger "golang-api-starter/internal/helper/logger/zap_log"
 	"golang-api-starter/internal/helper/utils"
+	"golang-api-starter/internal/modules/groupResourceAcl"
 	"golang-api-starter/internal/modules/groupUser"
 	"golang-api-starter/internal/modules/user"
 
@@ -26,33 +27,44 @@ func cascadeFields(groups Groups) {
 		return
 	}
 
-	// cascade group-users
-	var (
-		groupIds []string
-		groupId  string
-	)
-	// get all todoId
+	var groupIds []string
+	// get all gruopId
 	for _, group := range groups {
-		groupId = group.GetId()
+		groupId := group.GetId()
 		groupIds = append(groupIds, groupId)
 	}
 
-	// get groups by groupIds
 	condition := database.GetIdsMapCondition(utils.ToPtr("group_id"), groupIds)
+
+	// get groupUsers by groupId
 	groupUsers, _ := groupUser.Srvc.Get(condition)
 	groupUsersMap := groupUser.Srvc.GetGroupIdMap(groupUsers)
 
+	// get groupResourceAcls by groupId
+	groupResourceAcls, _ := groupResourceAcl.Srvc.Get(condition)
+	groupAclsMap := groupResourceAcl.Srvc.GetGroupIdMap(groupResourceAcls)
+
+	// map users & permission into group
 	for _, group := range groups {
-		// if no users assign empty slice for response json "users": [] instead of "users": null
+		// if no users, assign empty slice for response json "users": [] instead of "users": null
 		group.Users = []*user.User{}
 		// take out the groupUsers by groupId in map and assign
 		gus, haveUsers := groupUsersMap[group.GetId()]
 
-		if !haveUsers {
-			continue
-		} else {
+		if haveUsers {
 			for _, gu := range gus {
 				group.Users = append(group.Users, gu.User)
+			}
+		}
+
+		// if no permissions, assign empty slice for response json "permissions": [] instead of "permissions": null
+		group.Permissions = []*groupResourceAcl.GroupResourceAcl{}
+		// take out the groupUsers by groupId in map and assign
+		gas, haveAcls := groupAclsMap[group.GetId()]
+
+		if haveAcls {
+			for _, ga := range gas {
+				group.Permissions = append(group.Permissions, ga)
 			}
 		}
 	}

@@ -1,23 +1,23 @@
 package groupResourceAcl
 
 import (
-	"golang-api-starter/internal/database"
-	"golang-api-starter/internal/config"
-	"golang-api-starter/internal/middleware/jwtcheck"
 	"github.com/gofiber/fiber/v2"
+	"golang-api-starter/internal/config"
+	"golang-api-starter/internal/database"
+	"golang-api-starter/internal/middleware/jwtcheck"
 )
 
 var (
 	cfg       = config.Cfg
 	tableName = "group_resource_acls"
-	viewName  *string = nil
+	viewName  = "group_resource_acls_view"
 	Repo      = &Repository{}
 	Srvc      = &Service{}
 	ctrl      = &Controller{}
 )
 
 func GetRoutes(router fiber.Router) {
-	db := database.GetDatabase(tableName, viewName)
+	db := database.GetDatabase(tableName, &viewName)
 	Repo = NewRepository(db)
 	Srvc = NewService(Repo)
 	ctrl = NewController(Srvc)
