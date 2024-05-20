@@ -52,10 +52,7 @@ func (r *Repository) Get(queries map[string]interface{}) ([]*GroupResourceAcl, *
 }
 
 func (r *Repository) Create(groupResourceAcls []*GroupResourceAcl) ([]*GroupResourceAcl, error) {
-	for _, groupResourceAcl := range groupResourceAcls {
-		logger.Debugf("groupResourceAcl repo add: %+v", groupResourceAcl)
-	}
-	database.SetIgnoredCols("search")
+	database.SetIgnoredCols("group_name","resource_name","permission_type")
 	defer database.SetIgnoredCols()
 	rows, err := r.db.Save(GroupResourceAcls(groupResourceAcls))
 
@@ -70,6 +67,8 @@ func (r *Repository) Create(groupResourceAcls []*GroupResourceAcl) ([]*GroupReso
 
 func (r *Repository) Update(groupResourceAcls []*GroupResourceAcl) ([]*GroupResourceAcl, error) {
 	logger.Debugf("groupResourceAcl repo update")
+	database.SetIgnoredCols("group_name","resource_name","permission_type")
+	defer database.SetIgnoredCols()
 	rows, err := r.db.Save(GroupResourceAcls(groupResourceAcls))
 
 	var records GroupResourceAcls

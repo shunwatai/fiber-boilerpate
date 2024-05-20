@@ -5,7 +5,10 @@ import (
 	"golang-api-starter/internal/database"
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
+	"golang-api-starter/internal/modules/groupResourceAcl"
 	"golang-api-starter/internal/modules/groupUser"
+	"golang-api-starter/internal/modules/permissionType"
+	"golang-api-starter/internal/modules/resource"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -91,28 +94,14 @@ func (s *Service) Create(groups []*Group) ([]*Group, *helper.HttpErr) {
 
 func (s *Service) Update(groups []*Group) ([]*Group, *helper.HttpErr) {
 	logger.Debugf("group service update")
+
 	for _, group := range groups {
 		if err := s.checkUpdateNonExistRecord(group); err != nil {
 			return nil, &helper.HttpErr{fiber.StatusInternalServerError, err}
 		}
 
-		// update groupUsers table
-		if len(group.Users) > 0 {
-			groupUsers := []*groupUser.GroupUser{}
-			for _, u := range group.Users {
-				groupUsers = append(groupUsers, &groupUser.GroupUser{GroupId: group.GetId(), UserId: u.GetId()})
-			}
-
-			existingGroupUsers, _ := groupUser.Srvc.Get(map[string]interface{}{"group_id": group.GetId()})
-			existingGroupUsersIds := []string{}
-			for _, gu := range existingGroupUsers {
-				existingGroupUsersIds = append(existingGroupUsersIds, gu.GetId())
-			}
-			if len(existingGroupUsersIds) > 0 {
-				groupUser.Srvc.Delete(existingGroupUsersIds)
-			}
-			groupUser.Srvc.Create(groupUsers)
-		}
+		updateGroupUsers(group)
+		updateGroupResourceAcls(group)
 	}
 	results, err := s.repo.Update(groups)
 	return results, &helper.HttpErr{fiber.StatusInternalServerError, err}
@@ -129,4 +118,62 @@ func (s *Service) Delete(ids []string) ([]*Group, error) {
 	}
 
 	return records, s.repo.Delete(ids)
+}
+
+func updateGroupUsers(group *Group) {
+	// remove all existing groupUsers records
+	existingGroupUsers, _ := groupUser.Srvc.Get(map[string]interface{}{"group_id": group.GetId()})
+	existingGroupUsersIds := []string{}
+	for _, gu := range existingGroupUsers {
+		existingGroupUsersIds = append(existingGroupUsersIds, gu.GetId())
+	}
+	if len(existingGroupUsersIds) > 0 {
+		groupUser.Srvc.Delete(existingGroupUsersIds)
+	}
+	// update groupUsers table
+	if len(group.Users) > 0 {
+		groupUsers := []*groupUser.GroupUser{}
+		for _, u := range group.Users {
+			groupUsers = append(groupUsers, &groupUser.GroupUser{GroupId: group.GetId(), UserId: u.GetId()})
+		}
+
+		groupUser.Srvc.Create(groupUsers)
+	}
+}
+
+func updateGroupResourceAcls(group *Group) {
+	resources, _ := resource.Srvc.Get(map[string]interface{}{})
+	resourceNameMap := resource.Resources(resources).GetNameMap()
+	permissionTypes, _ := permissionType.Srvc.Get(map[string]interface{}{})
+	permissionTypeNameMap := permissionType.PermissionTypes(permissionTypes).GetNameMap()
+	// logger.Debugf("resourceNameMap: %+v, permissionTypeNameMap: %+v", resourceNameMap, permissionTypeNameMap)
+
+	// remove all existing groupResourceAcls records
+	existingGroupResourceAcls, _ := groupResourceAcl.Srvc.Get(map[string]interface{}{"group_id": group.GetId()})
+	existingGroupResourceAclsIds := []string{}
+	for _, gu := range existingGroupResourceAcls {
+		existingGroupResourceAclsIds = append(existingGroupResourceAclsIds, gu.GetId())
+	}
+	if len(existingGroupResourceAclsIds) > 0 {
+		groupResourceAcl.Srvc.Delete(existingGroupResourceAclsIds)
+	}
+	// update groupResourceAcls table
+	if len(group.Permissions) > 0 {
+		groupResourceAcls := []*groupResourceAcl.GroupResourceAcl{}
+		for _, perm := range group.Permissions {
+			if resourceNameMap[*perm.ResourceName] == nil ||
+				permissionTypeNameMap[*perm.PermissionType] == nil {
+				continue
+			}
+			resourceId := resourceNameMap[*perm.ResourceName].GetId()
+			permissionTypeId := permissionTypeNameMap[*perm.PermissionType].GetId()
+			groupResourceAcls = append(groupResourceAcls, &groupResourceAcl.GroupResourceAcl{
+				GroupId:          group.GetId(),
+				ResourceId:       resourceId,
+				PermissionTypeId: permissionTypeId,
+			})
+		}
+
+		groupResourceAcl.Srvc.Create(groupResourceAcls)
+	}
 }

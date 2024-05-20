@@ -70,6 +70,8 @@ func (r *Repository) Create({{.ModuleName}}s []*{{.StructName}}) ([]*{{.StructNa
 
 func (r *Repository) Update({{.ModuleName}}s []*{{.StructName}}) ([]*{{.StructName}}, error) {
 	logger.Debugf("{{.ModuleName}} repo update")
+	database.SetIgnoredCols("search")
+	defer database.SetIgnoredCols()
 	rows, err := r.db.Save({{.StructName}}s({{.ModuleName}}s))
 
 	var records {{.StructName}}s

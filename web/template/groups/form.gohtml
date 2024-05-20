@@ -15,7 +15,7 @@
         hx-target-5*="#popupMessage"
         hx-indicator="#spinner"
         hx-disabled-elt="input, button"
-        :hx-vals="JSON.stringify({'users':existingUsers})"
+        :hx-vals="JSON.stringify({'users':existingUsers,'permissions':constructPermissionsForSubmit()})"
       >
         {{if ne .group nil}}
           <input name="{{if .group.MongoId}}_id{{else}}id{{end}}" type="hidden" value="{{if .group.MongoId }}{{.group.MongoId}}{{else}}{{.group.Id}}{{end}}" />
@@ -31,6 +31,10 @@
           {{ template "groupUsersManage" . }}
         {{ end }}
 
+        {{ if .group }}
+          {{ template "aclsManage" . }}
+        {{ end }}
+
         <button type="submit" class="flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2">
           {{if eq .group nil}}Add{{else}}Update{{end}}
           <div id="spinner" class="htmx-indicator animate-spin w-5 h-5 rounded-full m-auto border-2 border-solid border-slate-500 border-t-transparent"></div>
@@ -41,6 +45,7 @@
   <script>
     function groupFormState(){
       return {
+        /* for user management popover interaction */
         toggleAddUserPopup: function(){
           const addUsersPopupEle = document.getElementById("addUsersPopup")
           const classes = Array.from(addUsersPopupEle.classList)
@@ -51,7 +56,7 @@
           }
         },
         availableUsers: [
-          {{- range .users}}
+          {{- range .availableUsers}}
             { 
               {{GetIdKeyName}}:{{- .Id -}},
               name:{{- .Name -}},
@@ -89,6 +94,60 @@
           })
           this.toggleAddUserPopup()
         },
+
+        /* for permission matrix */
+        permissionsMatrixData: {
+          // for looping the checkboxes
+          permissions: {
+            {{ range $resourceName,$permissions := .permissionsTableData.resourcesAcl }}
+              {{$resourceName}}:{
+                {{ range $.permissionsTableData.headers }}
+                  {{.Name}}: {{index $permissions .Name}},
+                {{ end }}
+              },
+            {{ end }}
+          },
+
+          // for looping the first row header
+          headers: [
+            {{ range .permissionsTableData.headers }}
+              {{ .Name }},
+            {{ end }}
+          ],
+          // for looping the first col header
+          resources: [
+            {{ range .permissionsTableData.resources }}
+              {{ .Name }},
+            {{ end }}
+          ],
+        },
+        handlePermissionsUpdate: function(e){
+          const {name,value,checked} = e.target
+          //console.log({name,value,checked})
+          this.permissionsMatrixData.permissions[name][value] = checked
+          this.constructPermissionsForSubmit()
+        },
+        // construct shape for submit PATCH req to API
+        constructPermissionsForSubmit: function(){
+          const permissions = []
+          {{ if .group }}
+          // update permissions by permissionsMatrixData
+          Object.keys(this.permissionsMatrixData.permissions).forEach(resourceName=>{
+            Object.keys(this.permissionsMatrixData.permissions[resourceName]).forEach(attr=>{
+              if (!this.permissionsMatrixData.permissions[resourceName][attr]) return
+              const data = {
+                groupId: {{GetId .group.MongoId .group.Id}},
+                resourceName,
+                permissionType:attr,
+              }
+              permissions.push(data)
+            })
+          })
+          {{ end }}
+
+          //console.log({permissions})
+          return permissions
+        }
       }
     }
     </script>

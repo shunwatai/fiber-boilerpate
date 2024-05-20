@@ -21,8 +21,8 @@ type Group struct {
 	Id          *helper.FlexInt                      `json:"id" db:"id" bson:"id,omitempty" example:"2" validate:"omitempty,id_custom_validation"`
 	Name        string                               `json:"name" db:"name" bson:"name,omitempty" validate:"required"`
 	Type        string                               `json:"type,omitempty" db:"type" bson:"type,omitempty"`
-	Users       []*user.User                         `json:"users"`
-	Permissions []*groupResourceAcl.GroupResourceAcl `json:"permissions"`
+	Users       []*user.User                         `json:"users" validate:"required"`
+	Permissions []*groupResourceAcl.GroupResourceAcl `json:"permissions" validate:"required"`
 	Disabled    bool                                 `json:"disabled" db:"disabled" bson:"disabled,omitempty" validate:"boolean"`
 	CreatedAt   *helper.CustomDatetime               `json:"createdAt" db:"created_at" bson:"created_at,omitempty"`
 	UpdatedAt   *helper.CustomDatetime               `json:"updatedAt" db:"updated_at" bson:"updated_at,omitempty"`

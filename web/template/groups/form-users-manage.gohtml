@@ -1,4 +1,10 @@
 {{ define "groupUsersManage"}}
+  <span class="flex items-center mt-2">
+    <span class="h-px flex-1 bg-black"></span>
+    <span class="shrink-0 px-6">Manage users</span>
+    <span class="h-px flex-1 bg-black"></span>
+  </span>
+
   <div class="flex gap-4">
     <label for="type" class="{{if eq .group nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 my-auto">Users</label>
     <span @click="toggleAddUserPopup" class="bx bx-plus text-green-400 my-auto text-xl"> </span>

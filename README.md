@@ -230,7 +230,7 @@ make docker-prod-log
 ```
 
 # DB Migration
-Install [go-migrate](https://github.com/golang-migrate/migrate) and the follow the [detail usage](migrations/README.md) for different DBs.
+Install [go-migrate](https://github.com/golang-migrate/migrate) and then follow the [detail usage](migrations/README.md) for different DBs.
 
 # Run the tailwindcss build process
 ```

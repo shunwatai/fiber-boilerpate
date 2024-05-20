@@ -1,0 +1,43 @@
+{{ define "aclsManage"}}
+  <span class="flex items-center mt-2">
+    <span class="h-px flex-1 bg-black"></span>
+    <span class="shrink-0 px-6">Manage permissions</span>
+    <span class="h-px flex-1 bg-black"></span>
+  </span>
+
+
+  <div id="aclsList" class="grid grid-cols-5 gap-4">
+    {{/* loop first row header */}}
+    <div class="m-auto"></div>
+    <template x-for="(header,index) in permissionsMatrixData.headers" :key="header+index">
+      <div class="m-auto" x-text="header"></div>
+    </template>
+
+    {{/* loop the permissions */}}
+    <template x-for="resourceName in permissionsMatrixData.resources" :key="resourceName">
+      <div class="contents">
+        <div class="m-auto" x-text="resourceName"> </div>
+        <template x-for="attr in permissionsMatrixData.headers" :key="resourceName+attr">
+          <div class="m-auto">
+            <input type="checkbox" :name="resourceName" :value="attr" :checked="permissionsMatrixData.permissions[resourceName][attr]" @change="handlePermissionsUpdate" />
+          </div>
+        </template>
+      </div>
+    </template>
+
+    {{/*
+    {{ range $resourceName,$permissions := .permissionsTableData.resourcesAcl }}
+      <div class="m-auto">{{ $resourceName }}</div>
+      {{ range $.permissionsTableData.headers }}
+        <div class="m-auto">
+          <input type="checkbox" id="{{$resourceName}}{{.Name}}"
+            {{ if index $permissions .Name }}
+              checked
+            {{ end }}
+          />
+        </div>
+      {{ end }}
+    {{ end }}
+    */}}
+  </div>
+{{ end }}

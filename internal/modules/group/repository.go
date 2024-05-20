@@ -75,7 +75,7 @@ func (r *Repository) Get(queries map[string]interface{}) ([]*Group, *helper.Pagi
 	defaultExactMatch := map[string]bool{
 		"id":  true,
 		"_id": true,
-		//"done": true, // bool match needs exact match, param can be 0(false) & 1(true)
+		"disabled": true, // bool match needs exact match, parram can be 0(false) & 1(true)
 	}
 	if queries["exactMatch"] != nil {
 		maps.Copy(queries["exactMatch"].(map[string]bool), defaultExactMatch)

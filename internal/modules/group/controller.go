@@ -6,8 +6,11 @@ import (
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
 	"golang-api-starter/internal/helper/utils"
+	"golang-api-starter/internal/modules/permissionType"
+	"golang-api-starter/internal/modules/resource"
 	"golang-api-starter/internal/modules/user"
 	"html/template"
+	"slices"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -318,6 +321,7 @@ func (c *Controller) GroupFormPage(ctx *fiber.Ctx) error {
 	tmplFiles := []string{
 		"web/template/parts/popup.gohtml",
 		"web/template/groups/form-users-manage.gohtml",
+		"web/template/groups/form-acls-manage.gohtml",
 		"web/template/groups/form.gohtml",
 		"web/template/parts/navbar.gohtml",
 		"web/template/base.gohtml",
@@ -329,7 +333,9 @@ func (c *Controller) GroupFormPage(ctx *fiber.Ctx) error {
 	u := new(Group)
 	// logger.Debugf("group_id: %+v", paramsMap["group_id"])
 
-	if paramsMap["group_id"] != nil { // update group
+	if paramsMap["group_id"] == nil { // new group
+		data["group"] = nil
+	} else { // update group
 		if cfg.DbConf.Driver == "mongodb" {
 			groupId := paramsMap["group_id"].(string)
 			u.MongoId = &groupId
@@ -342,26 +348,58 @@ func (c *Controller) GroupFormPage(ctx *fiber.Ctx) error {
 			u.Id = utils.ToPtr(helper.FlexInt(groupId))
 		}
 
+		// get group by ID
 		groups, _ := c.service.Get(map[string]interface{}{"id": u.GetId()})
 		if len(groups) == 0 {
 			logger.Errorf("something went wrong... failed to find group with id: %+v", u.Id)
 			return nil
 		}
+
+		// get users for users management popover modal
 		users, _ := user.Srvc.Get(map[string]interface{}{"disabled": false})
 		userIdMap := user.Srvc.GetIdMap(groups[0].Users)
-		usersWithoutExisting := []*user.User{}
+		availableUsersToBeSelected := []*user.User{}
 		for _, u := range users {
-			_, ok := userIdMap[u.GetId()]
-			if ok {
-				continue
+			_, exists := userIdMap[u.GetId()]
+			if !exists {
+				availableUsersToBeSelected = append(availableUsersToBeSelected, u)
 			}
-			usersWithoutExisting = append(usersWithoutExisting, u)
 		}
+
+		// get resources for ACL matrix
+		existingAclMap := map[string][]string{}
+		for _, permission := range groups[0].Permissions {
+			existingAclMap[*permission.ResourceName] = append(existingAclMap[*permission.ResourceName], *permission.PermissionType)
+		}
+		resourcesAcl := map[string]map[string]bool{}
+		resources, _ := resource.Srvc.Get(map[string]interface{}{"disabled": false, "order_by": "order.asc"})
+		permissionTypes, _ := permissionType.Srvc.Get(map[string]interface{}{"order_by": "order.asc"})
+		for _, resource := range resources {
+			logger.Debugf("resource: %+v", resource.Name)
+			resourcesAcl[resource.Name] = map[string]bool{}
+			for _, permType := range permissionTypes {
+				_, ok := existingAclMap[resource.Name]
+				hasPermission := slices.Contains(existingAclMap[resource.Name], permType.Name)
+				if ok && hasPermission {
+					resourcesAcl[resource.Name][permType.Name] = true
+				} else {
+					resourcesAcl[resource.Name][permType.Name] = false
+				}
+			}
+		}
+
+		// logger.Debugf("existingAclMap: %+v", existingAclMap)
+		// logger.Debugf("resourcesAcl: %+v", resourcesAcl)
+
 		data["group"] = groups[0]
-		data["users"] = usersWithoutExisting
+		data["availableUsers"] = availableUsersToBeSelected
+		// data["permissionTypes"] = permissionTypes
+		data["permissionsTableData"] = map[string]interface{}{
+			"headers":      permissionTypes,
+			"resources":    resources,
+			"resourcesAcl": resourcesAcl,
+		}
 		data["title"] = "Update group"
-	} else { // new group
-		data["group"] = nil
 	}
 
 	respCode = fiber.StatusOK

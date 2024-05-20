@@ -14,6 +14,7 @@ CREATE SEQUENCE permission_types_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 21474836
 CREATE TABLE "public"."permission_types" (
     "id" integer DEFAULT nextval('permission_types_id_seq') NOT NULL,
     "name" character varying(255) NOT NULL,
+    "order" integer NOT NULL,
     "created_at" timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "updated_at" timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT "permission_types_pkey" PRIMARY KEY ("id")
@@ -24,8 +25,8 @@ COMMENT ON COLUMN "permission_types"."name" IS 'permission attribute like add, r
 CREATE TRIGGER update_permission_types_updated_at BEFORE UPDATE ON permission_types FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 -- Pre-populate some default permissions
-INSERT INTO "permission_types" ("id", "name", "created_at", "updated_at") VALUES
-(1,	'read',	'2024-05-15 05:41:33.433213+00',	'2024-05-15 05:41:33.433213+00'),
-(2,	'add',	'2024-05-15 05:41:36.086894+00',	'2024-05-15 05:41:36.086894+00'),
-(3,	'edit',	'2024-05-15 05:41:42.740808+00',	'2024-05-15 05:41:42.740808+00'),
-(4,	'delete',	'2024-05-15 05:41:46.279443+00',	'2024-05-15 05:41:46.279443+00');
+INSERT INTO "permission_types" ("id", "name", "order", "created_at", "updated_at") VALUES
+(1,	'read',	 1,'2024-05-15 05:41:33.433213+00',	'2024-05-15 05:41:33.433213+00'),
+(2,	'add',	 2,'2024-05-15 05:41:36.086894+00',	'2024-05-15 05:41:36.086894+00'),
+(3,	'edit',	 3,'2024-05-15 05:41:42.740808+00',	'2024-05-15 05:41:42.740808+00'),
+(4,	'delete',4,	'2024-05-15 05:41:46.279443+00',	'2024-05-15 05:41:46.279443+00');
