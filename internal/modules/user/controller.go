@@ -7,6 +7,7 @@ import (
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
 	"golang-api-starter/internal/helper/utils"
+	"golang-api-starter/internal/modules/groupUser"
 	"html/template"
 	"strconv"
 	"sync"
@@ -19,7 +20,7 @@ type Controller struct {
 	service *Service
 }
 
-func sanitise(users Users) {
+func sanitise(users groupUser.Users) {
 	for _, u := range users {
 		u.Password = nil
 	}
@@ -99,8 +100,8 @@ func (c *Controller) GetById(ctx *fiber.Ctx) error {
 func (c *Controller) Create(ctx *fiber.Ctx) error {
 	logger.Debugf("user ctrl create\n")
 	c.service.ctx = ctx
-	user := &User{}
-	users := []*User{}
+	user := &groupUser.User{}
+	users := []*groupUser.User{}
 
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	reqCtx := &helper.ReqContext{Payload: fctx}
@@ -156,8 +157,8 @@ func (c *Controller) Create(ctx *fiber.Ctx) error {
 func (c *Controller) Update(ctx *fiber.Ctx) error {
 	logger.Debugf("user ctrl update\n")
 
-	user := &User{}
-	users := []*User{}
+	user := &groupUser.User{}
+	users := []*groupUser.User{}
 
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	reqCtx := &helper.ReqContext{Payload: fctx}
@@ -238,7 +239,7 @@ func (c *Controller) Delete(ctx *fiber.Ctx) error {
 	logger.Debugf("deletedIds: %+v, mongoIds: %+v\n", delIds, mongoDelIds)
 
 	var (
-		results []*User
+		results []*groupUser.User
 		err     error
 	)
 
@@ -265,7 +266,7 @@ func (c *Controller) Login(ctx *fiber.Ctx) error {
 	defer mu.Unlock()
 
 	logger.Debugf("user ctrl login")
-	user := &User{}
+	user := &groupUser.User{}
 
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	reqCtx := &helper.ReqContext{Payload: fctx}
@@ -330,11 +331,11 @@ func (c *Controller) Refresh(ctx *fiber.Ctx) error {
 
 	if cfg.DbConf.Driver == "mongodb" {
 		userId := claims["userId"].(string)
-		result, refreshErr = c.service.Refresh(&User{MongoId: &userId})
+		result, refreshErr = c.service.Refresh(&groupUser.User{MongoId: &userId})
 	} else {
 		userId := int64(claims["userId"].(float64))
 		// result, refreshErr = c.service.Refresh(&User{Id: &userId})
-		result, refreshErr = c.service.Refresh(&User{Id: utils.ToPtr(helper.FlexInt(userId))})
+		result, refreshErr = c.service.Refresh(&groupUser.User{Id: utils.ToPtr(helper.FlexInt(userId))})
 	}
 	if refreshErr != nil {
 		return fctx.JsonResponse(
@@ -384,7 +385,7 @@ func (c *Controller) SubmitLogin(ctx *fiber.Ctx) error {
 	html := `{{ template "popup" . }}`
 	tpl, _ = tpl.New("message").Parse(html)
 
-	u := new(User)
+	u := new(groupUser.User)
 	if err := fctx.Fctx.BodyParser(u); err != nil {
 		logger.Errorf("BodyParser err: %+v", err)
 		data["errMessage"] = "something went wrong: failed to parse request json"
@@ -417,7 +418,7 @@ func (c *Controller) ListUsersPage(ctx *fiber.Ctx) error {
 		"errMessage": nil,
 		"showNavbar": true,
 		"title":      "Users",
-		"users":      Users{},
+		"users":      groupUser.Users{},
 		"pagination": helper.Pagination{},
 		"username":   username,
 	}
@@ -448,7 +449,7 @@ func (c *Controller) GetUserList(ctx *fiber.Ctx) error {
 	data := fiber.Map{
 		"errMessage": nil,
 		"showNavbar": true,
-		"users":      Users{},
+		"users":      groupUser.Users{},
 		"pagination": helper.Pagination{},
 	}
 	tmplFiles := []string{"web/template/users/list.gohtml"}
@@ -478,7 +479,7 @@ func (c *Controller) UserFormPage(ctx *fiber.Ctx) error {
 	data := fiber.Map{
 		"errMessage": nil,
 		"showNavbar": true,
-		"user":       &User{},
+		"user":       &groupUser.User{},
 		"title":      "Create user",
 		"username":   username,
 	}
@@ -491,7 +492,7 @@ func (c *Controller) UserFormPage(ctx *fiber.Ctx) error {
 	tpl := template.Must(template.ParseFiles(tmplFiles...))
 
 	paramsMap := helper.GetQueryString(ctx.Request().URI().QueryString())
-	u := new(User)
+	u := new(groupUser.User)
 	// logger.Debugf("user_id: %+v", paramsMap["user_id"])
 
 	if paramsMap["user_id"] != nil { // update user
@@ -530,8 +531,8 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 	fctx.Fctx.Response().SetStatusCode(respCode)
 	reqCtx := &helper.ReqContext{Payload: fctx}
 
-	user := &User{}
-	users := []*User{}
+	user := &groupUser.User{}
+	users := []*groupUser.User{}
 
 	data := fiber.Map{}
 	tmplFiles := []string{"web/template/parts/popup.gohtml"}
@@ -590,8 +591,8 @@ func (c *Controller) SubmitNew(ctx *fiber.Ctx) error {
 	reqCtx := &helper.ReqContext{Payload: fctx}
 
 	c.service.ctx = ctx
-	user := &User{}
-	users := []*User{}
+	user := &groupUser.User{}
+	users := []*groupUser.User{}
 
 	data := fiber.Map{}
 	tmplFiles := []string{"web/template/parts/popup.gohtml"}

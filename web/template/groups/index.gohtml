@@ -120,7 +120,11 @@
       const results = [];
 
       checkboxes.forEach(function(checkbox) {
-        results.push({ {{ GetIdKeyName }}:checkbox.id,name:checkbox.value,disabled:checkbox.checked});
+        results.push({ 
+          {{ GetIdKeyName }}:checkbox.id,name:checkbox.value,disabled:checkbox.checked,
+          users:[],
+          permissions:[],
+        });
       });
 
       //console.log("results:", results)

@@ -76,12 +76,12 @@ func (rs Resources) rowsToStruct(rows database.Rows) []*Resource {
 	return records
 }
 
-func (rs Resources) GetTags(key string) []string {
+func (rs Resources) GetTags(key ...string) []string {
 	if len(rs) == 0 {
 		return []string{}
 	}
 
-	return rs[0].getTags(key)
+	return rs[0].getTags(key...)
 }
 
 func (rs *Resources) printValue() {

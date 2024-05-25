@@ -7,22 +7,29 @@ import (
 	"golang-api-starter/internal/helper/utils"
 	"golang-api-starter/internal/modules/groupResourceAcl"
 	"golang-api-starter/internal/modules/groupUser"
-	"golang-api-starter/internal/modules/user"
 
-	//"golang-api-starter/internal/modules/user"
 	"golang.org/x/exp/maps"
 )
 
 type Repository struct {
-	db database.IDatabase
+	db       database.IDatabase
+	UserRepo groupUser.IUserRepository
 }
 
 func NewRepository(db database.IDatabase) *Repository {
-	return &Repository{db}
+	return &Repository{db: db}
+}
+
+func (r *Repository) GetIdMap(groups groupUser.Groups) map[string]*groupUser.Group {
+	groupMap := map[string]*groupUser.Group{}
+	for _, group := range groups {
+		groupMap[group.GetId()] = group
+	}
+	return groupMap
 }
 
 // cascadeFields for joining other module, see the example in internal/modules/todo/repository.go
-func cascadeFields(groups Groups) {
+func cascadeFields(groups groupUser.Groups) {
 	if len(groups) == 0 {
 		return
 	}
@@ -37,22 +44,23 @@ func cascadeFields(groups Groups) {
 	condition := database.GetIdsMapCondition(utils.ToPtr("group_id"), groupIds)
 
 	// get groupUsers by groupId
-	groupUsers, _ := groupUser.Srvc.Get(condition)
-	groupUsersMap := groupUser.Srvc.GetGroupIdMap(groupUsers)
+	groupUsers, _ := groupUser.Repo.Get(condition)
+	groupUsersMap := groupUser.Repo.GetGroupIdMap(groupUsers)
 
 	// get groupResourceAcls by groupId
-	groupResourceAcls, _ := groupResourceAcl.Srvc.Get(condition)
-	groupAclsMap := groupResourceAcl.Srvc.GetGroupIdMap(groupResourceAcls)
+	groupResourceAcls, _ := groupResourceAcl.Repo.Get(condition)
+	groupAclsMap := groupResourceAcl.Repo.GetGroupIdMap(groupResourceAcls)
 
 	// map users & permission into group
 	for _, group := range groups {
 		// if no users, assign empty slice for response json "users": [] instead of "users": null
-		group.Users = []*user.User{}
+		group.Users = []*groupUser.User{}
 		// take out the groupUsers by groupId in map and assign
 		gus, haveUsers := groupUsersMap[group.GetId()]
 
 		if haveUsers {
 			for _, gu := range gus {
+				gu.User.Groups = nil
 				group.Users = append(group.Users, gu.User)
 			}
 		}
@@ -70,11 +78,11 @@ func cascadeFields(groups Groups) {
 	}
 }
 
-func (r *Repository) Get(queries map[string]interface{}) ([]*Group, *helper.Pagination) {
+func (r *Repository) Get(queries map[string]interface{}) ([]*groupUser.Group, *helper.Pagination) {
 	logger.Debugf("group repo get")
 	defaultExactMatch := map[string]bool{
-		"id":  true,
-		"_id": true,
+		"id":       true,
+		"_id":      true,
 		"disabled": true, // bool match needs exact match, parram can be 0(false) & 1(true)
 	}
 	if queries["exactMatch"] != nil {
@@ -83,46 +91,44 @@ func (r *Repository) Get(queries map[string]interface{}) ([]*Group, *helper.Pagi
 		queries["exactMatch"] = defaultExactMatch
 	}
 
-	queries["columns"] = Group{}.getTags()
+	queries["columns"] = groupUser.Groups{{}}.GetTags()
 	rows, pagination := r.db.Select(queries)
 
-	var records Groups
+	var records groupUser.Groups
 	if rows != nil {
-		records = records.rowsToStruct(rows)
+		records = records.RowsToStruct(rows)
 	}
 	// records.printValue()
-
-	cascadeFields(records)
 
 	return records, pagination
 }
 
-func (r *Repository) Create(groups []*Group) ([]*Group, error) {
+func (r *Repository) Create(groups []*groupUser.Group) ([]*groupUser.Group, error) {
 	for _, group := range groups {
 		logger.Debugf("group repo add: %+v", group)
 	}
 	database.SetIgnoredCols("search")
 	defer database.SetIgnoredCols()
-	rows, err := r.db.Save(Groups(groups))
+	rows, err := r.db.Save(groupUser.Groups(groups))
 
-	var records Groups
+	var records groupUser.Groups
 	if rows != nil {
-		records = records.rowsToStruct(rows)
+		records = records.RowsToStruct(rows)
 	}
-	records.printValue()
+	records.PrintValue()
 
 	return records, err
 }
 
-func (r *Repository) Update(groups []*Group) ([]*Group, error) {
+func (r *Repository) Update(groups []*groupUser.Group) ([]*groupUser.Group, error) {
 	logger.Debugf("group repo update")
-	rows, err := r.db.Save(Groups(groups))
+	rows, err := r.db.Save(groupUser.Groups(groups))
 
-	var records Groups
+	var records groupUser.Groups
 	if rows != nil {
-		records = records.rowsToStruct(rows)
+		records = records.RowsToStruct(rows)
 	}
-	records.printValue()
+	records.PrintValue()
 	// cascadeFields(records)
 
 	return records, err

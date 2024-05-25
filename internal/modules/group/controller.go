@@ -6,6 +6,7 @@ import (
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
 	"golang-api-starter/internal/helper/utils"
+	"golang-api-starter/internal/modules/groupUser"
 	"golang-api-starter/internal/modules/permissionType"
 	"golang-api-starter/internal/modules/resource"
 	"golang-api-starter/internal/modules/user"
@@ -31,6 +32,7 @@ func (c *Controller) Get(ctx *fiber.Ctx) error {
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	paramsMap := helper.GetQueryString(ctx.Request().URI().QueryString())
 	results, pagination := c.service.Get(paramsMap)
+
 
 	respCode = fiber.StatusOK
 	return fctx.JsonResponse(
@@ -61,8 +63,8 @@ func (c *Controller) GetById(ctx *fiber.Ctx) error {
 func (c *Controller) Create(ctx *fiber.Ctx) error {
 	logger.Debugf("group ctrl create\n")
 	c.service.ctx = ctx
-	group := &Group{}
-	groups := []*Group{}
+	group := &groupUser.Group{}
+	groups := []*groupUser.Group{}
 
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	reqCtx := &helper.ReqContext{Payload: fctx}
@@ -107,7 +109,7 @@ func (c *Controller) Create(ctx *fiber.Ctx) error {
 		// logger.Debugf("group? %+v\n", group)
 	}
 
-	// return []*Group{}
+	// return []*groupUser.Group{}
 	results, httpErr := c.service.Create(groups)
 	if httpErr.Err != nil {
 		return fctx.JsonResponse(
@@ -132,8 +134,8 @@ func (c *Controller) Create(ctx *fiber.Ctx) error {
 func (c *Controller) Update(ctx *fiber.Ctx) error {
 	logger.Debugf("group ctrl update\n")
 
-	group := &Group{}
-	groups := []*Group{}
+	group := &groupUser.Group{}
+	groups := []*groupUser.Group{}
 
 	fctx := &helper.FiberCtx{Fctx: ctx}
 	reqCtx := &helper.ReqContext{Payload: fctx}
@@ -217,7 +219,7 @@ func (c *Controller) Delete(ctx *fiber.Ctx) error {
 	logger.Debugf("deletedIds: %+v, mongoIds: %+v\n", delIds, mongoDelIds)
 
 	var (
-		results []*Group
+		results []*groupUser.Group
 		err     error
 	)
 
@@ -252,7 +254,7 @@ func (c *Controller) ListGroupsPage(ctx *fiber.Ctx) error {
 		"errMessage": nil,
 		"showNavbar": true,
 		"title":      "Groups",
-		"groups":     Groups{},
+		"groups":     groupUser.Groups{},
 		"pagination": helper.Pagination{},
 		"username":   username,
 	}
@@ -283,7 +285,7 @@ func (c *Controller) GetGroupList(ctx *fiber.Ctx) error {
 	data := fiber.Map{
 		"errMessage": nil,
 		"showNavbar": true,
-		"groups":     Groups{},
+		"groups":     groupUser.Groups{},
 		"pagination": helper.Pagination{},
 	}
 	tmplFiles := []string{"web/template/groups/list.gohtml"}
@@ -313,10 +315,10 @@ func (c *Controller) GroupFormPage(ctx *fiber.Ctx) error {
 	data := fiber.Map{
 		"errMessage": nil,
 		"showNavbar": true,
-		"group":      &Group{},
+		"group":      &groupUser.Group{},
 		"title":      "Create group",
 		"username":   username,
-		"users":      []user.User{},
+		"users":      []groupUser.User{},
 	}
 	tmplFiles := []string{
 		"web/template/parts/popup.gohtml",
@@ -330,7 +332,7 @@ func (c *Controller) GroupFormPage(ctx *fiber.Ctx) error {
 	tpl := template.Must(template.New("").Funcs(pagesFunc).ParseFiles(tmplFiles...))
 
 	paramsMap := helper.GetQueryString(ctx.Request().URI().QueryString())
-	u := new(Group)
+	u := new(groupUser.Group)
 	// logger.Debugf("group_id: %+v", paramsMap["group_id"])
 
 	if paramsMap["group_id"] == nil { // new group
@@ -357,8 +359,8 @@ func (c *Controller) GroupFormPage(ctx *fiber.Ctx) error {
 
 		// get users for users management popover modal
 		users, _ := user.Srvc.Get(map[string]interface{}{"disabled": false})
-		userIdMap := user.Srvc.GetIdMap(groups[0].Users)
-		availableUsersToBeSelected := []*user.User{}
+		userIdMap := Repo.UserRepo.GetIdMap(groups[0].Users)
+		availableUsersToBeSelected := []*groupUser.User{}
 		for _, u := range users {
 			_, exists := userIdMap[u.GetId()]
 			if !exists {
@@ -416,8 +418,8 @@ func (c *Controller) SubmitNew(ctx *fiber.Ctx) error {
 	reqCtx := &helper.ReqContext{Payload: fctx}
 
 	c.service.ctx = ctx
-	group := &Group{}
-	groups := []*Group{}
+	group := &groupUser.Group{}
+	groups := []*groupUser.Group{}
 
 	data := fiber.Map{}
 	tmplFiles := []string{"web/template/parts/popup.gohtml"}
@@ -467,8 +469,8 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 	fctx.Fctx.Response().SetStatusCode(respCode)
 	reqCtx := &helper.ReqContext{Payload: fctx}
 
-	group := &Group{}
-	groups := []*Group{}
+	group := &groupUser.Group{}
+	groups := []*groupUser.Group{}
 
 	data := fiber.Map{}
 	tmplFiles := []string{"web/template/parts/popup.gohtml"}

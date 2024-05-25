@@ -101,12 +101,12 @@ func (tds TodoDocuments) rowsToStruct(rows database.Rows) []*TodoDocument {
 	return records
 }
 
-func (tds TodoDocuments) GetTags(key string) []string {
+func (tds TodoDocuments) GetTags(key ...string) []string {
 	if len(tds) == 0 {
 		return []string{}
 	}
 
-	return tds[0].getTags(key)
+	return tds[0].getTags(key...)
 }
 
 func (tds *TodoDocuments) printValue() {

@@ -15,10 +15,10 @@
         hx-target-5*="#popupMessage"
         hx-indicator="#spinner"
         hx-disabled-elt="input, button"
-        hx-vals='{"done":"false"}'
+        hx-vals='{"done":{{.todo.Done}}}'
       >
         {{if ne .todo nil}}
-          <input name="id" type="hidden" value="{{if .todo.MongoId }}{{.todo.MongoId}}{{else}}{{.todo.Id}}{{end}}" />
+          <input name="{{GetIdKeyName}}" type="hidden" value="{{GetId .todo.MongoId .todo.Id}}" />
         {{end}}
 
         <label for="task" class="{{if eq .todo nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 mr-auto my-auto">Task name</label>

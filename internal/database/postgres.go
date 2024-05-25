@@ -144,7 +144,7 @@ func (m *Postgres) constructSelectStmtFromQuerystring(
 	}
 
 	selectStmt = fmt.Sprintf(`%s 
-			ORDER BY %s %s
+			ORDER BY "%s" %s
 			LIMIT %s OFFSET %s
 		`,
 		selectStmt,

@@ -4,6 +4,7 @@ import (
 	"golang-api-starter/internal/helper"
 	logger "golang-api-starter/internal/helper/logger/zap_log"
 	"golang-api-starter/internal/helper/utils"
+	"golang-api-starter/internal/modules/groupUser"
 	"golang-api-starter/internal/modules/user"
 	"html/template"
 
@@ -47,7 +48,7 @@ func (c *Controller) OAuthGetAuth(ctx *fiber.Ctx) error {
 
 	users, _ := user.Srvc.Get(map[string]interface{}{"name": username, "exactMatch": map[string]bool{"name": true}})
 	if len(users) == 0 { // new user, add to db
-		users = append(users, &user.User{
+		users = append(users, &groupUser.User{
 			Name:     username,
 			Password: utils.ToPtr(fiberUtils.UUIDv4()), // useless random dummy password for oauth user
 			IsOauth:  true,

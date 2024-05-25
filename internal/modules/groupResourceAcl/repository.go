@@ -16,6 +16,14 @@ func NewRepository(db database.IDatabase) *Repository {
 	return &Repository{db}
 }
 
+func (r *Repository) GetGroupIdMap(gras []*GroupResourceAcl) map[string][]*GroupResourceAcl {
+	groupResourceAclsMap := map[string][]*GroupResourceAcl{}
+	for _, gra := range gras {
+		groupResourceAclsMap[gra.GetGroupId()] = append(groupResourceAclsMap[gra.GetGroupId()], gra)
+	}
+	return groupResourceAclsMap
+}
+
 // cascadeFields for joining other module, see the example in internal/modules/todo/repository.go
 func cascadeFields(groupResourceAcls GroupResourceAcls) {
   if len(groupResourceAcls) == 0 {

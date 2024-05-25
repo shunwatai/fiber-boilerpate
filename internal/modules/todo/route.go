@@ -1,10 +1,11 @@
 package todo
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"golang-api-starter/internal/config"
 	"golang-api-starter/internal/database"
-	"golang-api-starter/internal/middleware/jwtcheck"
+	"golang-api-starter/internal/interfaces"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -16,13 +17,13 @@ var (
 	ctrl              = &Controller{}
 )
 
-func GetRoutes(router fiber.Router) {
+func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares) {
 	db := database.GetDatabase(tableName, viewName)
 	Repo = NewRepository(db)
 	Srvc = NewService(Repo)
 	ctrl = NewController(Srvc)
 
-	protectedViewRoute := router.Group("/todos", jwtcheck.CheckJwt())
+	protectedViewRoute := router.Group("/todos", custMiddleware.CheckJwt())
 	protectedViewRoute.Route("", func(todoPage fiber.Router) {
 		todoPage.Get("/", ctrl.ListTodosPage)
 		todoPage.Get("/list", ctrl.GetTodoList)
@@ -35,7 +36,7 @@ func GetRoutes(router fiber.Router) {
 		})
 	})
 
-	r := router.Group("/api/todos", jwtcheck.CheckJwt())
+	r := router.Group("/api/todos", custMiddleware.CheckJwt())
 	r.Get("/", GetAll)
 	r.Post("/", Create)
 	r.Patch("/", Update)

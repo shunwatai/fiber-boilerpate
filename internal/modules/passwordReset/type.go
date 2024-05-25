@@ -28,7 +28,7 @@ type PasswordReset struct {
 	MongoId *string     `json:"_id,omitempty" bson:"_id,omitempty" validate:"omitempty,id_custom_validation"` // https://stackoverflow.com/a/20739427
 	Id      *int64      `json:"id" db:"id" bson:"id,omitempty" example:"2" validate:"omitempty,id_custom_validation"`
 	UserId  interface{} `json:"userId" db:"user_id" bson:"user_id,omitempty" validate:"omitempty,id_custom_validation"`
-	//User      *user.User             `json:"user"`
+	//User      *groupUser.User             `json:"user"`
 	Email      string                 `json:"email,omitempty"`
 	Token      string                 `json:"token,omitempty"`
 	TokenHash  *string                `json:"tokenHash,omitempty" db:"token_hash" bson:"token_hash,omitempty"`
@@ -92,12 +92,12 @@ func (prs PasswordResets) rowsToStruct(rows database.Rows) []*PasswordReset {
 	return records
 }
 
-func (prs PasswordResets) GetTags(key string) []string {
+func (prs PasswordResets) GetTags(key ...string) []string {
 	if len(prs) == 0 {
 		return []string{}
 	}
 
-	return prs[0].getTags(key)
+	return prs[0].getTags(key...)
 }
 
 func (prs *PasswordResets) printValue() {

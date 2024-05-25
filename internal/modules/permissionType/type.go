@@ -75,12 +75,12 @@ func (pts PermissionTypes) rowsToStruct(rows database.Rows) []*PermissionType {
 	return records
 }
 
-func (pts PermissionTypes) GetTags(key string) []string {
+func (pts PermissionTypes) GetTags(key ...string) []string {
 	if len(pts) == 0 {
 		return []string{}
 	}
 
-	return pts[0].getTags(key)
+	return pts[0].getTags(key...)
 }
 
 func (pts *PermissionTypes) printValue() {

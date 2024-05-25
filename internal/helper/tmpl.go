@@ -50,5 +50,9 @@ func TmplCustomFuncs() template.FuncMap {
 			}
 			return "id"
 		},
+		// IsMongo check whether cfg.DbConf.Driver is mongo
+		"IsMongo": func() bool {
+			return cfg.DbConf.Driver == "mongodb"
+		},
 	}
 }

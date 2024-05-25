@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 	"sync"
 	"text/template"
@@ -209,11 +210,12 @@ func reGenerateServerFile() {
 	// moduleDirs, err := ioutil.ReadDir(fmt.Sprintf("%s/internal/modules/", basepath))
 	moduleDirs, err := os.ReadDir(fmt.Sprintf("%s/internal/modules/", basepath))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to open module ", err)
 	}
 
+	namesSkipForRegenerate := []string{"sample", "user", "group", "groupUser"}
 	for _, dir := range moduleDirs {
-		if dir.Name() == "sample" {
+		if slices.Contains(namesSkipForRegenerate, dir.Name()) || !dir.IsDir() {
 			continue
 		}
 		// structName := fmt.Sprintf("%s", cases.Title(language.English, cases.Compact).String(dir.Name()))

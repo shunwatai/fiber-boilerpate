@@ -5,7 +5,7 @@ import (
 	"golang-api-starter/internal/database"
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
-	"golang-api-starter/internal/modules/user"
+	"golang-api-starter/internal/modules/groupUser"
 	"log"
 	"reflect"
 	"slices"
@@ -19,7 +19,7 @@ type Document struct {
 	MongoId   *string                `json:"_id,omitempty" bson:"_id,omitempty" validate:"omitempty,id_custom_validation"`
 	Id        *helper.FlexInt        `json:"id" db:"id" bson:"id,omitempty" example:"2" validate:"omitempty,id_custom_validation"`
 	UserId    interface{}            `json:"userId" db:"user_id" bson:"user_id,omitempty" validate:"omitempty,id_custom_validation"`
-	User      *user.User             `json:"user"`
+	User      *groupUser.User             `json:"user"`
 	Name      string                 `json:"name" db:"name" bson:"name,omitempty" example:"test.jpg"`
 	FilePath  string                 `json:"filePath" db:"file_path" bson:"file_path,omitempty" example:"upload/xx/202210041710-test.jpg"`
 	FileType  string                 `json:"fileType" db:"file_type" bson:"file_type,omitempty" default:"jpg"`
@@ -84,12 +84,12 @@ func (docs Documents) rowsToStruct(rows database.Rows) []*Document {
 	return records
 }
 
-func (docs Documents) GetTags(key string) []string {
+func (docs Documents) GetTags(key ...string) []string {
 	if len(docs) == 0 {
 		return []string{}
 	}
 
-	return docs[0].getTags(key)
+	return docs[0].getTags(key...)
 }
 
 func (docs *Documents) printValue() {

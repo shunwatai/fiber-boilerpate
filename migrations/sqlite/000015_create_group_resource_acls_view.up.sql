@@ -1,5 +1,5 @@
 DROP VIEW IF EXISTS group_resource_acls_view;
-CREATE OR REPLACE VIEW group_resource_acls_view AS 
+CREATE VIEW group_resource_acls_view AS 
 SELECT 
   group_resource_acls.id id,
   group_id,

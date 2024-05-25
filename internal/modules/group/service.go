@@ -24,7 +24,7 @@ func NewService(r *Repository) *Service {
 
 // checkUpdateNonExistRecord for the "update" function to remain the createdAt value without accidental alter the createdAt
 // it may slow, should follow user/service.go's Update to fetch all records at once to reduce db fetching
-func (s *Service) checkUpdateNonExistRecord(group *Group) error {
+func (s *Service) checkUpdateNonExistRecord(group *groupUser.Group) error {
 	conditions := map[string]interface{}{}
 	conditions["id"] = group.GetId()
 
@@ -45,7 +45,7 @@ func (s *Service) checkUpdateNonExistRecord(group *Group) error {
 
 // isDuplicated check for duplicated name in DB
 // this function specifically made for Mysql because of its ON DUPLICATE KEY UPDATE can't ignore the UNIQUE index...
-func (s *Service) isDuplicated(group *Group) error {
+func (s *Service) isDuplicated(group *groupUser.Group) error {
 	conditions := map[string]interface{}{}
 	conditions["name"] = group.Name
 
@@ -63,12 +63,15 @@ func (s *Service) isDuplicated(group *Group) error {
 	return nil
 }
 
-func (s *Service) Get(queries map[string]interface{}) ([]*Group, *helper.Pagination) {
+func (s *Service) Get(queries map[string]interface{}) ([]*groupUser.Group, *helper.Pagination) {
 	logger.Debugf("group service get")
-	return s.repo.Get(queries)
+	groups, pagination := s.repo.Get(queries)
+	cascadeFields(groups)
+
+	return groups, pagination
 }
 
-func (s *Service) GetById(queries map[string]interface{}) ([]*Group, error) {
+func (s *Service) GetById(queries map[string]interface{}) ([]*groupUser.Group, error) {
 	logger.Debugf("group service getById")
 
 	records, _ := s.repo.Get(queries)
@@ -78,7 +81,7 @@ func (s *Service) GetById(queries map[string]interface{}) ([]*Group, error) {
 	return records, nil
 }
 
-func (s *Service) Create(groups []*Group) ([]*Group, *helper.HttpErr) {
+func (s *Service) Create(groups []*groupUser.Group) ([]*groupUser.Group, *helper.HttpErr) {
 	logger.Debugf("group service create")
 	// can remove this check if NOT using mariadb.
 	// pg,sqlite,monogo can throu error with ON DUPLICATE KEY UPDATE even with the 'name' as UNIQUE
@@ -92,7 +95,7 @@ func (s *Service) Create(groups []*Group) ([]*Group, *helper.HttpErr) {
 	return results, &helper.HttpErr{fiber.StatusInternalServerError, err}
 }
 
-func (s *Service) Update(groups []*Group) ([]*Group, *helper.HttpErr) {
+func (s *Service) Update(groups []*groupUser.Group) ([]*groupUser.Group, *helper.HttpErr) {
 	logger.Debugf("group service update")
 
 	for _, group := range groups {
@@ -100,14 +103,18 @@ func (s *Service) Update(groups []*Group) ([]*Group, *helper.HttpErr) {
 			return nil, &helper.HttpErr{fiber.StatusInternalServerError, err}
 		}
 
-		updateGroupUsers(group)
-		updateGroupResourceAcls(group)
+		// only update users:[] & permissions:[] when PATch single record.
+		// it is because of frontend is difficult to pass the validation of these 2 fields when batch updating "disabled"  
+		if len(groups) == 1 {
+			updateGroupUsers(group)
+			updateGroupResourceAcls(group)
+		}
 	}
 	results, err := s.repo.Update(groups)
 	return results, &helper.HttpErr{fiber.StatusInternalServerError, err}
 }
 
-func (s *Service) Delete(ids []string) ([]*Group, error) {
+func (s *Service) Delete(ids []string) ([]*groupUser.Group, error) {
 	logger.Debugf("group service delete")
 
 	getByIdsCondition := database.GetIdsMapCondition(nil, ids)
@@ -120,7 +127,7 @@ func (s *Service) Delete(ids []string) ([]*Group, error) {
 	return records, s.repo.Delete(ids)
 }
 
-func updateGroupUsers(group *Group) {
+func updateGroupUsers(group *groupUser.Group) {
 	// remove all existing groupUsers records
 	existingGroupUsers, _ := groupUser.Srvc.Get(map[string]interface{}{"group_id": group.GetId()})
 	existingGroupUsersIds := []string{}
@@ -141,7 +148,7 @@ func updateGroupUsers(group *Group) {
 	}
 }
 
-func updateGroupResourceAcls(group *Group) {
+func updateGroupResourceAcls(group *groupUser.Group) {
 	resources, _ := resource.Srvc.Get(map[string]interface{}{})
 	resourceNameMap := resource.Resources(resources).GetNameMap()
 	permissionTypes, _ := permissionType.Srvc.Get(map[string]interface{}{})

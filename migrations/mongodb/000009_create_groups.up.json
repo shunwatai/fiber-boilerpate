@@ -12,5 +12,16 @@
       }
     ],
     "writeConcern": { "w": "majority" }
+  },
+  {
+    "insert": "groups",
+    "documents": [
+      {
+        "_id": { "$oid": "6635cbe4e9a61419ae544e85" },
+        "disabled": false,
+        "name": "admin",
+        "type": "admin"
+      }
+    ]
   }
 ]

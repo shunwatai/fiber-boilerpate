@@ -7,7 +7,7 @@ import (
 	"golang-api-starter/internal/helper/logger/zap_log"
 	"slices"
 
-	//"golang-api-starter/internal/modules/user"
+	//"golang-api-starter/internal/modules/groupUser"
 	"log"
 	"reflect"
 	"strconv"
@@ -20,7 +20,7 @@ type {{.StructName}} struct {
 	MongoId   *string                `json:"_id,omitempty" bson:"_id,omitempty" validate:"omitempty,id_custom_validation"` // https://stackoverflow.com/a/20739427
 	Id        *int64                 `json:"id" db:"id" bson:"id,omitempty" example:"2" validate:"omitempty,id_custom_validation"`
 	//UserId    interface{}            `json:"userId" db:"user_id" bson:"user_id,omitempty" validate:"omitempty,id_custom_validation"`
-	//User      *user.User             `json:"user"`
+	//User      *groupUser.User             `json:"user"`
 	Col1      string                 `json:"col1" db:"col_1" bson:"col_1,omitempty" validate:"required"`
 	Col2      *bool                  `json:"col2" db:"col_2" bson:"col_2,omitempty" validate:"required,boolean"`
 	CreatedAt *helper.CustomDatetime `json:"createdAt" db:"created_at" bson:"created_at,omitempty"`
@@ -81,12 +81,12 @@ func ({{.Initial}}s {{.StructName}}s) rowsToStruct(rows database.Rows) []*{{.Str
 	return records
 }
 
-func ({{.Initial}}s {{.StructName}}s) GetTags(key string) []string {
+func ({{.Initial}}s {{.StructName}}s) GetTags(key ...string) []string {
 	if len({{.Initial}}s) == 0 {
 		return []string{}
 	}
 
-	return {{.Initial}}s[0].getTags(key)
+	return {{.Initial}}s[0].getTags(key...)
 }
 
 func ({{.Initial}}s *{{.StructName}}s) printValue() {

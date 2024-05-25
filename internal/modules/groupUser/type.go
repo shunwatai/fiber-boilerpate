@@ -5,10 +5,8 @@ import (
 	"golang-api-starter/internal/database"
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
-	"golang-api-starter/internal/modules/user"
 	"slices"
 
-	//"golang-api-starter/internal/modules/user"
 	"log"
 	"reflect"
 	"strconv"
@@ -22,7 +20,8 @@ type GroupUser struct {
 	Id        *helper.FlexInt        `json:"id" db:"id" bson:"id,omitempty" example:"2" validate:"omitempty,id_custom_validation"`
 	GroupId   interface{}            `json:"groupId" db:"group_id" bson:"group_id,omitempty" validate:"omitempty,id_custom_validation"`
 	UserId    interface{}            `json:"userId" db:"user_id" bson:"user_id,omitempty" validate:"omitempty,id_custom_validation"`
-	User      *user.User             `json:"user"`
+	User      *User                  `json:"user"`
+	Group     *Group                 `json:"group"`
 	CreatedAt *helper.CustomDatetime `json:"createdAt" db:"created_at" bson:"created_at,omitempty"`
 	UpdatedAt *helper.CustomDatetime `json:"updatedAt" db:"updated_at" bson:"updated_at,omitempty"`
 }
@@ -93,12 +92,12 @@ func (gus GroupUsers) rowsToStruct(rows database.Rows) []*GroupUser {
 	return records
 }
 
-func (gus GroupUsers) GetTags(key string) []string {
+func (gus GroupUsers) GetTags(key ...string) []string {
 	if len(gus) == 0 {
 		return []string{}
 	}
 
-	return gus[0].getTags(key)
+	return gus[0].getTags(key...)
 }
 
 func (gus *GroupUsers) printValue() {

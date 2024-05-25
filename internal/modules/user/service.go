@@ -8,6 +8,7 @@ import (
 	"golang-api-starter/internal/database"
 	"golang-api-starter/internal/helper"
 	logger "golang-api-starter/internal/helper/logger/zap_log"
+	"golang-api-starter/internal/modules/groupUser"
 	"strconv"
 	"time"
 
@@ -35,7 +36,7 @@ func (s *Service) GetLoggedInUsername() string {
 }
 
 /* this func for generate the jwt claims like the access & refresh tokens */
-func GenerateUserToken(user User, tokenType string) *jwt.Token {
+func GenerateUserToken(user groupUser.User, tokenType string) *jwt.Token {
 	var expireTime = &jwt.NumericDate{time.Now().Add(time.Minute * 10)} // 10 mins for access token?
 
 	env := cfg.ServerConf.Env
@@ -67,7 +68,7 @@ func GenerateUserToken(user User, tokenType string) *jwt.Token {
 	return auth.GetToken(claims)
 }
 
-func GetUserTokenResponse(user *User) (map[string]interface{}, error) {
+func GetUserTokenResponse(user *groupUser.User) (map[string]interface{}, error) {
 	accessClaims := GenerateUserToken(*user, "accessToken")
 	refreshClaims := GenerateUserToken(*user, "refreshToken")
 
@@ -95,23 +96,15 @@ func hashUserPassword(pwd *string) error {
 	return nil
 }
 
-func (s *Service) GetIdMap(users Users) map[string]*User {
-	userMap := map[string]*User{}
-	sanitise(users)
-	for _, user := range users {
-		userMap[user.GetId()] = user
-	}
-	return userMap
-}
-
-func (s *Service) Get(queries map[string]interface{}) ([]*User, *helper.Pagination) {
+func (s *Service) Get(queries map[string]interface{}) ([]*groupUser.User, *helper.Pagination) {
 	logger.Debugf("user service get")
 	users, pagination := s.repo.Get(queries)
+	cascadeFields(users)
 
 	return users, pagination
 }
 
-func (s *Service) GetById(queries map[string]interface{}) ([]*User, error) {
+func (s *Service) GetById(queries map[string]interface{}) ([]*groupUser.User, error) {
 	logger.Debugf("user service getById\n")
 
 	records, _ := s.repo.Get(queries)
@@ -121,7 +114,7 @@ func (s *Service) GetById(queries map[string]interface{}) ([]*User, error) {
 	return records, nil
 }
 
-func (s *Service) Create(users []*User) ([]*User, *helper.HttpErr) {
+func (s *Service) Create(users []*groupUser.User) ([]*groupUser.User, *helper.HttpErr) {
 	logger.Debugf("user service create")
 	newUserNames := []string{}
 	for _, user := range users {
@@ -170,7 +163,7 @@ func (s *Service) Create(users []*User) ([]*User, *helper.HttpErr) {
 	return results, &helper.HttpErr{fiber.StatusInternalServerError, err}
 }
 
-func (s *Service) Update(users []*User) ([]*User, *helper.HttpErr) {
+func (s *Service) Update(users []*groupUser.User) ([]*groupUser.User, *helper.HttpErr) {
 	logger.Debugf("user service update")
 
 	userIds := []string{}
@@ -179,7 +172,7 @@ func (s *Service) Update(users []*User) ([]*User, *helper.HttpErr) {
 	}
 
 	// create map by existing user from DB
-	userIdMap := map[string]User{}
+	userIdMap := map[string]groupUser.User{}
 	getByIdsCondition := database.GetIdsMapCondition(nil, userIds)
 	existings, _ := s.repo.Get(getByIdsCondition)
 	for _, user := range existings {
@@ -247,9 +240,9 @@ func (s *Service) Update(users []*User) ([]*User, *helper.HttpErr) {
 	return results, &helper.HttpErr{fiber.StatusInternalServerError, err}
 }
 
-func (s *Service) Delete(ids []string) ([]*User, error) {
+func (s *Service) Delete(ids []string) ([]*groupUser.User, error) {
 	logger.Debugf("user service delete")
-	records := []*User{}
+	records := []*groupUser.User{}
 	getByIdsCondition := database.GetIdsMapCondition(nil, ids)
 	records, _ = s.repo.Get(getByIdsCondition)
 	if len(records) == 0 {
@@ -259,7 +252,7 @@ func (s *Service) Delete(ids []string) ([]*User, error) {
 	return records, s.repo.Delete(ids)
 }
 
-func (s *Service) Login(user *User) (map[string]interface{}, *helper.HttpErr) {
+func (s *Service) Login(user *groupUser.User) (map[string]interface{}, *helper.HttpErr) {
 	logger.Debugf("user service login")
 
 	results, _ := s.repo.Get(map[string]interface{}{
@@ -271,6 +264,7 @@ func (s *Service) Login(user *User) (map[string]interface{}, *helper.HttpErr) {
 	if len(results) == 0 {
 		return nil, &helper.HttpErr{fiber.StatusNotFound, fmt.Errorf("user not exists...")}
 	}
+	logger.Debugf("results?? %+v", results)
 
 	if !user.IsOauth {
 		var checkPassword = func(hashedPwd string, plainPwd string) bool {
@@ -299,10 +293,10 @@ func (s *Service) Login(user *User) (map[string]interface{}, *helper.HttpErr) {
 	}
 }
 
-func (s *Service) Refresh(user *User) (map[string]interface{}, *helper.HttpErr) {
+func (s *Service) Refresh(user *groupUser.User) (map[string]interface{}, *helper.HttpErr) {
 	logger.Debugf("user service refresh")
 
-	results := []*User{}
+	results := []*groupUser.User{}
 	getByIdsCondition := database.GetIdsMapCondition(nil, []string{user.GetId()})
 	results, _ = s.repo.Get(getByIdsCondition)
 	if len(results) == 0 {
@@ -317,7 +311,7 @@ func (s *Service) Refresh(user *User) (map[string]interface{}, *helper.HttpErr) 
 	}
 }
 
-func IndexOfDuplicatedName(users Users, existingUser *User) int {
+func IndexOfDuplicatedName(users groupUser.Users, existingUser *groupUser.User) int {
 	for i, u := range users {
 		if u.Name == existingUser.Name {
 			return i

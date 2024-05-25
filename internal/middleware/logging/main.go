@@ -6,8 +6,8 @@ import (
 	"golang-api-starter/internal/auth"
 	"golang-api-starter/internal/config"
 	"golang-api-starter/internal/helper"
-	"golang-api-starter/internal/helper/utils"
 	"golang-api-starter/internal/helper/logger/zap_log"
+	"golang-api-starter/internal/helper/utils"
 	customLog "golang-api-starter/internal/modules/log"
 	"log"
 	"slices"
@@ -16,10 +16,12 @@ import (
 
 var cfg = config.Cfg
 
+type Logger struct{}
+
 /*
- * Logger() is a middleware for showing the http req & resp info
+ * Log() is a middleware for showing the http req & resp info
  */
-func Logger() fiber.Handler {
+func (l *Logger) Log() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// zlog.Printf("I AM LOGGER....")
 

@@ -6,7 +6,7 @@ import (
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
 	"golang-api-starter/internal/modules/document"
-	"golang-api-starter/internal/modules/user"
+	"golang-api-starter/internal/modules/groupUser"
 	"log"
 	"reflect"
 	"slices"
@@ -20,7 +20,7 @@ type Todo struct {
 	MongoId       *string                `json:"_id,omitempty" bson:"_id,omitempty" validate:"omitempty,id_custom_validation"` // https://stackoverflow.com/a/20739427
 	Id            *helper.FlexInt        `json:"id" db:"id" bson:"id,omitempty" example:"2" validate:"omitempty,id_custom_validation"`
 	UserId        interface{}            `json:"userId" db:"user_id" bson:"user_id,omitempty" validate:"omitempty,id_custom_validation"`
-	User          *user.User             `json:"user"`
+	User          *groupUser.User             `json:"user"`
 	TodoDocuments interface{}            `json:"-"`
 	Documents     []*document.Document   `json:"documents"`
 	Task          string                 `json:"task" db:"task" bson:"task,omitempty" validate:"required"`
@@ -85,12 +85,12 @@ func (todos Todos) rowsToStruct(rows database.Rows) []*Todo {
 	return records
 }
 
-func (todos Todos) GetTags(key string) []string {
+func (todos Todos) GetTags(key ...string) []string {
 	if len(todos) == 0 {
 		return []string{}
 	}
 
-	return todos[0].getTags(key)
+	return todos[0].getTags(key...)
 }
 
 func (todos *Todos) printValue() {

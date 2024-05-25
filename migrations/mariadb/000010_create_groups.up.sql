@@ -6,3 +6,7 @@ CREATE TABLE IF NOT EXISTS  `groups` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp,
   `updated_at` datetime NOT NULL DEFAULT current_timestamp ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- Pre-populate default admin group
+INSERT INTO `groups` (`id`, `name`, `type`, `disabled`, `created_at`, `updated_at`) VALUES
+(1,	'admin', 'admin', '0',	'2024-05-14 06:54:25',	'2024-05-14 06:54:25');

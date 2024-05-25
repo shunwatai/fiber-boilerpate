@@ -6,6 +6,7 @@ import (
 	logger "golang-api-starter/internal/helper/logger/zap_log"
 	"golang-api-starter/internal/helper/utils"
 	"golang-api-starter/internal/modules/document"
+	"golang-api-starter/internal/modules/groupUser"
 	"golang-api-starter/internal/modules/todoDocument"
 	"golang-api-starter/internal/modules/user"
 
@@ -41,19 +42,19 @@ func cascadeFields(todos Todos) {
 
 	// if no userIds, do nothing and return
 	if len(userIds) > 0 {
-		users := []*user.User{}
+		users := []*groupUser.User{}
 
 		// get users by userIds
 		condition := database.GetIdsMapCondition(nil, userIds)
 		users, _ = user.Srvc.Get(condition)
 		// get the map[userId]user
-		userMap := user.Srvc.GetIdMap(users)
+		userMap := user.Repo.GetIdMap(users)
 
 		for _, todo := range todos {
 			if todo.UserId == nil {
 				continue
 			}
-			user := &user.User{}
+			user := &groupUser.User{}
 			// take out the user by userId in map and assign
 			user = userMap[todo.GetUserId()]
 			todo.User = user

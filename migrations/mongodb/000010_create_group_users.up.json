@@ -1,5 +1,14 @@
 [
   {
     "create": "group_users"
+  },
+  {
+    "insert": "group_users",
+    "documents": [
+      {
+        "group_id": "6635cbe4e9a61419ae544e85",
+        "user_id": "665039a594a6147d8462cb54"
+      }
+    ]
   }
 ]

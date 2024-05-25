@@ -1,4 +1,4 @@
-package user
+package groupUser
 
 import (
 	"golang-api-starter/internal/helper"
@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-func TestGetId(t *testing.T) {
-	user := &User{
+func TestGroupGetId(t *testing.T) {
+	group := &Group{
 		MongoId: utils.ToPtr("xxxx-xxxx-xxxx-xxxx"),
 		Id:      utils.ToPtr(helper.FlexInt(2)),
 	}
@@ -18,11 +18,11 @@ func TestGetId(t *testing.T) {
 	tests := []struct {
 		name     string
 		dbDriver string
-		input    *User
+		input    *Group
 		want     string
 	}{
-		{name: "test Id", dbDriver: "postgres-or-mariadb-or-sqlite", input: user, want: "2"},
-		{name: "test MongoId", dbDriver: "mongodb", input: user, want: "xxxx-xxxx-xxxx-xxxx"},
+		{name: "test Id", dbDriver: "postgres-or-mariadb-or-sqlite", input: group, want: "2"},
+		{name: "test MongoId", dbDriver: "mongodb", input: group, want: "xxxx-xxxx-xxxx-xxxx"},
 	}
 
 	for _, testCase := range tests {
@@ -33,7 +33,7 @@ func TestGetId(t *testing.T) {
 				t.Logf("failed loading conf, err: %+v\n", err.Error())
 			}
 
-			got := user.GetId()
+			got := group.GetId()
 			eq := reflect.DeepEqual(testCase.want, got)
 
 			if !eq {
@@ -43,18 +43,19 @@ func TestGetId(t *testing.T) {
 	}
 }
 
-func TestStructToMap(t *testing.T) {
+func TestGroupStructToMap(t *testing.T) {
 	var id int64 = 2
 	now := time.Now()
 	customDatetime := &helper.CustomDatetime{&now, utils.ToPtr(time.RFC3339)}
 	timeStr, _ := customDatetime.MarshalJSON()
 	timeJson := strings.Replace(string(timeStr), "\"", "", -1)
-	users := Users{
-		&User{
+	groups := Groups{
+		&Group{
 			MongoId:   utils.ToPtr("xxxx-xxxx-xxxx-xxxx"),
 			Id:        utils.ToPtr(helper.FlexInt(id)),
-			FirstName: utils.ToPtr("first"),
-			LastName:  utils.ToPtr("last"),
+			Name:      "user",
+			Type:      "user",
+			Disabled:  false,
 			CreatedAt: customDatetime,
 			UpdatedAt: customDatetime,
 		},
@@ -62,17 +63,17 @@ func TestStructToMap(t *testing.T) {
 
 	tests := []struct {
 		name  string
-		input Users
+		input Groups
 		want  []map[string]interface{}
 	}{
-		{name: "test StructToMap", input: users, want: []map[string]interface{}{
-			{"_id": "xxxx-xxxx-xxxx-xxxx", "id": float64(2), "created_at": timeJson, "updated_at": timeJson, "first_name": "first", "last_name": "last", "disabled": false, "name": "", "is_oauth": false},
+		{name: "test StructToMap", input: groups, want: []map[string]interface{}{
+			{"_id": "xxxx-xxxx-xxxx-xxxx", "id": float64(2), "created_at": timeJson, "updated_at": timeJson, "name": "user", "type": "user", "disabled": false, "users": nil, "permissions": nil},
 		}},
 	}
 
 	for _, testCase := range tests {
 		t.Run(testCase.name, func(t *testing.T) {
-			got := users.StructToMap()
+			got := groups.StructToMap()
 			eq := reflect.DeepEqual(testCase.want, got)
 
 			if !eq {
@@ -82,9 +83,9 @@ func TestStructToMap(t *testing.T) {
 	}
 }
 
-func TestGetTags(t *testing.T) {
-	users := Users{
-		&User{},
+func TestGroupGetTags(t *testing.T) {
+	groups := Groups{
+		&Group{},
 	}
 
 	tests := []struct {
@@ -92,14 +93,14 @@ func TestGetTags(t *testing.T) {
 		input string
 		want  []string
 	}{
-		{name: "test get db tags", input: "db", want: []string{"id", "name", "password", "email", "first_name", "last_name", "disabled", "is_oauth", "provider", "created_at", "updated_at", "search"}},
-		{name: "test get bson tags", input: "bson", want: []string{"_id", "id", "name", "password", "email", "first_name", "last_name", "disabled", "is_oauth", "provider", "created_at", "updated_at", "search"}},
-		{name: "test get json tags", input: "json", want: []string{"_id", "id", "name", "password", "email", "firstName", "lastName", "disabled", "isOauth", "provider", "createdAt", "updatedAt"}},
+		{name: "test get db tags", input: "db", want: []string{"id", "name", "type", "disabled", "created_at", "updated_at"}},
+		{name: "test get bson tags", input: "bson", want: []string{"_id", "id", "name", "type", "disabled", "created_at", "updated_at"}},
+		{name: "test get json tags", input: "json", want: []string{"_id", "id", "name", "type", "users", "permissions", "disabled", "createdAt", "updatedAt"}},
 	}
 
 	for _, testCase := range tests {
 		t.Run(testCase.name, func(t *testing.T) {
-			got := users.GetTags(testCase.input)
+			got := groups.GetTags(testCase.input)
 			eq := reflect.DeepEqual(testCase.want, got)
 
 			if !eq {

@@ -23,3 +23,8 @@ CREATE TABLE "public"."groups" (
 
 -- Apply trigger update_updated_at_column()
 CREATE TRIGGER update_groups_updated_at BEFORE UPDATE ON groups FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+-- Pre-populate default admin group
+INSERT INTO "groups" ("id", "name", "type", "disabled", "created_at", "updated_at") VALUES
+(1,	'admin', 'admin', '0',	'2024-05-14 06:54:25.780889+00',	'2024-05-14 06:54:25.780889+00');
+

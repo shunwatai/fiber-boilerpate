@@ -56,7 +56,7 @@ type ConnectionInfo struct {
 
 type Records interface {
 	StructToMap() []map[string]interface{}
-	GetTags(string) []string
+	GetTags(...string) []string
 }
 
 type IgnoredCols []string

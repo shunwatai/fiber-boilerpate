@@ -21,6 +21,7 @@
     "insert": "users",
     "documents": [
       {
+        "_id": { "$oid": "665039a594a6147d8462cb54" },
         "disabled": false,
         "first_name": null,
         "last_name": null,

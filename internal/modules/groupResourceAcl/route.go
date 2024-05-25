@@ -1,10 +1,11 @@
 package groupResourceAcl
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"golang-api-starter/internal/config"
 	"golang-api-starter/internal/database"
-	"golang-api-starter/internal/middleware/jwtcheck"
+	"golang-api-starter/internal/interfaces"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -16,13 +17,13 @@ var (
 	ctrl      = &Controller{}
 )
 
-func GetRoutes(router fiber.Router) {
+func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares) {
 	db := database.GetDatabase(tableName, &viewName)
 	Repo = NewRepository(db)
 	Srvc = NewService(Repo)
 	ctrl = NewController(Srvc)
 
-	r := router.Group("/api/group-resource-acls", jwtcheck.CheckJwt())
+	r := router.Group("/api/group-resource-acls", custMiddleware.CheckJwt())
 	r.Get("/", GetAll)
 	r.Post("/", Create)
 	r.Patch("/", Update)

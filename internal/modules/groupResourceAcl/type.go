@@ -95,12 +95,12 @@ func (gras GroupResourceAcls) rowsToStruct(rows database.Rows) []*GroupResourceA
 	return records
 }
 
-func (gras GroupResourceAcls) GetTags(key string) []string {
+func (gras GroupResourceAcls) GetTags(key ...string) []string {
 	if len(gras) == 0 {
 		return []string{}
 	}
 
-	return gras[0].getTags(key)
+	return gras[0].getTags(key...)
 }
 
 func (gras *GroupResourceAcls) printValue() {

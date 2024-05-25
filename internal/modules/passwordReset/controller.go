@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
+	"golang-api-starter/internal/modules/groupUser"
 	"golang-api-starter/internal/modules/user"
 	"html/template"
 	"time"
@@ -299,7 +300,7 @@ func (c *Controller) SendResetEmail(ctx *fiber.Ctx) error {
 
 	fctx := &helper.FiberCtx{Fctx: ctx}
 
-	u := new(user.User)
+	u := new(groupUser.User)
 	if err := fctx.Fctx.BodyParser(u); err != nil {
 		logger.Errorf("BodyParser err: %+v", err)
 		data["errMessage"] = "something went wrong: failed to parse request json"
@@ -400,7 +401,7 @@ func (c *Controller) ChangePassword(ctx *fiber.Ctx) error {
 	html := `{{ template "popup" . }}`
 	tpl, _ = tpl.New("message").Parse(html)
 
-	u := new(user.User)
+	u := new(groupUser.User)
 
 	if err := fctx.Fctx.BodyParser(u); err != nil {
 		logger.Errorf("BodyParser err: %+v", err)
@@ -413,7 +414,7 @@ func (c *Controller) ChangePassword(ctx *fiber.Ctx) error {
 		return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 	}
 
-	users, httpErr := user.Srvc.Update(user.Users{u})
+	users, httpErr := user.Srvc.Update(groupUser.Users{u})
 	if httpErr.Err != nil {
 		logger.Errorf("user Update err: %+v", httpErr.Err.Error())
 		data["errMessage"] = "something went wrong: failed to reset password"

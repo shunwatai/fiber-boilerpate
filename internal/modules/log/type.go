@@ -87,12 +87,12 @@ func (lgs Logs) rowsToStruct(rows database.Rows) []*Log {
 	return records
 }
 
-func (lgs Logs) GetTags(key string) []string {
+func (lgs Logs) GetTags(key ...string) []string {
 	if len(lgs) == 0 {
 		return []string{}
 	}
 
-	return lgs[0].getTags(key)
+	return lgs[0].getTags(key...)
 }
 
 func (lgs *Logs) printValue() {

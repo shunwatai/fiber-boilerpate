@@ -10,11 +10,13 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
+type JwtChecker struct{}
+
 /*
 * CheckJwt is a middleware for checking the jwt in both cookie & header
 * it will first check the cookie, if failed then check the header
  */
-func CheckJwt() fiber.Handler {
+func (jc *JwtChecker) CheckJwt() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// logger.Debugf("middleware checking jwt in header.....")
 		requestHeader := c.GetReqHeaders()
