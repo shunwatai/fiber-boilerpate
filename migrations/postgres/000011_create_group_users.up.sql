@@ -32,5 +32,5 @@ ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE;
 CREATE TRIGGER update_group_users_updated_at BEFORE UPDATE ON group_users FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 -- Pre-populate admin user assigns into admin group
-INSERT INTO "group_users" ("id", "group_id", "user_id", "created_at", "updated_at") VALUES
-(1,	1, 1,	'2024-05-14 06:54:25.780889+00',	'2024-05-14 06:54:25.780889+00');
+INSERT INTO "group_users" ("group_id", "user_id", "created_at", "updated_at") VALUES
+(1, 1,	'2024-05-14 06:54:25.780889+00',	'2024-05-14 06:54:25.780889+00');

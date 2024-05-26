@@ -15,10 +15,11 @@
         hx-target-5*="#popupMessage"
         hx-indicator="#spinner"
         hx-disabled-elt="input, button"
-        hx-vals='{"done":{{.todo.Done}}}'
+        hx-vals='{"done":{{if .todo}}{{.todo.Done}}{{else}}{{false}}{{end}}}'
       >
         {{if ne .todo nil}}
-          <input name="{{GetIdKeyName}}" type="hidden" value="{{GetId .todo.MongoId .todo.Id}}" />
+          <!-- name must be "id" for form-data submit. will handle between mongoId at backend -->
+          <input name="id" type="hidden" value="{{GetId .todo.MongoId .todo.Id}}" />
         {{end}}
 
         <label for="task" class="{{if eq .todo nil}}after:content-['*'] after:ml-0.5 after:text-red-500{{end}} block font-medium text-slate-700 mr-auto my-auto">Task name</label>

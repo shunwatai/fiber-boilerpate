@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"golang-api-starter/internal/auth"
+	"golang-api-starter/internal/database"
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
 	"golang-api-starter/internal/helper/utils"
@@ -489,7 +490,8 @@ func (c *Controller) UserFormPage(ctx *fiber.Ctx) error {
 		"web/template/parts/navbar.gohtml",
 		"web/template/base.gohtml",
 	}
-	tpl := template.Must(template.ParseFiles(tmplFiles...))
+	pagesFunc := helper.TmplCustomFuncs()
+	tpl := template.Must(template.New("").Funcs(pagesFunc).ParseFiles(tmplFiles...))
 
 	paramsMap := helper.GetQueryString(ctx.Request().URI().QueryString())
 	u := new(groupUser.User)
@@ -564,6 +566,11 @@ func (c *Controller) SubmitUpdate(ctx *fiber.Ctx) error {
 			data["errMessage"] = "please ensure all records with id for PATCH"
 			return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
 		}
+	}
+
+	// workaround if batch update Disabled on list page, ignore these fields for insert statement because of sliqte issue...
+	if len(users) > 1 {
+		*database.IgnrCols = append(*database.IgnrCols, "first_name", "last_name", "provider")
 	}
 
 	_, httpErr := c.service.Update(users)

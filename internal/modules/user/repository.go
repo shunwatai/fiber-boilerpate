@@ -105,7 +105,8 @@ func (r *Repository) Create(users []*groupUser.User) ([]*groupUser.User, error) 
 
 func (r *Repository) Update(users []*groupUser.User) ([]*groupUser.User, error) {
 	logger.Debugf("user repo update")
-	database.SetIgnoredCols("search")
+	*database.IgnrCols = append(*database.IgnrCols,"search")
+	database.SetIgnoredCols(*database.IgnrCols...)
 	defer database.SetIgnoredCols()
 	rows, err := r.db.Save(groupUser.Users(users))
 

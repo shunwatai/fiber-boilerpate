@@ -15,7 +15,7 @@
         hx-target-5*="#popupMessage"
         hx-indicator="#spinner"
         hx-disabled-elt="input, button"
-        hx-vals="js:{password:setPasswordNullIfEmpty(),disabled:{{.user.Disabled}}}"
+        hx-vals="js:{password:setPasswordNullIfEmpty(),disabled:{{if .user}}{{.user.Disabled}}{{else}}false{{end}}}"
       >
         {{if ne .user nil}}
           <input name="{{GetIdKeyName}}" type="hidden" value="{{GetId .user.MongoId .user.Id}}" />

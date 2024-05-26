@@ -25,7 +25,7 @@ CREATE TABLE "public"."resources" (
 CREATE TRIGGER update_resources_updated_at BEFORE UPDATE ON resources FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 -- Pre-populate some default resources
-INSERT INTO "resources" ("id", "name", "order", "disabled", "created_at", "updated_at") VALUES
-(1,	'users',	1, '0',	'2024-05-14 06:54:25.780889+00',	'2024-05-14 06:54:25.780889+00'),
-(2,	'groups',	2, '0',	'2024-05-14 06:54:30.014063+00',	'2024-05-14 06:54:30.014063+00'),
-(3,	'todos',	3, '0',	'2024-05-14 06:54:33.907284+00',	'2024-05-14 06:54:33.907284+00');
+INSERT INTO "resources" ("name", "order", "disabled", "created_at", "updated_at") VALUES
+('users',	1, '0',	'2024-05-14 06:54:25.780889+00',	'2024-05-14 06:54:25.780889+00'),
+('groups',	2, '0',	'2024-05-14 06:54:30.014063+00',	'2024-05-14 06:54:30.014063+00'),
+('todos',	3, '0',	'2024-05-14 06:54:33.907284+00',	'2024-05-14 06:54:33.907284+00');

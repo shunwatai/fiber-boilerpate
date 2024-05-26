@@ -25,7 +25,7 @@ type User struct {
 	LastName  *string                `json:"lastName,omitempty" db:"last_name" bson:"last_name,omitempty" example:"Watson"`
 	Disabled  bool                   `json:"disabled" db:"disabled" bson:"disabled,omitempty" example:"false"`
 	IsOauth   bool                   `json:"isOauth" db:"is_oauth" bson:"is_oauth,omitempty" example:"false"`
-	Provider  *string                `json:"provider" db:"provider" bson:"provider,omitempty" example:"google"`
+	Provider  *string                `json:"provider,omitempty" db:"provider" bson:"provider,omitempty" example:"google"`
 	Groups    []*Group               `json:"groups"`
 	CreatedAt *helper.CustomDatetime `json:"createdAt" db:"created_at"  bson:"created_at,omitempty"`
 	UpdatedAt *helper.CustomDatetime `json:"updatedAt" db:"updated_at" bson:"updated_at,omitempty"`

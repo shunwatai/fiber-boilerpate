@@ -18,7 +18,7 @@
         :hx-vals="JSON.stringify({
           'users':constructUsersForSubmit(),
           'permissions':constructPermissionsForSubmit(),
-          'disabled':{{.group.Disabled}},
+          'disabled':{{if .group}}{{.group.Disabled}}{{else}}false{{end}},
         })"
       >
         {{if ne .group nil}}
