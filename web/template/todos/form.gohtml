@@ -12,6 +12,7 @@
         class="flex flex-col w-full md:w-1/3 mx-auto gap-4 p-2 w-[28vw]"
         hx-encoding='multipart/form-data'
         {{if eq .todo nil}}hx-post{{else}}hx-patch{{end}}="/todos"
+        hx-target-4*="#popupMessage"
         hx-target-5*="#popupMessage"
         hx-indicator="#spinner"
         hx-disabled-elt="input, button"

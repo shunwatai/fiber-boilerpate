@@ -13,6 +13,7 @@
         {{if eq .user nil}}hx-post{{else}}hx-patch{{end}}="/users"
         hx-ext="json-enc"
         hx-target-5*="#popupMessage"
+        hx-target-4*="#popupMessage"
         hx-indicator="#spinner"
         hx-disabled-elt="input, button"
         hx-vals="js:{password:setPasswordNullIfEmpty(),disabled:{{if .user}}{{.user.Disabled}}{{else}}false{{end}}}"

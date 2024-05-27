@@ -26,7 +26,7 @@ func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares
 	ctrl = NewController(Srvc)
 
 	// web view routes
-	protectedViewRoute := router.Group("/groups", custMiddleware.CheckJwt())
+	protectedViewRoute := router.Group("/groups", custMiddleware.CheckJwt(), custMiddleware.CheckAccess("groups"))
 	protectedViewRoute.Route("", func(userPage fiber.Router) {
 		userPage.Get("/", ctrl.ListGroupsPage)
 		userPage.Get("/list", ctrl.GetGroupList)
@@ -38,7 +38,7 @@ func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares
 		})
 	})
 
-	r := router.Group("/api/groups", custMiddleware.CheckJwt())
+	r := router.Group("/api/groups", custMiddleware.CheckJwt(), custMiddleware.CheckAccess("groups"))
 	r.Get("/", GetAll)
 	r.Post("/", Create)
 	r.Patch("/", Update)

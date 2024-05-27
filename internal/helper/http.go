@@ -1,8 +1,10 @@
 package helper
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"html/template"
 	"strings"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type HttpErr struct {
@@ -23,12 +25,32 @@ func (ctx *FiberCtx) JsonResponse(respCode int, data map[string]interface{}) err
 func (ctx *FiberCtx) ErrResponse(respCode int, err error) error {
 	reqHeader := ctx.Fctx.GetReqHeaders()
 	isHtml := strings.Contains(reqHeader["Accept"][0], "text/html")
+	isHxReq := false
+	if reqHeader["Hx-Request"] != nil && reqHeader["Hx-Request"][0] == "true" {
+		isHxReq = true
+	}
 
 	if isHtml {
+		if respCode == fiber.StatusUnauthorized {
+			ctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+			return ctx.Fctx.
+				Status(respCode).
+				Redirect("/unauthorised", fiber.StatusPermanentRedirect)
+		} else {
+			return ctx.Fctx.
+				Status(respCode).
+				Redirect("/error", fiber.StatusPermanentRedirect)
+		}
+	}
+
+	if isHxReq && respCode == fiber.StatusUnauthorized {
 		ctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-		return ctx.Fctx.
-			Status(respCode).
-			Redirect("/error", fiber.StatusPermanentRedirect)
+		tmplFiles := []string{"web/template/parts/popup.gohtml"}
+		tpl := template.Must(template.ParseFiles(tmplFiles...))
+
+		html := `{{ template "popup" . }}`
+		tpl, _ = tpl.New("message").Parse(html)
+		return tpl.Execute(ctx.Fctx.Status(respCode).Response().BodyWriter(), fiber.Map{"errMessage": "Insufficient permission"})
 	}
 
 	return ctx.Fctx.

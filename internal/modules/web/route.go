@@ -19,4 +19,5 @@ func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares
 
 	router.Get("/home", custMiddleware.CheckJwt(), ctrl.HomePage)
 	router.Get("/error", ctrl.ErrorPage)
+	router.Get("/unauthorised", ctrl.UnauthorisedPage)
 }

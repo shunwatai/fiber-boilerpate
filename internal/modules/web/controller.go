@@ -41,3 +41,14 @@ func (c *Controller) ErrorPage(ctx *fiber.Ctx) error {
 
 	return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", fiber.Map{})
 }
+
+func (c *Controller) UnauthorisedPage(ctx *fiber.Ctx) error {
+	tpl := template.Must(template.ParseFiles("web/template/unauthorised.gohtml", "web/template/parts/navbar.gohtml", "web/template/base.gohtml"))
+
+	fctx := &helper.FiberCtx{Fctx: ctx}
+	respCode = fiber.StatusOK
+
+	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+
+	return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", fiber.Map{"showNavbar": true,"errMessage":"insufficient permission"})
+}

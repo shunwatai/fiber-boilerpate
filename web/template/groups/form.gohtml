@@ -13,6 +13,7 @@
         {{if eq .group nil}}hx-post{{else}}hx-patch{{end}}="/groups"
         hx-ext="json-enc"
         hx-target-5*="#popupMessage"
+        hx-target-4*="#popupMessage"
         hx-indicator="#spinner"
         hx-disabled-elt="input, button"
         :hx-vals="JSON.stringify({
