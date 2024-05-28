@@ -43,7 +43,7 @@ func (jc *JwtChecker) CheckJwt() fiber.Handler {
 		if err != nil {
 			if isHtml {
 				c.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
-				return c.Redirect("/error", fiber.StatusPermanentRedirect)
+				return c.Redirect("/error", fiber.StatusTemporaryRedirect)
 			}
 
 			return c.

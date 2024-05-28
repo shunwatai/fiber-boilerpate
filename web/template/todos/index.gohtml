@@ -17,6 +17,8 @@
         :class="`${checkedCount.length===0?'opacity-50':''} flex gap-2 border-2 rounded-md shadow-sm border-slate-300 w-fit p-2 text-red-500`"
         type="button"
         hx-delete="/todos"
+        hx-target-4*="#popupMessage"
+        hx-target-5*="#popupMessage"
         hx-vals="js:{ids:getIdsAsArray()}"
         hx-confirm="Click confirm to delete"
         :disabled="checkedCount.length === 0"
