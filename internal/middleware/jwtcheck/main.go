@@ -4,6 +4,7 @@ import (
 	"errors"
 	"golang-api-starter/internal/auth"
 	logger "golang-api-starter/internal/helper/logger/zap_log"
+	"slices"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,9 +17,15 @@ type JwtChecker struct{}
 * CheckJwt is a middleware for checking the jwt in both cookie & header
 * it will first check the cookie, if failed then check the header
  */
-func (jc *JwtChecker) CheckJwt() fiber.Handler {
+func (jc *JwtChecker) CheckJwt(ignorePaths ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// logger.Debugf("middleware checking jwt in header.....")
+		url := string(c.Request().URI().Path())
+		// logger.Debugf("jwt check: %+v, %+v", url, slices.Contains(ignorePaths, url))
+		if slices.Contains(ignorePaths, url) {
+			return c.Next()
+		}
+
 		requestHeader := c.GetReqHeaders()
 		isHtml := strings.Contains(requestHeader["Accept"][0], "text/html")
 

@@ -36,8 +36,7 @@ func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares
 	publicViewRoute.Get("/login", ctrl.LoginPage)
 	publicViewRoute.Post("/login", ctrl.SubmitLogin)
 
-	protectedViewRoute := router.Group("/users", custMiddleware.CheckJwt(), custMiddleware.CheckAccess("users"))
-	// protectedViewRoute := router.Group("/users", custMiddleware.CheckJwt())
+	protectedViewRoute := router.Group("/users", custMiddleware.CheckAccess("users"))
 	protectedViewRoute.Route("", func(userPage fiber.Router) {
 		userPage.Get("/", ctrl.ListUsersPage)
 		userPage.Get("/list", ctrl.GetUserList)
@@ -50,7 +49,7 @@ func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares
 	})
 
 	// users routes
-	r := router.Group("/api/users", custMiddleware.CheckJwt(), custMiddleware.CheckAccess("users"))
+	r := router.Group("/api/users", custMiddleware.CheckAccess("users"))
 	r.Get("/", GetAll)
 	r.Post("/", Create)
 	r.Patch("/", Update)

@@ -27,9 +27,9 @@ func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares
 	viewRoute.Get("/", ctrl.PasswordResetPage)
 	viewRoute.Get("/forgot", ctrl.SendResetEmailPage)
 	viewRoute.Post("/send", ctrl.SendResetEmail)
-	viewRoute.Patch("/", ctrl.ChangePassword, custMiddleware.CheckJwt())
+	viewRoute.Patch("/", ctrl.ChangePassword)
 
-	r := router.Group("/api/password-resets", custMiddleware.CheckJwt())
+	r := router.Group("/api/password-resets")
 	r.Get("/", GetAll)
 	r.Post("/", Create)
 	r.Patch("/", Update)

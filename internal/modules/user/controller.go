@@ -629,6 +629,7 @@ func (c *Controller) SubmitNew(ctx *fiber.Ctx) error {
 		}
 	}
 
+	*database.IgnrCols = append(*database.IgnrCols, "provider")
 	_, httpErr := c.service.Create(users)
 	if httpErr.Err != nil {
 		data["errMessage"] = httpErr.Err.Error()

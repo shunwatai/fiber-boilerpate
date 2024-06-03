@@ -14,8 +14,8 @@ func (cm *CustomMiddlewares) CheckAccess(resourceName string) fiber.Handler {
 	return (&permissioncheck.PermissionChecker{}).CheckAccess(resourceName)
 }
 
-func (cm *CustomMiddlewares) CheckJwt() fiber.Handler {
-	return (&jwtcheck.JwtChecker{}).CheckJwt()
+func (cm *CustomMiddlewares) CheckJwt(ignorePaths ...string) fiber.Handler {
+	return (&jwtcheck.JwtChecker{}).CheckJwt(ignorePaths...)
 }
 
 func (cm *CustomMiddlewares) Log() fiber.Handler {

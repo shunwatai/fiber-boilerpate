@@ -23,7 +23,7 @@ func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares
 	Srvc = NewService(Repo)
 	ctrl = NewController(Srvc)
 
-	protectedViewRoute := router.Group("/todos", custMiddleware.CheckJwt(), custMiddleware.CheckAccess("todos"))
+	protectedViewRoute := router.Group("/todos", custMiddleware.CheckAccess("todos"))
 	protectedViewRoute.Route("", func(todoPage fiber.Router) {
 		todoPage.Get("/", ctrl.ListTodosPage)
 		todoPage.Get("/list", ctrl.GetTodoList)
@@ -36,7 +36,7 @@ func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares
 		})
 	})
 
-	r := router.Group("/api/todos", custMiddleware.CheckJwt(), custMiddleware.CheckAccess("todos"))
+	r := router.Group("/api/todos", custMiddleware.CheckAccess("todos"))
 	r.Get("/", GetAll)
 	r.Post("/", Create)
 	r.Patch("/", Update)

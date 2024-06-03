@@ -90,7 +90,8 @@ func (r *Repository) Get(queries map[string]interface{}) ([]*groupUser.User, *he
 
 func (r *Repository) Create(users []*groupUser.User) ([]*groupUser.User, error) {
 	logger.Debugf("user repo create")
-	database.SetIgnoredCols("search")
+	*database.IgnrCols = append(*database.IgnrCols,"search")
+	database.SetIgnoredCols(*database.IgnrCols...)
 	defer database.SetIgnoredCols()
 	rows, err := r.db.Save(groupUser.Users(users))
 

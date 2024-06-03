@@ -89,7 +89,20 @@ func (f *Fiber) LoadAllRoutes() {
 	// initiate custom middleware
 	custMiddlewares := middleware.NewCustMiddlewares()
 
-	router := f.App.Group("", custMiddlewares.Log()) // add logging to all routes
+	skipJwtCheckRoutes := []string{
+		"/api/auth/login",
+		"/login",
+		"/home",
+		"/ping",
+		"/error",
+		"/password-resets",
+		"/password-resets/forgot",
+		"/password-resets/send",
+	}
+	router := f.App.Group("",
+		custMiddlewares.Log(),                           // add logging to all routes
+		custMiddlewares.CheckJwt(skipJwtCheckRoutes...), // add jwt check to all routes
+	)
 	sample.GetRoutes(router, custMiddlewares)        // sample routes for testing
 	user.GetRoutes(router, custMiddlewares, group.Repo)
 	group.GetRoutes(router, custMiddlewares, user.Repo)

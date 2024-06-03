@@ -17,7 +17,7 @@ func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares
 	Srvc = NewService()
 	ctrl = NewController(Srvc)
 
-	router.Get("/home", custMiddleware.CheckJwt(), ctrl.HomePage)
+	router.Get("/home", ctrl.HomePage)
 	router.Get("/error", ctrl.ErrorPage)
 	router.Get("/unauthorised", ctrl.UnauthorisedPage)
 }

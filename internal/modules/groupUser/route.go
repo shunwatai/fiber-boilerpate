@@ -25,7 +25,7 @@ func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares
 	Srvc = NewService(Repo)
 	ctrl = NewController(Srvc)
 
-	r := router.Group("/api/group-users", custMiddleware.CheckJwt())
+	r := router.Group("/api/group-users")
 	r.Get("/", GetAll)
 	r.Post("/", Create)
 	r.Patch("/", Update)
