@@ -43,17 +43,17 @@ func (lg *Log) GetId() string {
 	}
 }
 
-//func (lg *Log) GetUserId() string {
-//	if cfg.DbConf.Driver == "mongodb" {
-//		userId, ok := lg.UserId.(string)
-//		if !ok {
-//			return ""
-//		}
-//		return userId
-//	} else {
-//		return strconv.Itoa(int(lg.UserId.(int64)))
-//	}
-//}
+func (lg *Log) GetUserId() string {
+	if cfg.DbConf.Driver == "mongodb" {
+		userId, ok := lg.UserId.(string)
+		if !ok {
+			return ""
+		}
+		return userId
+	} else {
+		return strconv.Itoa(int(lg.UserId.(int64)))
+	}
+}
 
 func (lgs Logs) StructToMap() []map[string]interface{} {
 	mapsResults := []map[string]interface{}{}

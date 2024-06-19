@@ -66,3 +66,9 @@ notification:
 #redis:
 #  host: "localhost"
 #  port: "6379"
+
+rbmq:
+  host: "rabbitmq-dev"
+  port: "5672"
+  user: "user"
+  pass: "password"

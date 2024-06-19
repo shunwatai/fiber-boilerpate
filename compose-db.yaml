@@ -56,10 +56,23 @@ services:
     networks:
       - api
 
+  # this section is not related to db, but just put the redis & rabbitmq etc. here
+  rabbitmq-dev:
+    image: rabbitmq:3-management-alpine
+    restart: always
+    env_file:
+      - ./db.env
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq-data-dev:/var/lib/rabbitmq/
+
 volumes:
   pg-data-dev:
   mariadb-data-dev:
   mongo-data-dev:
+  rabbitmq-data-dev:
 
 networks:
   api:

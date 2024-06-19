@@ -43,6 +43,13 @@ type MongodbConf struct {
 	Database *string
 }
 
+type RabbitMqConf struct {
+	Host *string
+	Port *string
+	User *string
+	Pass *string
+}
+
 type DbConf struct {
 	Driver       string `mapstructure:"engine"`
 	SqliteConf   `mapstructure:"sqlite"`
@@ -103,6 +110,7 @@ type Config struct {
 	*Logging      `mapstructure:"logging"`
 	*OAuth        `mapstructure:"oauth"`
 	*Notification `mapstructure:"notification"`
+	*RabbitMqConf `mapstructure:"rbmq"`
 	Vpr           *viper.Viper
 }
 

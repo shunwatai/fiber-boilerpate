@@ -20,4 +20,5 @@ func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares
 	router.Get("/ping", ctrl.Ping)
 	router.Get("/hallo", ctrl.HalloPage)
 	router.Post("/test-email", ctrl.SendEmail)
+	router.Post("/test-rbmq", ctrl.SendToQueue)
 }
