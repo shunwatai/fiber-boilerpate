@@ -147,10 +147,7 @@ func (m *MariaDb) constructSelectStmtFromQuerystring(
 		limit = strconv.Itoa(int(pagination.Items))
 	}
 
-	selectStmt = fmt.Sprintf(`%s 
-			ORDER BY "%s" %s
-			LIMIT %s OFFSET %s
-		`,
+	selectStmt = fmt.Sprintf("%s ORDER BY `%s` %s LIMIT %s OFFSET %s",
 		selectStmt,
 		pagination.OrderBy["key"], pagination.OrderBy["by"],
 		limit, offset,

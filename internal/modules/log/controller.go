@@ -2,8 +2,13 @@ package log
 
 import (
 	"errors"
+	"fmt"
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
+	"golang-api-starter/internal/helper/utils"
+	"golang-api-starter/internal/modules/user"
+	"html/template"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -233,4 +238,119 @@ func (c *Controller) Delete(ctx *fiber.Ctx) error {
 		respCode,
 		map[string]interface{}{"data": results},
 	)
+}
+
+/* view controllers start here */
+func (c *Controller) ListLogsPage(ctx *fiber.Ctx) error {
+	user.Srvc.SetCtx(ctx)
+	username := user.Srvc.GetLoggedInUsername()
+	// data for template
+	data := fiber.Map{
+		"errMessage": nil,
+		"showNavbar": true,
+		"title":      "Logs",
+		"logs":       Logs{},
+		"pagination": helper.Pagination{},
+		"logname":    username,
+	}
+	tmplFiles := []string{
+		"web/template/parts/popup.gohtml",
+		"web/template/logs/list.gohtml",
+		"web/template/logs/index.gohtml",
+		"web/template/parts/navbar.gohtml",
+		"web/template/base.gohtml",
+	}
+	pagesFunc := helper.TmplCustomFuncs()
+	tpl := template.Must(template.New("").Funcs(pagesFunc).ParseFiles(tmplFiles...))
+
+	paramsMap := helper.GetQueryString(ctx.Request().URI().QueryString())
+	logs, pagination := c.service.Get(paramsMap)
+	logger.Debugf("logs?? %+v", logs)
+	data["logs"] = logs
+	data["pagination"] = pagination
+
+	fctx := &helper.FiberCtx{Fctx: ctx}
+	respCode = fiber.StatusOK
+
+	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
+}
+
+func (c *Controller) GetLogList(ctx *fiber.Ctx) error {
+	// data for template
+	data := fiber.Map{
+		"errMessage": nil,
+		"showNavbar": true,
+		"logs":       Logs{},
+		"pagination": helper.Pagination{},
+	}
+	tmplFiles := []string{"web/template/logs/list.gohtml"}
+	pagesFunc := helper.TmplCustomFuncs()
+	tpl := template.Must(template.New("").Funcs(pagesFunc).ParseFiles(tmplFiles...))
+	html := `{{ template "list" . }}`
+	tpl, _ = tpl.New("").Parse(html)
+
+	paramsMap := helper.GetQueryString(ctx.Request().URI().QueryString())
+	logs, pagination := c.service.Get(paramsMap)
+	data["logs"] = logs
+	data["pagination"] = pagination
+
+	fctx := &helper.FiberCtx{Fctx: ctx}
+	respCode = fiber.StatusOK
+
+	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	fctx.Fctx.Set("HX-Push-Url", fmt.Sprintf("/logs?%s", string(ctx.Request().URI().QueryString())))
+	return tpl.Execute(fctx.Fctx.Response().BodyWriter(), data)
+}
+
+func (c *Controller) LogDetailPage(ctx *fiber.Ctx) error {
+	user.Srvc.SetCtx(ctx)
+	username := user.Srvc.GetLoggedInUsername()
+	fctx := &helper.FiberCtx{Fctx: ctx}
+	// data for template
+	data := fiber.Map{
+		"errMessage": nil,
+		"showNavbar": true,
+		"log":        &Log{},
+		"title":      "Log detail",
+		"username":   username,
+	}
+	tmplFiles := []string{
+		"web/template/parts/popup.gohtml",
+		"web/template/logs/form.gohtml",
+		"web/template/parts/navbar.gohtml",
+		"web/template/base.gohtml",
+	}
+	pagesFunc := helper.TmplCustomFuncs()
+	tpl := template.Must(template.New("").Funcs(pagesFunc).ParseFiles(tmplFiles...))
+
+	paramsMap := helper.GetQueryString(ctx.Request().URI().QueryString())
+	lg := new(Log)
+	// logger.Debugf("log_id: %+v", paramsMap["log_id"])
+	logger.Debugf("log_id: %+v", paramsMap["log_id"])
+
+	if cfg.DbConf.Driver == "mongodb" {
+		logId := paramsMap["log_id"].(string)
+		lg.MongoId = &logId
+	} else {
+		logId, err := strconv.ParseInt(paramsMap["log_id"].(string), 10, 64)
+		if err != nil {
+			return nil
+		}
+
+		lg.Id = utils.ToPtr(helper.FlexInt(logId))
+
+		// get group by ID
+		logs, _ := c.service.Get(map[string]interface{}{"id": lg.GetId()})
+		if len(logs) == 0 {
+			logger.Errorf("something went wrong... failed to find log with id: %+v", lg.Id)
+			return nil
+		}
+
+		data["log"] = logs[0]
+	}
+
+	respCode = fiber.StatusOK
+	fctx.Fctx.Set(fiber.HeaderContentType, fiber.MIMETextHTML)
+	return tpl.ExecuteTemplate(fctx.Fctx.Response().BodyWriter(), "base.gohtml", data)
 }

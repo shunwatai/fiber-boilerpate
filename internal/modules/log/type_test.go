@@ -12,7 +12,7 @@ import (
 func TestGetId(t *testing.T) {
 	log := &Log{
 		MongoId: utils.ToPtr("xxxx-xxxx-xxxx-xxxx"),
-		Id:      utils.ToPtr(int64(2)),
+		Id:      utils.ToPtr(helper.FlexInt(2)),
 	}
 
 	tests := []struct {
@@ -52,7 +52,7 @@ func TestStructToMap(t *testing.T) {
 	logs := Logs{
 		&Log{
 			MongoId:   utils.ToPtr("xxxx-xxxx-xxxx-xxxx"),
-			Id:        &id,
+			Id:        utils.ToPtr(helper.FlexInt(id)),
 			CreatedAt: customDatetime,
 			UpdatedAt: customDatetime,
 		},
@@ -64,7 +64,7 @@ func TestStructToMap(t *testing.T) {
 		want  []map[string]interface{}
 	}{
 		{name: "test StructToMap", input: logs, want: []map[string]interface{}{
-			{"_id": "xxxx-xxxx-xxxx-xxxx", "id": float64(2), "created_at": timeJson, "updated_at": timeJson, "http_method": "", "duration": float64(0), "ip_address": "", "request_body": nil, "request_header": "", "response_body": nil, "route": "", "status": float64(0), "user_agent": "", "user_id": nil},
+			{"_id": "xxxx-xxxx-xxxx-xxxx", "id": float64(2), "created_at": timeJson, "updated_at": timeJson, "http_method": "", "duration": float64(0), "ip_address": "", "request_body": nil, "request_header": "", "response_body": nil, "route": "", "status": float64(0), "user_agent": "", "user_id": nil, "username": nil},
 		}},
 	}
 
@@ -92,7 +92,7 @@ func TestGetTags(t *testing.T) {
 	}{
 		{name: "test get db tags", input: "db", want: []string{"id", "user_id", "ip_address", "http_method", "route", "user_agent", "request_header", "request_body", "response_body", "status", "duration", "created_at", "updated_at"}},
 		{name: "test get bson tags", input: "bson", want: []string{"_id", "id", "user_id", "ip_address", "http_method", "route", "user_agent", "request_header", "request_body", "response_body", "status", "duration", "created_at", "updated_at"}},
-		{name: "test get json tags", input: "json", want: []string{"_id", "id", "userId", "ipAddress", "httpMethod", "route", "userAgent", "requestHeader", "requestBody", "responseBody", "status", "duration", "createdAt", "updatedAt"}},
+		{name: "test get json tags", input: "json", want: []string{"_id", "id", "userId", "username", "ipAddress", "httpMethod", "route", "userAgent", "requestHeader", "requestBody", "responseBody", "status", "duration", "createdAt", "updatedAt"}},
 	}
 
 	for _, testCase := range tests {

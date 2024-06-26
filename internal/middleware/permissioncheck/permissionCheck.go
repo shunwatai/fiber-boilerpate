@@ -37,7 +37,7 @@ func (pc *PermissionChecker) CheckAccess(resourceName string) fiber.Handler {
 		// get groupUsers by userId
 		groupUsers, _ := groupUser.Srvc.Get(map[string]interface{}{"user_id": userId})
 		if len(groupUsers) == 0 {
-			return fctx.ErrResponse(fiber.StatusUnauthorized, logger.Errorf("userId: %+v doesn't belong to any group", userId))
+			return fctx.ErrResponse(fiber.StatusForbidden, logger.Errorf("userId: %+v doesn't belong to any group", userId))
 		}
 
 		groupIds := []string{}
@@ -56,7 +56,7 @@ func (pc *PermissionChecker) CheckAccess(resourceName string) fiber.Handler {
 		})
 
 		if err := checkPermission(reqMethod, groupResourceAcls); err != nil {
-			return fctx.ErrResponse(fiber.StatusUnauthorized, fmt.Errorf("userId: %+v in groupId: %+v %+v to %+v", userId, groupIds, err.Error(), resourceName))
+			return fctx.ErrResponse(fiber.StatusForbidden, fmt.Errorf("userId: %+v in groupId: %+v %+v to %+v", userId, groupIds, err.Error(), resourceName))
 		}
 
 		return c.Next()

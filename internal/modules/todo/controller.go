@@ -167,7 +167,6 @@ func (c *Controller) Update(ctx *fiber.Ctx) error {
 				map[string]interface{}{"message": "please ensure all records with id for PATCH"},
 			)
 		}
-
 	}
 
 	results, httpErr := c.service.Update(todos)

@@ -44,6 +44,7 @@ func (r *Repository) Get(queries map[string]interface{}) ([]*Log, *helper.Pagina
 	}
 	// records.printValue()
 
+	records.setUsername()
 	//cascadeFields(records)
 
 	return records, pagination

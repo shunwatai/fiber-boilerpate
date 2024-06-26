@@ -262,7 +262,7 @@ The `cmd/gen/gen.go` is for generating new module without tedious copy & paste, 
 
 [Detail usage](cmd/gen/README.md)
 
-# API details
+# API & other module details
 ## Users
 [readme](internal/modules/user/README.md)
 
@@ -274,6 +274,9 @@ The `cmd/gen/gen.go` is for generating new module without tedious copy & paste, 
 
 ## Password reset
 [readme](internal/modules/passwordReset/README.md)
+
+## RabbitMQ
+[readme](internal/rabbitmq/README.md)
 
 # Run tests
 To disable cache when running tests, run with options: `-count=1`

@@ -1,0 +1,7 @@
+[
+  {
+    "delete": "resources",
+    "deletes": [{ "q": { "_id": { "$oid": "66753a14af69c843059548bb" } }, "limit": 0 }],
+    "writeConcern": { "w": "majority", "wtimeout": 5000 }
+  }
+]

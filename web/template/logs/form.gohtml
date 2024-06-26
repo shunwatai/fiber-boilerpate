@@ -1,0 +1,104 @@
+{{ define "title"}}<title>{{.title}}</title>{{ end }}
+      
+{{ define "content"}}
+  {{ template "popup" . }}
+
+  <!-- log: {{.log}} -->
+
+  <div class="m-2">
+    <div class="flex mb-2 gap-2">
+      <form 
+        id="log-form"
+        class="flex flex-col w-full md:w-1/3 mx-auto gap-4 p-2 w-[28vw]"
+        {{if eq .log nil}}hx-post{{else}}hx-patch{{end}}="/logs"
+        hx-ext="json-enc"
+        hx-target-5*="#popupMessage"
+        hx-target-4*="#popupMessage"
+        hx-indicator="#spinner"
+        hx-disabled-elt="input, button"
+      >
+        {{if ne .log nil}}
+          <input name="{{GetIdKeyName}}" type="hidden" value="{{GetId .log.MongoId .log.Id}}" />
+        {{end}}
+
+        <label for="ipAddress" class="block font-medium text-slate-700 mr-auto my-auto">IP</label>
+        <input name="ipAddress" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" value="{{if ne .log nil}}{{.log.IpAddress}}{{end}}" readonly />
+
+        <label for="httpMethod" class="block font-medium text-slate-700 mr-auto my-auto">HttpMethod</label>
+        <input name="httpMethod" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" value="{{if and (ne .log nil) (ne .log nil)}}{{.log.HttpMethod}}{{end}}" readonly />
+
+        <label for="route" class="block font-medium text-slate-700 mr-auto my-auto">Route</label>
+        <input name="route" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" value="{{if and (ne .log nil) (ne .log nil)}}{{.log.Route}}{{end}}" readonly />
+
+        <label for="status" class="block font-medium text-slate-700 mr-auto my-auto">Status</label>
+        <input name="status" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" value="{{if and (ne .log nil) (ne .log nil)}}{{.log.Status}}{{end}}" readonly />
+
+        <label for="duration" class="block font-medium text-slate-700 mr-auto my-auto">Duration(ms)</label>
+        <input name="duration" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" value="{{if and (ne .log nil) (ne .log nil)}}{{.log.Status}}{{end}}" readonly />
+
+        <label for="createdAt" class="block font-medium text-slate-700 mr-auto my-auto">Timestamp</label>
+        <input name="createdAt" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" value="{{if and (ne .log nil) (ne .log nil)}}{{.log.CreatedAt}}{{end}}" readonly />
+
+        <label for="userAgent" class="block font-medium text-slate-700 mr-auto my-auto">User Agent</label>
+        <input name="userAgent" class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block rounded-md sm:text-sm focus:ring-1" value="{{if and (ne .log nil) (ne .log nil)}}{{.log.UserAgent}}{{end}}" readonly />
+
+        <label for="requestBody" class="block font-medium text-slate-700 mr-auto my-auto">Request Body</label>
+        <pre id="requestBody" class="relative w-full rounded-md bg-gray-800 text-slate-100 p-2 text-xs overflow-auto whitespace-pre-wrap break-words"><button onclick="copyToClipboard('requestBody')" class="absolute right-0 copyBtn mr-4 p-1 rounded-md border border-slate-300" type="button"><span class="bx bx-copy"></span></button></pre>
+
+        <label for="responseBody" class="block font-medium text-slate-700 mr-auto my-auto">Response Body</label>
+        <pre id="responseBody" class="relative w-full rounded-md bg-gray-800 text-slate-100 p-2 text-xs overflow-auto whitespace-pre-wrap break-words"><button onclick="copyToClipboard('responseBody')" class="absolute right-0 copyBtn mr-4 p-1 rounded-md border border-slate-300" type="button"><span class="bx bx-copy"></span></button></pre>
+      </form>
+    </div>
+  </div>
+  <script>
+    function syntaxHighlight(json) {
+      json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        let cls = 'text-emerald-400'; // number
+        if (/^"/.test(match)) {
+          if (/:$/.test(match)) {
+            cls = 'text-pink-400'; // key
+          } else {
+            cls = 'text-sky-400'; // string
+          }
+        } else if (/true|false/.test(match)) {
+          cls = 'text-purple-400'; // boolean
+        } else if (/null/.test(match)) {
+          cls = 'text-cyan-400'; // null
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+      });
+    }
+
+    function displayJson(eleId,rawJson){
+      const ele = document.getElementById(eleId);
+      if (!rawJson){
+        //ele.innerHTML = "";
+        const copyBtn = ele.getElementsByClassName("copyBtn")[0];
+        copyBtn.classList.add("hidden");
+        return
+      }
+      const obj = JSON.parse(rawJson);
+      const str = syntaxHighlight(JSON.stringify(obj, undefined, 2));
+      ele.classList.add("h-fit");
+      ele.classList.add("max-h-60");
+      ele.innerHTML += str;
+    }
+
+    displayJson("requestBody", {{if .log.RequestBody}}{{.log.RequestBody}}{{else}}""{{end}});
+    displayJson("responseBody", {{if .log.ResponseBody}}{{.log.ResponseBody}}{{else}}""{{end}});
+
+    // ref: https://stackoverflow.com/a/49110531
+    function copyToClipboard(eleId) {
+      const copyText = document.getElementById(eleId).textContent;
+      const textArea = document.createElement('textarea');
+      textArea.textContent = copyText;
+      document.body.append(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      textArea.remove();
+    } 
+  </script>
+{{end}}
+
+{{ define "footer" }}<div></div>{{ end }}

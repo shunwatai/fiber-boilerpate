@@ -23,6 +23,16 @@ func GetRoutes(router fiber.Router, custMiddleware interfaces.ICustomMiddlewares
 	Srvc = NewService(Repo)
 	ctrl = NewController(Srvc)
 
+	protectedViewRoute := router.Group("/logs", custMiddleware.CheckAccess("logs"))
+	protectedViewRoute.Route("", func(logPage fiber.Router) {
+		logPage.Get("/", ctrl.ListLogsPage)
+		logPage.Get("/list", ctrl.GetLogList)
+
+		logPage.Route("/form", func(logForm fiber.Router) {
+			logForm.Get("/", ctrl.LogDetailPage)
+		})
+	})
+
 	r := router.Group("/api/logs")
 	r.Get("/", GetAll)
 	// r.Post("/", Create)

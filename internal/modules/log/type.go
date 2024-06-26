@@ -5,6 +5,8 @@ import (
 	"golang-api-starter/internal/database"
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
+	"golang-api-starter/internal/modules/groupUser"
+	"golang-api-starter/internal/modules/user"
 	"slices"
 
 	//"golang-api-starter/internal/modules/user"
@@ -18,8 +20,9 @@ import (
 
 type Log struct {
 	MongoId       *string                `json:"_id,omitempty" bson:"_id,omitempty" validate:"omitempty,id_custom_validation"`
-	Id            *int64                 `json:"id" db:"id" bson:"id,omitempty" example:"2" validate:"omitempty,id_custom_validation"`
+	Id            *helper.FlexInt        `json:"id" db:"id" bson:"id,omitempty" example:"2" validate:"omitempty,id_custom_validation"`
 	UserId        interface{}            `json:"userId" db:"user_id" bson:"user_id" example:"1"`
+	Username      *string                `json:"username"`
 	IpAddress     string                 `json:"ipAddress" db:"ip_address" bson:"ip_address" example:"29.23.43.23"`
 	HttpMethod    string                 `json:"httpMethod" db:"http_method" bson:"http_method" example:"GET"`
 	Route         string                 `json:"route" db:"route" bson:"route" example:"/api/users"`
@@ -140,4 +143,41 @@ func (lg Log) getTags(key ...string) []string {
 		}
 	}
 	return cols
+}
+
+func (logs Logs) setUsername(){
+	var (
+		userIds []string
+		userId  string
+	)
+	// get all userIds
+	for _, log := range logs {
+		if log.UserId == nil {
+			continue
+		}
+
+		userId = log.GetUserId()
+		userIds = append(userIds, userId)
+	}
+
+	// if no userIds, do nothing and return
+	if len(userIds) > 0 {
+		users := []*groupUser.User{}
+
+		// get users by userIds
+		condition := database.GetIdsMapCondition(nil, userIds)
+		users, _ = user.Srvc.Get(condition)
+		// get the map[userId]user
+		userMap := user.Repo.GetIdMap(users)
+
+		for _, log := range logs {
+			if log.UserId == nil {
+				continue
+			}
+			user := &groupUser.User{}
+			// take out the user by userId in map and assign
+			user = userMap[log.GetUserId()]
+			log.Username = &user.Name
+		}
+	}
 }

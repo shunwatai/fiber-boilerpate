@@ -66,7 +66,7 @@ func TestUserStructToMap(t *testing.T) {
 		want  []map[string]interface{}
 	}{
 		{name: "test StructToMap", input: users, want: []map[string]interface{}{
-			{"_id": "xxxx-xxxx-xxxx-xxxx", "id": float64(2), "created_at": timeJson, "updated_at": timeJson, "first_name": "first", "last_name": "last", "disabled": false, "name": "", "is_oauth": false,"groups":nil,"provider":nil},
+			{"_id": "xxxx-xxxx-xxxx-xxxx", "id": float64(2), "created_at": timeJson, "updated_at": timeJson, "first_name": "first", "last_name": "last", "disabled": false, "name": "", "is_oauth": false,"groups":nil},
 		}},
 	}
 

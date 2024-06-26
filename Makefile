@@ -47,6 +47,9 @@ migrate-up:
 migrate-down: 
 	go run main.go migrate-down $(filter-out $@,$(MAKECMDGOALS))
 
+rbmq-worker: 
+	go run main.go run-rbmq-worker
+
 tw-watch:
 	npx tailwindcss -i ./web/static/css/input.css -o ./web/static/css/output.css --watch
 
