@@ -7,6 +7,8 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // ToPtr uses to return the pointer of the value without using one more line to declare a variable
@@ -35,10 +37,20 @@ func RootDir(level int) string {
 // GetRandString generate random string by given length
 // ref: https://gist.github.com/arxdsilva/8caeca47b126a290c4562a25464895e8
 func GetRandString(length int) string {
-	if length < 1{
+	if length < 1 {
 		length = 1
 	}
 	b := make([]byte, length)
 	rand.Read(b)
 	return fmt.Sprintf("%x", b)
+}
+
+// HashPassword hash the given plain string by bcrypt
+func HashPassword(pwd string) string {
+	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.MinCost)
+	if err != nil {
+		fmt.Printf("failed to bcrypt.GenerateFromPassword, err: %+v", err)
+	}
+
+	return string(hash)
 }

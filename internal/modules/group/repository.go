@@ -4,8 +4,6 @@ import (
 	"golang-api-starter/internal/database"
 	"golang-api-starter/internal/helper"
 	logger "golang-api-starter/internal/helper/logger/zap_log"
-	"golang-api-starter/internal/helper/utils"
-	"golang-api-starter/internal/modules/groupResourceAcl"
 	"golang-api-starter/internal/modules/groupUser"
 
 	"golang.org/x/exp/maps"
@@ -30,52 +28,8 @@ func (r *Repository) GetIdMap(groups groupUser.Groups) map[string]*groupUser.Gro
 
 // cascadeFields for joining other module, see the example in internal/modules/todo/repository.go
 func cascadeFields(groups groupUser.Groups) {
-	if len(groups) == 0 {
-		return
-	}
-
-	var groupIds []string
-	// get all gruopId
-	for _, group := range groups {
-		groupId := group.GetId()
-		groupIds = append(groupIds, groupId)
-	}
-
-	condition := database.GetIdsMapCondition(utils.ToPtr("group_id"), groupIds)
-
-	// get groupUsers by groupId
-	groupUsers, _ := groupUser.Repo.Get(condition)
-	groupUsersMap := groupUser.Repo.GetGroupIdMap(groupUsers)
-
-	// get groupResourceAcls by groupId
-	groupResourceAcls, _ := groupResourceAcl.Repo.Get(condition)
-	groupAclsMap := groupResourceAcl.Repo.GetGroupIdMap(groupResourceAcls)
-
-	// map users & permission into group
-	for _, group := range groups {
-		// if no users, assign empty slice for response json "users": [] instead of "users": null
-		group.Users = []*groupUser.User{}
-		// take out the groupUsers by groupId in map and assign
-		gus, haveUsers := groupUsersMap[group.GetId()]
-
-		if haveUsers {
-			for _, gu := range gus {
-				gu.User.Groups = nil
-				group.Users = append(group.Users, gu.User)
-			}
-		}
-
-		// if no permissions, assign empty slice for response json "permissions": [] instead of "permissions": null
-		group.Permissions = []*groupResourceAcl.GroupResourceAcl{}
-		// take out the groupUsers by groupId in map and assign
-		gas, haveAcls := groupAclsMap[group.GetId()]
-
-		if haveAcls {
-			for _, ga := range gas {
-				group.Permissions = append(group.Permissions, ga)
-			}
-		}
-	}
+	groups.SetUsers()
+	groups.SetPermissions()
 }
 
 func (r *Repository) Get(queries map[string]interface{}) ([]*groupUser.Group, *helper.Pagination) {

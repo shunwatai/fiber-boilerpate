@@ -5,6 +5,7 @@ import (
 	"golang-api-starter/internal/database"
 	"golang-api-starter/internal/helper"
 	"golang-api-starter/internal/helper/logger/zap_log"
+	"golang-api-starter/internal/helper/utils"
 	"golang-api-starter/internal/modules/groupUser"
 	"golang-api-starter/internal/modules/user"
 	"slices"
@@ -145,7 +146,7 @@ func (lg Log) getTags(key ...string) []string {
 	return cols
 }
 
-func (logs Logs) setUsername(){
+func (logs Logs) setUsername() {
 	var (
 		userIds []string
 		userId  string
@@ -174,10 +175,14 @@ func (logs Logs) setUsername(){
 			if log.UserId == nil {
 				continue
 			}
-			user := &groupUser.User{}
+
 			// take out the user by userId in map and assign
-			user = userMap[log.GetUserId()]
-			log.Username = &user.Name
+			user, ok := userMap[log.GetUserId()]
+			if !ok {
+				log.Username = utils.ToPtr("unknown user")
+			} else {
+				log.Username = &user.Name
+			}
 		}
 	}
 }

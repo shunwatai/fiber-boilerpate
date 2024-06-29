@@ -227,7 +227,8 @@ func (m *Postgres) Save(records Records) (Rows, error) {
 			colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=COALESCE(EXCLUDED.%s, %s.%s)", col, col, m.TableName, col))
 			continue
 		}
-		colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=COALESCE(EXCLUDED.%s, %s.%s)", col, col, m.TableName, col))
+		// colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=COALESCE(EXCLUDED.%s, %s.%s)", col, col, m.TableName, col))
+		colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=EXCLUDED.%s", col, col))
 	}
 
 	insertStmt := fmt.Sprintf(

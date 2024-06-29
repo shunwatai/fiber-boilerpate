@@ -104,3 +104,15 @@ func (c *FiberCtx) ParseJsonToStruct(single interface{}, plural interface{}) (er
 
 	return singleErr, allFailed
 }
+
+type Optional[T any] struct {
+	Presented bool
+	Value     *T
+}
+
+// UnmarshalJSON is implemented by deferring to the wrapped type (T).
+// It will be called only if the value is defined in the JSON payload.
+func (o *Optional[T]) UnmarshalJSON(data []byte) error {
+	o.Presented = true
+	return json.Unmarshal(data, &o.Value)
+}

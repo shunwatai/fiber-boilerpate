@@ -248,8 +248,8 @@ func (m *Sqlite) Save(records Records) (Rows, error) {
 			colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=IFNULL(excluded.%s, CURRENT_TIMESTAMP)", col, col))
 			continue
 		}
-		// colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=excluded.%s", col, col))
-		colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=IFNULL(excluded.%s, %s.%s)", col, col, m.TableName, col))
+		// colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=IFNULL(excluded.%s, %s.%s)", col, col, m.TableName, col))
+		colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=excluded.%s", col, col))
 	}
 
 	insertStmt := fmt.Sprintf(

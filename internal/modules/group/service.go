@@ -78,6 +78,8 @@ func (s *Service) GetById(queries map[string]interface{}) ([]*groupUser.Group, e
 	if len(records) == 0 {
 		return nil, fmt.Errorf("%s with id: %s not found", tableName, queries["id"])
 	}
+	cascadeFields(records)
+
 	return records, nil
 }
 
@@ -111,6 +113,8 @@ func (s *Service) Update(groups []*groupUser.Group) ([]*groupUser.Group, *helper
 		}
 	}
 	results, err := s.repo.Update(groups)
+
+	cascadeFields(results)
 	return results, &helper.HttpErr{fiber.StatusInternalServerError, err}
 }
 

@@ -229,8 +229,8 @@ func (m *MariaDb) Save(records Records) (Rows, error) {
 			colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=IFNULL(VALUES(%s), CURRENT_TIMESTAMP)", col, col))
 			continue
 		}
-		// colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=VALUES(%s)", col, col))
-		colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=IFNULL(VALUES(%s), %s.%s)", col, col, m.TableName, col))
+		// colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=IFNULL(VALUES(%s), %s.%s)", col, col, m.TableName, col))
+		colUpdateSet = append(colUpdateSet, fmt.Sprintf("%s=VALUES(%s)", col, col))
 	}
 
 	insertStmt := fmt.Sprintf(
@@ -248,8 +248,7 @@ func (m *MariaDb) Save(records Records) (Rows, error) {
 	insertedIds := []string{}
 	sqlResult, err := m.db.NamedQuery(insertStmt, records)
 	if err != nil {
-		logger.Errorf("insert error: %+v", err)
-		return nil, err
+		return nil, logger.Errorf("insert error: %+v", err)
 	}
 	// logger.Debugf("sqlResult: %+v", sqlResult)
 
@@ -263,7 +262,7 @@ func (m *MariaDb) Save(records Records) (Rows, error) {
 		insertedIds = append(insertedIds, id)
 	}
 	if len(insertedIds) == 0 { // mariadb no error throw when violated foreign key... so check the error here
-		return nil, fmt.Errorf("insert error...")
+		return nil, logger.Errorf("insert error...")
 	}
 
 	logger.Debugf("insertedIds: %+v", insertedIds)

@@ -5,6 +5,7 @@ import (
 	"golang-api-starter/internal/database"
 	"golang-api-starter/internal/helper"
 	logger "golang-api-starter/internal/helper/logger/zap_log"
+	"golang-api-starter/internal/helper/utils"
 	"golang-api-starter/internal/modules/groupResourceAcl"
 	"log"
 	"reflect"
@@ -121,4 +122,58 @@ func (g Group) getTags(key ...string) []string {
 		}
 	}
 	return cols
+}
+
+func (groups Groups) SetUsers() {
+	if len(groups) == 0 {
+		return
+	}
+
+	groupIds := make([]string, 0, len(groups))
+	for _, group := range groups {
+		groupIds = append(groupIds, group.GetId())
+	}
+
+	condition := database.GetIdsMapCondition(utils.ToPtr("group_id"), groupIds)
+	groupUsers, _ := Repo.Get(condition)
+
+	groupUsersMap := Repo.GetGroupIdMap(groupUsers)
+
+	// map users into group
+	for _, group := range groups {
+		// if no users, assign empty slice for response json "users": [] instead of "users": null
+		group.Users = make([]*User, 0)
+		// take out the groupUsers by groupId in map and assign
+		if gus, haveUsers := groupUsersMap[group.GetId()]; haveUsers {
+			for _, gu := range gus {
+				gu.User.Groups = nil
+				group.Users = append(group.Users, gu.User)
+			}
+		}
+	}
+}
+
+func (groups Groups) SetPermissions() {
+	if len(groups) == 0 {
+		return
+	}
+
+	groupIds := make([]string, 0, len(groups))
+	for _, group := range groups {
+		groupIds = append(groupIds, group.GetId())
+	}
+
+	condition := database.GetIdsMapCondition(utils.ToPtr("group_id"), groupIds)
+	groupResourceAcls, _ := groupResourceAcl.Repo.Get(condition)
+	groupAclsMap := groupResourceAcl.Repo.GetGroupIdMap(groupResourceAcls)
+
+	// map permission into group
+	for _, group := range groups {
+		// if no permissions, assign empty slice for response json "permissions": [] instead of "permissions": null
+		group.Permissions = make([]*groupResourceAcl.GroupResourceAcl, 0)
+		// take out the groupUsers by groupId in map and assign
+		if gas, haveAcls := groupAclsMap[group.GetId()]; haveAcls {
+			group.Permissions = append(group.Permissions, gas...)
+		}
+	}
 }
